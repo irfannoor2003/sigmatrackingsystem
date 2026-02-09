@@ -3,11 +3,9 @@
 @section('title','All Salesmen Visits Report')
 
 @section('content')
-
 <style>
     input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Makes the calendar icon white */
-    cursor: pointer;
+    filter: invert(1); /* Changes a black icon to white */
 }
 </style>
 
@@ -150,7 +148,7 @@
                         <td class="p-2 text-white/90">{{ $v->customer->name }}</td>
 
                         <td class="p-2 text-white/90">
-                            <a href="{{ route('admin.reports.show', $v->id) }}"
+                            <a href="{{ route('salehead.visits.show', $v->id) }}"
                                class="text-indigo-300 hover:underline flex items-center">
                                 <i data-lucide="link" class="w-3 h-3 mr-1"></i> {{ $v->purpose }}
                             </a>
@@ -205,7 +203,7 @@
 
                 <div class="bg-white/5 p-3 rounded-xl">
                     <div class="text-white/60 text-xs flex items-center"><i data-lucide="target" class="w-4 h-4 mr-2"></i> Purpose</div>
-                    <a href="{{ route('admin.reports.show', $v->id) }}"
+                    <a href="{{ route('salehead.visits.show', $v->id) }}"
                        class="text-indigo-300 text-sm flex items-center">
                        <i data-lucide="link" class="w-3 h-3 mr-1"></i> {{ $v->purpose }}
                     </a>

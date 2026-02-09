@@ -13,7 +13,7 @@
     </h2>
 
     {{-- Form --}}
-    <form method="POST" action="{{ route('admin.staff.update', $staff->id) }}">
+    <form method="POST" action="{{ route('hr.staff.update', $staff->id) }}">
         @csrf
         @method('PUT')
 

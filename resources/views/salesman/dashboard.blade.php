@@ -12,12 +12,13 @@
     </h1>
 
     <!-- ✅ Holiday Banner -->
-    @if($todayHoliday)
-        <div class="bg-red-500/20 text-red-400 p-4 rounded mb-6 text-center font-semibold">
-            📢 Today ({{ \Carbon\Carbon::parse($todayHoliday->date)->format('F d, Y') }}) is a company holiday:
-            <span class="font-bold">{{ $todayHoliday->title }}</span>
-        </div>
-    @endif
+   @if($isNonWorkingDay)
+    <div class="bg-purple-500/10 border border-purple-500/30 text-purple-300 p-4 rounded mb-6 text-center font-semibold">
+        📢 Today is a non-working day:
+        <span class="font-bold">{{ $nonWorkingReason }}</span>
+    </div>
+@endif
+
 
     <!-- Welcome Card -->
     <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg flex items-center gap-4">
@@ -57,10 +58,12 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
 
         <!-- Add Customer -->
-        <a href="{{ $todayHoliday ? '#' : route('salesman.customers.create') }}"
-           @if($todayHoliday) class="opacity-50 cursor-not-allowed" @endif
-           class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6 hover:bg-white/20 transition border-l-4"
-           style="border-left-color:#ff2ba6;">
+        <a href="{{ $isNonWorkingDay ? '#' : route('salesman.customers.create') }}"
+   class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6
+          {{ $isNonWorkingDay ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-white/20' }}
+          transition border-l-4"
+   style="border-left-color:#ff2ba6;">
+
             <div class="flex items-center gap-3">
                 <i data-lucide="user-plus" class="w-7 h-7 text-pink-500"></i>
                 <h3 class="text-xl font-semibold text-magenta-300">Add Customer</h3>
@@ -69,10 +72,12 @@
         </a>
 
         <!-- Add Visit -->
-        <a href="{{ $todayHoliday ? '#' : route('salesman.visits.create') }}"
-           @if($todayHoliday) class="opacity-50 cursor-not-allowed" @endif
-           class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6 hover:bg-white/20 transition border-l-4"
-           style="border-left-color:#ff2ba6;">
+        <a href="{{ $isNonWorkingDay ? '#' : route('salesman.visits.create') }}"
+   class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6
+          {{ $isNonWorkingDay ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-white/20' }}
+          transition border-l-4"
+   style="border-left-color:#ff2ba6;">
+
             <div class="flex items-center gap-3">
                 <i data-lucide="map-pin" class="w-7 h-7 text-pink-500"></i>
                 <h3 class="text-xl font-semibold text-magenta-300">Add Visit</h3>
@@ -81,10 +86,12 @@
         </a>
 
         <!-- My Visits -->
-        <a href="{{ $todayHoliday ? '#' : route('salesman.visits.index') }}"
-           @if($todayHoliday) class="opacity-50 cursor-not-allowed" @endif
-           class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6 hover:bg-white/20 transition border-l-4"
-           style="border-left-color:#ff2ba6;">
+        <a href="{{ $isNonWorkingDay ? '#' : route('salesman.visits.index') }}"
+   class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6
+          {{ $isNonWorkingDay ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-white/20' }}
+          transition border-l-4"
+   style="border-left-color:#ff2ba6;">
+
             <div class="flex items-center gap-3">
                 <i data-lucide="clipboard" class="w-7 h-7 text-pink-500"></i>
                 <h3 class="text-xl font-semibold text-magenta-300">My Visits</h3>

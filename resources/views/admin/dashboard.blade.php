@@ -11,7 +11,15 @@
     use App\Models\Customer;
 
     // TOTAL STAFF (exclude admin)
-    $totalStaff = User::whereIn('role', ['salesman','it','account','store','office_boy'])->count();
+    $totalStaff = User::whereIn('role', [
+    'salesman',
+    'it',
+    'account',
+    'store',
+    'office_boy',
+
+])->count();
+
 
     // TODAY WORKING STAFF
     $todayWorkingStaff = Attendance::whereDate('date', now()->toDateString())
@@ -27,16 +35,23 @@
         <i data-lucide="briefcase" class="w-8 h-8 text-cyan-400 absolute top-4 right-4"></i>
         <h3 class="text-sm font-medium text-white/80">Total Staff</h3>
         <p class="text-4xl font-extrabold text-white mt-2">{{ $totalStaff }}</p>
-        <span class="text-xs text-white/60 mt-2 inline-block">Sales · IT · Accounts · Store · Office_boy</span>
+        <span class="text-xs text-white/60 mt-2 inline-block">Sales · IT · Accounts · Store · Office_boy </span>
     </div>
 
-    <!-- Staff Working Today -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-        <i data-lucide="check-circle" class="w-8 h-8 text-green-400 absolute top-4 right-4"></i>
-        <h3 class="text-sm font-medium text-white/80">Working Today</h3>
-        <p class="text-4xl font-extrabold text-white mt-2">{{ $todayWorkingStaff }}</p>
-        <span class="text-xs text-white/60 mt-2 inline-block">Marked present today</span>
-    </div>
+   <!-- Staff Working Today -->
+<div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
+    <i data-lucide="check-circle" class="w-8 h-8 text-green-400 absolute top-4 right-4"></i>
+    <h3 class="text-sm font-medium text-white/80">Working Today</h3>
+    <p class="text-4xl font-extrabold text-white mt-2">{{ $todayWorkingStaff }}</p>
+    <span class="text-xs text-white/60 mt-2 inline-block">Marked present today</span>
+
+    <!-- See Details Link -->
+    <a href="{{ route('admin.attendance.today') }}"
+       class="mt-4 inline-block text-xs text-white/80 underline hover:text-white">
+        See Details
+    </a>
+</div>
+
 
     <!-- Salesmen -->
     <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">

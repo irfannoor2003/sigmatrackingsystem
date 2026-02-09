@@ -1,11 +1,8 @@
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Clock-In Reminder</title>
+    <title>Auto Clock-Out Notice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -52,7 +49,7 @@
                             font-size:12px;
                             opacity:0.9;
                         ">
-                            Attendance Reminder
+                            Attendance Notification
                         </p>
                     </td>
                 </tr>
@@ -66,7 +63,7 @@
                             color:#111827;
                             font-size:18px;
                         ">
-                            ⏰ Clock-In Reminder
+                            ⏰ Auto Clock-Out Notice
                         </h2>
 
                         <p style="
@@ -74,7 +71,7 @@
                             line-height:1.65;
                             color:#374151;
                         ">
-                            Hello <strong>{{ $user->name }}</strong>,
+                            Hello <strong>{{ $attendance->user->name }}</strong>,
                         </p>
 
                         <p style="
@@ -82,16 +79,35 @@
                             line-height:1.65;
                             color:#374151;
                         ">
-                            This is a gentle reminder to <strong>clock in</strong> for today.
-                            Please ensure your attendance is marked on time.
+                            You were <strong>automatically clocked out</strong> at
+                            <strong>8:00 PM</strong> because no manual clock-out
+                            was recorded for today.
                         </p>
 
+                        <!-- Info Box -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="
+                            margin-top:16px;
+                            background:#fdf2f8;
+                            border:1px solid #fbcfe8;
+                            border-radius:10px;
+                        ">
+                            <tr>
+                                <td style="padding:14px;font-size:13px;color:#374151;">
+                                    <strong>Date:</strong> {{ $attendance->date }} <br>
+                                    <strong>Clock In:</strong> {{ $attendance->clock_in }} <br>
+                                    <strong>Clock Out:</strong> 8:00 PM (Auto)
+                                </td>
+                            </tr>
+                        </table>
+
                         <p style="
+                            margin-top:16px;
                             font-size:14px;
                             line-height:1.65;
                             color:#374151;
                         ">
-                            If you are on leave, kindly inform the HR department.
+                            If this auto clock-out is incorrect, please contact
+                            the HR department for correction.
                         </p>
 
                         <!-- Divider -->

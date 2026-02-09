@@ -11,11 +11,9 @@
             opacity: 0.9;
             cursor: pointer;
         }
-        input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Makes the calendar icon white */
-    cursor: pointer;
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Changes a black icon to white */
 }
-
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
@@ -37,14 +35,16 @@
 
         {{-- HEADER --}}
         <div class="relative glass p-8 rounded-2xl border border-white/20 shadow-2xl mb-8 overflow-hidden">
-    <!-- Decorative blurred circle -->
-    <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400/20 blur-3xl rounded-full hidden lg:block"></div>
+
+    <!-- Decorative blur (desktop only) -->
+    <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400/20 blur-3xl rounded-full hidden md:block"></div>
 
     <div class="relative flex flex-col lg:flex-row lg:items-center gap-4">
 
         <div class="bg-white/10 p-3 rounded-2xl">
             <i data-lucide="clipboard-list" class="w-8 h-8 text-[#ff2ba6]"></i>
         </div>
+
 
                 <div>
                     <h2 class="text-3xl font-extrabold text-white">Attendance Reports</h2>
@@ -55,7 +55,7 @@
 
                 <div class="flex flex-col sm:flex-row gap-3 lg:ml-auto w-full lg:w-auto">
 
-                    @if (auth()->user()->role === 'admin')
+                    @if (auth()->user()->role === 'hr')
                         <button onclick="openHolidayModal()"
                             class="w-full sm:w-auto sm:ml-auto
 flex items-center justify-center gap-2
@@ -68,7 +68,7 @@ text-white font-bold shadow-xl
                             Mark Holiday
                         </button>
                     @endif
-                    <a href="{{ route('admin.attendance.export.all', ['month' => $monthInput]) }}"
+                    <a href="{{ route('hr.attendance.export.all', ['month' => $monthInput]) }}"
                         class="inline-flex items-center justify-center px-5 py-3 rounded-2xl
        bg-green-600 hover:bg-green-700
        text-white font-semibold text-sm shadow"
@@ -80,7 +80,7 @@ text-white font-bold shadow-xl
         </div>
 
         {{-- FILTERS --}}
-        <form method="GET" action="{{ route('admin.attendance.index') }}"
+        <form method="GET" action="{{ route('hr.attendance.index') }}"
             class="glass p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl mb-8">
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
@@ -122,7 +122,7 @@ text-white font-bold shadow-xl
                         Apply
                     </button>
 
-                    <a href="{{ route('admin.attendance.index') }}"
+                    <a href="{{ route('hr.attendance.index') }}"
                         class="px-6 py-3 rounded-2xl bg-white/5 text-white border border-white/10">
                         Reset
                     </a>
@@ -222,7 +222,7 @@ text-white font-bold shadow-xl
                                 </td>
 
                                 <td class="text-center">
-                                    <a href="{{ route('admin.attendance.staff', ['id' => $user->id, 'month' => $monthInput]) }}"
+                                    <a href="{{ route('hr.attendance.staff', ['id' => $user->id, 'month' => $monthInput]) }}"
                                         class="inline-flex items-center gap-1 px-4 py-2 rounded-xl
                                       bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
                                       hover:scale-105 transition text-white text-xs font-bold">
@@ -299,7 +299,7 @@ text-white font-bold shadow-xl
 
             {{-- Action --}}
             <div class="mt-4">
-                <a href="{{ route('admin.attendance.staff', ['id' => $u->id, 'month' => $monthInput]) }}"
+                <a href="{{ route('hr.attendance.staff', ['id' => $u->id, 'month' => $monthInput]) }}"
                    class="block text-center py-2 rounded-lg
                           bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
                           text-white text-sm font-semibold">
@@ -326,7 +326,7 @@ text-white font-bold shadow-xl
 
             <h3 class="text-2xl font-bold text-white mb-4">📅 Mark Company Holiday</h3>
 
-            <form method="POST" action="{{ route('admin.holiday.store') }}">
+            <form method="POST" action="{{ route('hr.holiday.store') }}">
                 @csrf
 
                 {{-- ERROR DISPLAY (CRITICAL) --}}

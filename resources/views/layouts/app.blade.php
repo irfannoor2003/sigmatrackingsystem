@@ -59,7 +59,8 @@
         <aside class="w-72 hidden md:flex flex-col glass shadow-2xl border-r border-white/10">
 
             <div class="p-6 border-b border-white/10">
-                <a href="{{ route('dashboard') ?? url('/') }}" class="hf-heading text-white">
+                <a href="{{ Route::has('dashboard') ? route('dashboard') : url('/') }}" class="hf-heading text-white">
+
                     SES<span class="text-[var(--hf-magenta-light)]">.</span>
                 </a>
                 <p class="text-xs text-gray-300 mt-1">Salesman Tracking System</p>
@@ -136,6 +137,69 @@
                         </a>
                     @endif
 
+ @if ($role === 'saleshead')
+
+
+   {{-- Dashboard --}}
+<a href="{{ route('salehead.dashboard') }}"
+   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+   {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
+    <i data-lucide="layout-dashboard"></i>
+    Dashboard
+</a>
+
+{{-- Salesman Visits --}}
+<a href="{{ route('salehead.reports.index') }}"
+   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+   {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
+    <i data-lucide="clipboard-list"></i>
+    Salesman Visits
+</a>
+
+
+{{-- All Customers --}}
+<a href="{{ route('salehead.customers.index') }}"
+   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+   {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
+    <i data-lucide="building-2"></i>
+    All Customers
+</a>
+
+@endif
+
+@if (auth()->user()->role === 'hr')
+
+    <a href="{{ route('hr.dashboard') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.dashboard') ? 'sidebar-active' : '' }}">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+        Dashboard
+    </a>
+
+    <a href="{{ route('hr.staff.index') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.staff.*') ? 'sidebar-active' : '' }}">
+        <i data-lucide="users-round" class="w-5 h-5"></i>
+        All Staff
+    </a>
+
+    <a href="{{ route('hr.attendance.index') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.attendance.index') ? 'sidebar-active' : '' }}">
+        <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+        Attendance Reports
+    </a>
+
+    <a href="{{ route('hr.attendance.leave-requests') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.attendance.leave-requests') ? 'sidebar-active' : '' }}">
+        <i data-lucide="mail" class="w-5 h-5"></i>
+        Leave Messages
+    </a>
+
+@endif
+
+
                    @if (auth()->user()->role === 'salesman')
 
     {{-- Dashboard --}}
@@ -207,7 +271,8 @@
 
 @endif
 
-               @if (in_array($role, ['it', 'account', 'store', 'office_boy']))
+               @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
+
 
     {{-- Staff Dashboard --}}
     <a href="{{ route('staff.dashboard') }}"
@@ -452,6 +517,69 @@
        {{ request()->routeIs('salesman.old-customers.index') ? 'sidebar-active-mobile' : '' }}">
         <i data-lucide="database" class="w-5 h-5"></i>
         View Old Customers
+    </a>
+
+@endif
+@if ($role === 'saleshead')
+
+
+   {{-- Dashboard --}}
+<a href="{{ route('salehead.dashboard') }}"
+   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+   {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
+    <i data-lucide="layout-dashboard"></i>
+    Dashboard
+</a>
+
+
+{{-- Salesman Visits --}}
+<a href="{{ route('salehead.reports.index') }}"
+   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+   {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
+    <i data-lucide="clipboard-list"></i>
+    Salesman Visits
+</a>
+
+
+
+{{-- All Customers --}}
+<a href="{{ route('salehead.customers.index') }}"
+   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+   {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
+    <i data-lucide="building-2"></i>
+    All Customers
+</a>
+
+@endif
+
+@if (auth()->user()->role === 'hr')
+
+    <a href="{{ route('hr.dashboard') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.dashboard') ? 'sidebar-active' : '' }}">
+        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+        Dashboard
+    </a>
+
+    <a href="{{ route('hr.staff.index') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.staff.*') ? 'sidebar-active' : '' }}">
+        <i data-lucide="users-round" class="w-5 h-5"></i>
+        All Staff
+    </a>
+
+    <a href="{{ route('hr.attendance.index') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.attendance.index') ? 'sidebar-active' : '' }}">
+        <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+        Attendance Reports
+    </a>
+
+   <a href="{{ route('hr.attendance.leave-requests') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('hr.attendance.leave-requests') ? 'sidebar-active' : '' }}">
+        <i data-lucide="mail" class="w-5 h-5"></i>
+        Leave Messages
     </a>
 
 @endif

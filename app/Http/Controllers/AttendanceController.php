@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use App\Mail\AttendanceClockInVerificationMail;
+use App\Helpers\AttendanceHelper;
+
 
 class AttendanceController extends Controller
 {
@@ -68,23 +70,23 @@ class AttendanceController extends Controller
             ->where('date', $today)
             ->first();
 
-        $todayHoliday = Holiday::isHoliday($today)
-            ? Holiday::title($today)
-            : null;
+        $isNonWorkingDay = AttendanceHelper::isNonWorkingDay($today);
+$nonWorkingReason = AttendanceHelper::nonWorkingReason($today);
 
         // ✅ ALWAYS DEFINED
         $hideLeaveButton   = now()->hour >= 12;
         $hideClockInButton = now()->hour >= 15;
 
-        return view(
-            $this->viewPath('index'),
-            compact(
-                'attendance',
-                'todayHoliday',
-                'hideLeaveButton',
-                'hideClockInButton'
-            )
-        );
+       return view(
+    $this->viewPath('index'),
+    compact(
+        'attendance',
+        'hideLeaveButton',
+        'hideClockInButton',
+        'isNonWorkingDay',
+        'nonWorkingReason'
+    )
+);
     }
 
     /* ================= CHECK-IN VIEW ================= */
@@ -96,12 +98,20 @@ class AttendanceController extends Controller
     /* ================= CLOCK IN ================= */
     public function clockIn(Request $request)
     {
-        $user = $this->staffUser();
-        $today = today()->toDateString();
 
-        if (Holiday::isHoliday($today)) {
-            return back()->with('error', 'Attendance disabled due to holiday.');
-        }
+        $user = $this->staffUser();
+    $today = today()->toDateString();
+
+   if (AttendanceHelper::isNonWorkingDay($today)) {
+    return back()->with('error', 'Attendance is disabled today.');
+}
+
+    // ⛔ BLOCK HOLIDAYS
+    if (Holiday::isHoliday($today)) {
+        return back()->with('error', 'Attendance disabled due to holiday.');
+    }
+
+
 
         $request->validate([
             'lat' => 'required|numeric',
@@ -174,6 +184,10 @@ AttendanceVerification::create([
     /* ================= VERIFY CLOCK IN ================= */
     public function verifyClockIn(Request $request, $token)
 {
+     $today = today()->toDateString();
+   if (AttendanceHelper::isNonWorkingDay($today)) {
+    return back()->with('error', 'Attendance is disabled today.');
+}
     // 1️⃣ Signed URL check
     if (! $request->hasValidSignature()) {
         abort(403, 'Invalid or expired verification link.');
@@ -207,7 +221,7 @@ AttendanceVerification::create([
     $user = User::findOrFail($verification->user_id);
     Auth::login($user);
 
-    $today = today()->toDateString();
+
 
     // 6️⃣ Prevent duplicate attendance
     if (Attendance::where('salesman_id', $user->id)
@@ -258,9 +272,10 @@ AttendanceVerification::create([
         $user = $this->staffUser();
         $today = today()->toDateString();
 
-        if (Holiday::isHoliday($today)) {
-            return back()->with('error', 'Holiday today.');
-        }
+        if (AttendanceHelper::isNonWorkingDay($today)) {
+   abort(403, 'Attendance is disabled today.');
+
+}
 
         $request->validate([
             'lat' => 'required|numeric',
@@ -303,46 +318,68 @@ AttendanceVerification::create([
 
     /* ================= HISTORY ================= */
     public function history(Request $request)
-    {
-        $user = $this->staffUser();
-        $monthInput = $request->month ?? now()->format('Y-m');
+{
+    $user = $this->staffUser();
+    $monthInput = $request->month ?? now()->format('Y-m');
 
-        $start = Carbon::createFromFormat('Y-m', $monthInput)->startOfMonth();
-        $end   = Carbon::createFromFormat('Y-m', $monthInput)->endOfMonth();
+    $start = Carbon::createFromFormat('Y-m', $monthInput)->startOfMonth();
+    $end   = Carbon::createFromFormat('Y-m', $monthInput)->endOfMonth();
 
-        $attendances = Attendance::where('salesman_id', $user->id)
-            ->whereBetween('date', [$start, $end])
-            ->get()
-            ->keyBy(fn ($a) => Carbon::parse($a->date)->format('Y-m-d'));
+    $attendances = Attendance::where('salesman_id', $user->id)
+        ->whereBetween('date', [$start, $end])
+        ->get()
+        ->keyBy(fn ($a) => Carbon::parse($a->date)->format('Y-m-d'));
 
-        $calendar = [];
-        $date = $start->copy();
+    $calendar = [];
+    $date = $start->copy();
 
-        while ($date <= $end) {
-            $key = $date->format('Y-m-d');
-            $attendance = $attendances->get($key);
+    while ($date <= $end) {
+        $key = $date->format('Y-m-d');
+        $attendance = $attendances->get($key);
 
-            $calendar[] = [
-                'date' => $key,
-                'status' =>
-                    Holiday::isHoliday($key) ? 'holiday' :
-                    ($attendance?->status ?? ($date->isFuture() ? 'future' : 'absent')),
-                'attendance' => $attendance,
-                'holiday' => Holiday::title($key),
-            ];
+        // Determine holiday/non-working day
+        $isHoliday = Holiday::isHoliday($key);
+        $holidayTitle = Holiday::title($key);
+        $isSunday = $date->isSunday();
+        $isNonWorking = AttendanceHelper::isNonWorkingDay($key);
+        $nonWorkingReason = AttendanceHelper::nonWorkingReason($key);
 
-            $date->addDay();
+        // Determine status
+        if ($attendance) {
+            $status = $attendance->status; // present / leave
+        } elseif ($isHoliday || $isSunday || $isNonWorking) {
+            $status = 'holiday';
+        } elseif ($date->isFuture()) {
+            $status = 'future';
+        } else {
+            $status = 'absent';
         }
 
-        return view($this->viewPath('history'), compact('calendar', 'monthInput'));
+        // Holiday / reason title
+        $holidayText = $holidayTitle ?? ($isSunday ? 'Sunday' : ($isNonWorking ? $nonWorkingReason : null));
+
+        $calendar[] = [
+            'date' => $key,
+            'status' => $status,
+            'attendance' => $attendance,
+            'holiday' => $holidayText,
+        ];
+
+        $date->addDay();
     }
+
+    return view($this->viewPath('history'), compact('calendar', 'monthInput'));
+}
+
 
     /* ================= REQUEST LEAVE ================= */
     public function requestLeave(Request $request)
     {
         $user = $this->staffUser();
         $today = today()->toDateString();
-
+ if (AttendanceHelper::isNonWorkingDay($today)) {
+    return back()->with('error', 'Attendance is disabled today.');
+}
         if (now()->hour >= 12) {
             return back()->with('error', 'Leave allowed before 12 PM only.');
         }

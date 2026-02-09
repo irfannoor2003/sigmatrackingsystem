@@ -10,9 +10,18 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
+
+private function allowOnly(array $roles)
+{
+    if (!in_array(auth()->user()->role, $roles)) {
+        abort(403);
+    }
+}
+
     // Dashboard charts
     public function index()
     {
+         $this->allowOnly(['admin']);
         $year = Carbon::now()->year;
 
         $monthlyVisits = Visit::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
@@ -44,6 +53,7 @@ class ReportController extends Controller
     // Salesman personal report
     public function salesmanReport()
     {
+        $this->allowOnly(['salesman']);
         $salesmanId = auth()->id();
 
         $visits = Visit::with('customer')
@@ -64,6 +74,9 @@ class ReportController extends Controller
     // Admin report (for your view)
     public function adminReport(Request $request)
     {
+        $this->allowOnly(['admin', 'saleshead']);
+
+
         $query = Visit::with(['customer', 'salesman']);
 
         if ($request->salesman_id) {
@@ -102,6 +115,7 @@ class ReportController extends Controller
     // Admin single visit details
     public function show($id)
     {
+         $this->allowOnly(['admin', 'saleshead']);
         $visit = Visit::with(['salesman', 'customer'])->findOrFail($id);
 
         return view('admin.reports.show', compact('visit'));
@@ -109,6 +123,7 @@ class ReportController extends Controller
     // Salesman Monthly Visit Report (Printable)
 public function monthlyVisitReport(Request $request)
 {
+    $this->allowOnly(['salesman']);
     $salesmanId = auth()->id();
 
     $monthInput = $request->month ?? now()->format('Y-m');

@@ -15,13 +15,12 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     opacity: .9;
 }
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Makes the calendar icon white */
-    cursor: pointer;
+    filter: invert(1); /* Changes a black icon to white */
 }
 input[type="time"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
+    filter: invert(1); /* Changes a black icon to white */
 }
+
 .glass {
     background: rgba(255,255,255,.06);
     backdrop-filter: blur(18px);
@@ -47,13 +46,13 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         <p class="mt-1 text-sm text-pink-300 font-semibold">Role: {{ ucfirst($user->role) }} • {{ $displayMonth }}</p>
 
       <div class="flex flex-col sm:flex-row gap-3 mt-4">
-    <a href="{{ route('admin.attendance.index') }}"
+    <a href="{{ route('hr.attendance.index') }}"
        class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl
               bg-white/5 hover:bg-white/10 text-white border border-white/10">
         <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
     </a>
 
-    <a href="{{ route('admin.attendance.export.single', [$user->id, 'month' => $monthInput]) }}"
+    <a href="{{ route('hr.attendance.export.single', [$user->id, 'month' => $monthInput]) }}"
        class="inline-flex items-center justify-center px-4 py-2 rounded-xl
               bg-blue-600 hover:bg-blue-700 text-white font-semibold">
         Export Excel
@@ -81,7 +80,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
                 <h3 class="font-bold text-white mb-4 flex items-center gap-2">
                     <i data-lucide="ban" class="w-5 h-5 text-red-400"></i> Mark Leave
                 </h3>
-                <form method="POST" action="{{ route('admin.attendance.leave', $user->id) }}" class="space-y-3">
+                <form method="POST" action="{{ route('hr.attendance.leave', $user->id) }}" class="space-y-3">
                     @csrf
                     <input type="date" name="date" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
                     <textarea name="note" rows="3" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white" placeholder="Leave reason"></textarea>
@@ -94,7 +93,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
                 <h3 class="font-bold text-white mb-4 flex items-center gap-2">
                     <i data-lucide="briefcase" class="w-5 h-5 text-indigo-400"></i> Manual Visit
                 </h3>
-                <form method="POST" action="{{ route('admin.attendance.manual.visit.store', $user->id) }}" class="space-y-3">
+                <form method="POST" action="{{ route('hr.attendance.manual.visit.store', $user->id) }}" class="space-y-3">
                     @csrf
                     <input type="date" name="start_date" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
                     <input type="date" name="end_date" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">

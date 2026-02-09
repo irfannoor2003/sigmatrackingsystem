@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
 {
-    // ✅ Central role list (single source of truth)
+    // ✅ Central role list
     private array $roles = [
         'admin',
         'salesman',
@@ -21,16 +21,16 @@ class StaffController extends Controller
         'saleshead'
     ];
 
+
+
     public function index(Request $request)
     {
         $query = User::query();
 
-        // Filter by Role
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // Search by Name or Email
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -41,12 +41,12 @@ class StaffController extends Controller
 
         $staff = $query->orderBy('name')->paginate(10);
 
-        return view('admin.staff.index', compact('staff'));
+        return view('hr.staff.index', compact('staff'));
     }
 
     public function create()
     {
-        return view('admin.staff.create');
+        return view('hr.staff.create');
     }
 
     public function store(Request $request)
@@ -65,14 +65,12 @@ class StaffController extends Controller
             'role'     => $request->role,
         ]);
 
-        return redirect()
-            ->route('admin.staff.index')
-            ->with('success', 'Staff created successfully.');
+        return redirect()->route('hr.staff.index')->with('success', 'Staff created successfully.');
     }
 
     public function edit(User $staff)
     {
-        return view('admin.staff.edit', compact('staff'));
+        return view('hr.staff.edit', compact('staff'));
     }
 
     public function update(Request $request, User $staff)
@@ -96,27 +94,12 @@ class StaffController extends Controller
 
         $staff->update($data);
 
-        return redirect()
-            ->route('admin.staff.index')
-            ->with('success', 'Staff updated successfully.');
+        return redirect()->route('hr.staff.index')->with('success', 'Staff updated successfully.');
     }
+
     public function destroy(User $staff)
-{
-    // ❌ Prevent deleting yourself
-    if (auth()->id() === $staff->id) {
-        return back()->with('error', 'You cannot delete your own account.');
+    {
+        $staff->delete();
+        return redirect()->route('hr.staff.index')->with('success', 'Staff deleted successfully.');
     }
-
-    // ❌ Optional: protect critical roles
-    if (in_array($staff->role, ['admin', 'saleshead'])) {
-        return back()->with('error', 'This role cannot be deleted.');
-    }
-
-    $staff->delete();
-
-    return redirect()
-        ->route('admin.staff.index')
-        ->with('success', 'Staff deleted successfully.');
-}
-
 }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visit;
 use App\Models\Customer;
-use App\Models\Holiday; // ✅ import Holiday
+use App\Helpers\AttendanceHelper;
 use Carbon\Carbon;
 
 class SalesmanDashboardController extends Controller
@@ -54,13 +54,17 @@ class SalesmanDashboardController extends Controller
 
         // ✅ Check if today is a holiday
         $today = Carbon::today()->format('Y-m-d');
-        $todayHoliday = Holiday::where('date', $today)->first();
+
+$isNonWorkingDay = AttendanceHelper::isNonWorkingDay($today);
+$nonWorkingReason = AttendanceHelper::nonWorkingReason($today);
+
 
         return view('salesman.dashboard', [
             'visitLabels'   => $visitLabels,
             'visitData'     => $visitData,
             'customerData'  => $customerData,
-            'todayHoliday'  => $todayHoliday, // pass holiday info to view
+            'isNonWorkingDay' => $isNonWorkingDay,
+    'nonWorkingReason' => $nonWorkingReason,
         ]);
     }
 }

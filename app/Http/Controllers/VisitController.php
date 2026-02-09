@@ -49,7 +49,7 @@ public function index(Request $request)
         ]);
     }
 
-    $visits = $query->paginate(10)->withQueryString();
+    $visits = $query->paginate(18)->withQueryString();
 
     return view('salesman.visits.index', compact('visits'));
 }

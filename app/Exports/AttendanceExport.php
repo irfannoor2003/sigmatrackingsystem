@@ -45,11 +45,28 @@ class AttendanceExport implements FromCollection, WithHeadings
             );
 
         /* ================= HOLIDAYS ================= */
-        $holidays = Holiday::whereBetween('date', [$start, $end])
-            ->get()
-            ->keyBy(fn ($h) =>
-                Carbon::parse($h->date)->format('Y-m-d')
-            );
+
+// DB holidays
+$dbHolidays = Holiday::whereBetween('date', [$start, $end])
+    ->get()
+    ->keyBy(fn ($h) => Carbon::parse($h->date)->format('Y-m-d'));
+
+// Config Pakistan holidays (MM-DD)
+$configHolidays = collect(config('pakistan_holidays'))
+    ->mapWithKeys(function ($title, $md) use ($year) {
+
+        $date = Carbon::createFromFormat('Y-m-d', $year . '-' . $md);
+
+        return [
+            $date->format('Y-m-d') => (object)[
+                'title' => $title
+            ]
+        ];
+    });
+
+// 🔥 IMPORTANT FIX HERE
+$holidays = $dbHolidays->toBase()->merge($configHolidays);
+
 
         /* ================= SALESMEN ================= */
         $salesmen = $this->salesmanId

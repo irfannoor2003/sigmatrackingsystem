@@ -128,6 +128,15 @@
             </div>
         @endif
 
+        <div id="print-header" class="hidden print:block mb-4">
+    <p style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">
+        Name: {{ auth()->user()->name }}
+    </p>
+    <p style="font-size: 12px; font-weight: 400; color: #555;">
+        Date: {{ now()->format('d M Y') }}
+    </p>
+</div>
+
         {{-- Table Container --}}
         <div
             class="bg-white/10 backdrop-blur-xl border border-white/20
@@ -136,7 +145,7 @@
             <table class="w-full table-auto text-white hidden md:table">
                 <thead>
                     <tr class="bg-white/10 text-white/80">
-                        <th class="p-3 text-left print:hidden">
+                        <th class="p-3 text-left ">
                             {{-- Icon for ID/Index --}}
                             <div class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -260,10 +269,10 @@
                     @forelse ($visits as $v)
                         <tr class="border-t border-white/10 hover:bg-white/5 transition">
 
-                            <td class="p-3 print:hidden">{{ $v->id }}</td>
+                            <td class="p-3 ">{{ $v->id }}</td>
                             <td class="p-3">{{ $v->customer->name }}</td>
 
-                            <td class="p-3 text-white/80">
+                            <td class="p-3 ">
                                 {{ $v->purpose }}
                             </td>
 
@@ -278,13 +287,13 @@
                                 </span>
                             </td>
 
-                            <td class="p-3 text-white/60 max-w-xs">
+                            <td class="p-3 max-w-xs">
                                 <div class="break-words whitespace-pre-line max-h-24 overflow-y-auto pr-1">
                                     {{ $v->notes ?? '-' }}
                                 </div>
                             </td>
 
-                            <td class="p-3 text-white/80">
+                            <td class="p-3 ">
                                 @if ($v->distance_km)
                                     {{ $v->distance_km }} km
                                 @else
@@ -292,14 +301,14 @@
                                 @endif
                             </td>
 
-                            <td class="p-3 text-white/80">
+                            <td class="p-3 ">
                                 @if ($v->status == 'completed' && $v->completed_at)
                                     {{ \Carbon\Carbon::parse($v->started_at)->diffForHumans($v->completed_at, true) }}
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td class="p-3 text-white/80">
+                            <td class="p-3 ">
                                 {{ optional($v->started_at)->format('d M Y, h:i A') ?? '-' }}
                             </td>
 
@@ -612,13 +621,14 @@
             background: #fff !important;
             color: #000 !important;
             font-family: Arial, sans-serif;
-            font-size: 12px;
+
         }
 
         /* Show print header */
-        #print-header {
-            display: block !important;
-        }
+       #print-header {
+        display: block !important;
+        margin-bottom: 10px;
+    }
 
         /* Hide unwanted UI */
         button,
@@ -677,5 +687,9 @@
             color: #000 !important;
             padding: 0 !important;
         }
+        table td, table th {
+        font-size: 12px;
+        color: #000;
+    }
     }
 </style>

@@ -14,7 +14,7 @@
         </h2>
 
         {{-- Form --}}
-        <form method="POST" action="{{ route('admin.staff.store') }}">
+        <form method="POST" action="{{ route('hr.staff.store') }}">
             @csrf
 
             <!-- Name -->

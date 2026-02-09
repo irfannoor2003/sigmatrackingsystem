@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ClockInReminderMail;
 use App\Mail\ClockOutReminderMail;
 use Carbon\Carbon;
+use App\Helpers\AttendanceHelper;
 
 class AttendanceReminderCommand extends Command
 {
@@ -17,54 +18,47 @@ class AttendanceReminderCommand extends Command
 
     public function handle()
     {
-        $now   = now();
         $today = now()->toDateString();
+
+        // ✅ Skip reminders on non-working days (Sundays + holidays)
+        if (AttendanceHelper::isNonWorkingDay($today)) {
+            $this->info('Non-working day. Emails skipped.');
+            return;
+        }
+
+        $now = now();
 
         /* =========================================================
          | CLOCK-IN REMINDER (11:00 AM – 3:00 PM)
-         | ❗ DOES NOT CREATE ATTENDANCE
          ========================================================= */
         if ($now->between(
             Carbon::today()->setTime(11, 0),
             Carbon::today()->setTime(15, 0)
         )) {
 
-            User::whereNotNull('role')
-                ->where('role', '!=', 'admin')
+            User::whereIn('role', ['salesman','it','account','store','office_boy'])
                 ->each(function ($user) use ($today) {
 
                     $attendance = Attendance::where('salesman_id', $user->id)
                         ->where('date', $today)
                         ->first();
 
-                    // ❌ If already clocked in or leave → do nothing
-                    if (
-                        $attendance &&
-                        ($attendance->clock_in || $attendance->status === 'leave')
-                    ) {
+                    // ❌ Skip if already clocked in, on leave, or reminder sent
+                    if ($attendance && ($attendance->clock_in || $attendance->status === 'leave' || $attendance->clock_in_reminder_sent)) {
                         return;
                     }
 
-                    // ❌ Reminder already sent
-                    if ($attendance && $attendance->clock_in_reminder_sent) {
-                        return;
-                    }
+                    Mail::to($user->email)->send(new ClockInReminderMail($user));
 
-                    Mail::to($user->email)
-                        ->send(new ClockInReminderMail($user));
-
-                    // ✅ Mark reminder sent ONLY if record exists
+                    // ✅ Mark reminder sent if attendance exists
                     if ($attendance) {
-                        $attendance->update([
-                            'clock_in_reminder_sent' => 1,
-                        ]);
+                        $attendance->update(['clock_in_reminder_sent' => 1]);
                     }
                 });
         }
 
         /* =========================================================
          | CLOCK-OUT REMINDER (AFTER 6:00 PM)
-         | ❗ ONLY FOR USERS WHO CLOCKED IN
          ========================================================= */
         if ($now->hour >= 18) {
 

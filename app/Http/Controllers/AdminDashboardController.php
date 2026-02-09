@@ -41,5 +41,29 @@ class AdminDashboardController extends Controller
             'attendanceActivities',
             'visitActivities'
         ));
+         return view('dashboard', [
+        'role' => auth()->user()->role, // pass current role
+        'attendanceActivities' => $attendanceActivities,
+    ]);
     }
+
+    public function todayAttendance()
+{
+    $today = Carbon::today();
+
+    // All staff except admin & saleshead
+    $roles = ['salesman', 'it', 'account', 'store', 'office_boy'];
+    $allStaff = User::whereIn('role', $roles)->orderBy('name')->get();
+
+    // Get all attendance records for today
+    $attendanceToday = Attendance::whereDate('date', $today)->pluck('salesman_id')->toArray();
+
+    // Split into present / absent
+    $presentStaff = $allStaff->whereIn('id', $attendanceToday);
+    $absentStaff  = $allStaff->whereNotIn('id', $attendanceToday);
+
+    return view('admin.attendance.today', compact(
+        'presentStaff', 'absentStaff', 'today'
+    ));
+}
 }

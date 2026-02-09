@@ -91,4 +91,14 @@ class User extends Authenticatable
     {
         return in_array($this->role, (array) $roles);
     }
+    public function isHR()
+{
+    return $this->role === 'hr';
+}
+
+public function isSalesHead()
+{
+    return $this->role === 'saleshead';
+}
+
 }

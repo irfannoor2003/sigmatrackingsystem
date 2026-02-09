@@ -12,21 +12,25 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\SalesmanDashboardController;
+use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\StaffDashboardController;
-
 
 // Admin
 use App\Http\Controllers\Admin\AttendanceReportController;
-use App\Http\Controllers\Admin\ManualVisitController; // ✅ ADDED
+use App\Http\Controllers\Admin\ManualVisitController;
 use App\Http\Controllers\Admin\SalesmanController as AdminSalesmanController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\OldCustomerController as AdminOldCustomerController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\HolidayController;
+use App\Http\Controllers\HRDashboardController;
+use App\Http\Controllers\SalesHeadDashboardController;
+use App\Http\Controllers\HR\StaffController as HRStaffController;
+
+
 
 // Salesman
 use App\Http\Controllers\Salesman\CustomerController as SalesmanCustomerController;
@@ -46,13 +50,15 @@ Route::get('/', fn () => view('welcome'));
 */
 Route::get('/dashboard', function () {
     return match (auth()->user()->role) {
-        'admin'    => redirect()->route('admin.dashboard'),
-        'salesman' => redirect()->route('salesman.dashboard'),
-        'it', 'account', 'store', 'office_boy'
-            => redirect()->route('staff.dashboard'),
-        default    => abort(403),
+        'admin'     => redirect()->route('admin.dashboard'),
+        'hr'        => redirect()->route('hr.dashboard'),
+        'saleshead' => redirect()->route('salehead.dashboard'),
+        'salesman'  => redirect()->route('salesman.dashboard'),
+        'it', 'account', 'store', 'office_boy' => redirect()->route('staff.dashboard'),
+        default     => abort(403),
     };
 })->middleware('auth')->name('dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -70,6 +76,7 @@ require __DIR__ . '/auth.php';
 /*
 |--------------------------------------------------------------------------
 | ADMIN ROUTES
+| (Admin + HR + SalesHead will reuse these)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin'])
@@ -80,18 +87,18 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
 
-        // Reports
+        /* ---------------- Reports ---------------- */
         Route::get('/reports', [ReportController::class, 'adminReport'])
             ->name('reports.index');
 
         Route::get('/reports/{id}', [ReportController::class, 'show'])
             ->name('reports.show');
 
-        // Holidays
+        /* ---------------- Holidays ---------------- */
         Route::post('/holiday/store', [HolidayController::class, 'store'])
             ->name('holiday.store');
 
-        // Customers
+        /* ---------------- Customers ---------------- */
         Route::get('/customers', [AdminCustomerController::class, 'index'])
             ->name('customers.index');
 
@@ -107,15 +114,14 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/customers/export/bulk', [AdminCustomerController::class, 'exportBulk'])
             ->name('customers.export.bulk');
 
-        // Salesmen
+        Route::get('/attendance/today', [AdminDashboardController::class, 'todayAttendance'])
+            ->name('attendance.today');
+
+        /* ---------------- Salesmen ---------------- */
         Route::resource('salesmen', AdminSalesmanController::class)
             ->except(['show']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | ADMIN ATTENDANCE
-        |--------------------------------------------------------------------------
-        */
+        /* ---------------- Attendance ---------------- */
         Route::prefix('attendance')->name('attendance.')->group(function () {
 
             Route::get('/', [AttendanceReportController::class, 'index'])
@@ -130,41 +136,34 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('/update/{attendanceId}', [AttendanceReportController::class, 'updateAttendance'])
                 ->name('update');
 
-            Route::get('/export/all',
-        [AttendanceReportController::class, 'exportAllExcel']
-    )->name('export.all');
+            Route::get('/export/all', [AttendanceReportController::class, 'exportAllExcel'])
+                ->name('export.all');
 
-    Route::get('/export/single/{id}',
-        [AttendanceReportController::class, 'exportSingleExcel']
-    )->name('export.single');
+            Route::get('/export/single/{id}', [AttendanceReportController::class, 'exportSingleExcel'])
+                ->name('export.single');
 
-    Route::get('/export/pdf', [AttendanceReportController::class, 'exportPdf'])
-        ->name('export.pdf');
+            Route::get('/export/pdf', [AttendanceReportController::class, 'exportPdf'])
+                ->name('export.pdf');
 
-    Route::get('/leave-requests', [AttendanceReportController::class, 'leaveRequests'])
-        ->name('leave-requests');
+            Route::get('/leave-requests', [AttendanceReportController::class, 'leaveRequests'])
+                ->name('leave-requests');
 
-            /*
-            |--------------------------------------------------------------------------
-            | ✅ MANUAL VISITS (ADMIN)
-            |--------------------------------------------------------------------------
-            */
-            Route::get(
-                '/manual-visit/{user}',
-                [ManualVisitController::class, 'create']
-            )->name('manual.visit.create');
+            /* -------- Manual Visits (ADMIN ONLY – later we lock) -------- */
+            Route::get('/manual-visit/{user}', [ManualVisitController::class, 'create'])
+                ->name('manual.visit.create');
 
-            Route::post(
-                '/manual-visit/{user}',
-                [ManualVisitController::class, 'store']
-            )->name('manual.visit.store');
+            Route::post('/manual-visit/{user}', [ManualVisitController::class, 'store'])
+                ->name('manual.visit.store');
+
         });
 
-        // Promotions
+
+
+        /* ---------------- Promotions ---------------- */
         Route::post('/promotions/send', [PromotionController::class, 'send'])
             ->name('promotions.send');
 
-        // Staff
+        /* ---------------- Staff ---------------- */
         Route::get('/staff', [StaffController::class, 'index'])
             ->name('staff.index');
 
@@ -180,7 +179,11 @@ Route::middleware(['auth', 'role:admin'])
         Route::put('/staff/{staff}', [StaffController::class, 'update'])
             ->name('staff.update');
 
-        // Old Customers
+        Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])
+            ->name('staff.destroy');
+
+
+        /* ---------------- Old Customers ---------------- */
         Route::get('/old-customers', [AdminOldCustomerController::class, 'index'])
             ->name('old-customers.index');
     });
@@ -239,7 +242,10 @@ Route::middleware(['auth', 'role:it,account,store,office_boy'])
     ->prefix('staff')
     ->name('staff.')
     ->group(function () {
-        Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/dashboard', [StaffDashboardController::class, 'index'])
+            ->name('dashboard');
+
         Route::prefix('attendance')->name('attendance.')->group(function () {
             Route::get('/', [AttendanceController::class, 'index'])->name('index');
             Route::post('/clock-in', [AttendanceController::class, 'clockIn'])->name('clockin');
@@ -250,7 +256,7 @@ Route::middleware(['auth', 'role:it,account,store,office_boy'])
 
 /*
 |--------------------------------------------------------------------------
-| COMMON
+| COMMON ATTENDANCE
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')
@@ -260,9 +266,6 @@ Route::middleware('auth')
     ->post('/attendance/leave', [AttendanceController::class, 'requestLeave'])
     ->name('attendance.leave');
 
-
-
-
 Route::post('/attendance/clock-in-request',
     [AttendanceController::class, 'clockInRequest']
 )->middleware('auth');
@@ -271,4 +274,88 @@ Route::get('/attendance/verify/{token}',
     [AttendanceController::class, 'verifyClockIn']
 )->name('attendance.verify')->middleware('signed');
 
+// SalesHead Routes
+Route::prefix('salehead')->middleware(['auth','role:saleshead'])->name('salehead.')->group(function () {
 
+    // ---------------- Dashboard ----------------
+    Route::get('/dashboard', [SalesHeadDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    // ---------------- Visits ----------------
+    Route::get('/visits', [SalesHeadDashboardController::class, 'visitsReport'])
+        ->name('reports.index');
+
+    Route::get('/visits/{id}', [SalesHeadDashboardController::class, 'showVisit'])
+        ->name('visits.show');
+
+    // ---------------- Customers ----------------
+    Route::get('/customers', [SalesHeadDashboardController::class, 'customers'])
+        ->name('customers.index');
+
+    Route::get('/customers/{id}', [SalesHeadDashboardController::class, 'showCustomer'])
+        ->name('customers.show');
+
+
+});
+
+
+
+
+Route::prefix('hr')
+    ->middleware(['auth', 'role:hr'])
+    ->name('hr.')
+    ->group(function () {
+
+    // Dashboard
+    Route::get('/dashboard', [HrDashboardController::class, 'index'])
+        ->name('dashboard');
+        // HR Holiday Management
+;
+ Route::get('attendance/today', [HrDashboardController::class, 'todayAttendance'])
+            ->name('attendance.today');
+
+    // Staff
+    // Staff management
+Route::prefix('staff')->name('staff.')->group(function () {
+
+    Route::get('/', [HRStaffController::class, 'index'])->name('index');      // List all staff
+    Route::get('/create', [HRStaffController::class, 'create'])->name('create'); // Create form
+    Route::post('/', [HRStaffController::class, 'store'])->name('store');        // Store new staff
+    Route::get('/{staff}/edit', [HRStaffController::class, 'edit'])->name('edit');   // Edit form
+    Route::put('/{staff}', [HRStaffController::class, 'update'])->name('update');   // Update staff
+    Route::delete('/{staff}', [HRStaffController::class, 'destroy'])->name('destroy'); // Delete staff
+});
+
+
+    // Attendance
+    Route::prefix('attendance')->name('attendance.')->group(function () {
+
+        // Attendance overview (NO ID)
+        Route::get('/', [HrDashboardController::class, 'attendanceIndex'])
+            ->name('index');
+
+        // Leave requests
+        Route::get('/leave-requests', [HrDashboardController::class, 'leaveRequests'])
+            ->name('leave-requests');
+
+        // Single staff attendance (ID REQUIRED)
+        Route::get('/staff/{id}', [HrDashboardController::class, 'staffReport'])
+            ->name('staff');
+
+        // Mark leave (ID REQUIRED)
+        Route::post('/staff/{id}/leave', [HrDashboardController::class, 'markLeave'])
+            ->name('leave');
+
+        // Manual visit
+        Route::post('/manual-visit/{user}', [HrDashboardController::class, 'storeManualVisit'])
+            ->name('manual.visit.store');
+
+            // Exports
+            Route::get('/export/all', [HrDashboardController::class, 'exportExcel'])
+            ->name('export.all');
+
+            Route::get('/export/single/{id}', [HrDashboardController::class, 'exportExcel'])
+            ->name('export.single');
+            });
+            Route::post('/holiday/store', [HrDashboardController::class, 'storeHoliday'])->name('holiday.store');
+});
