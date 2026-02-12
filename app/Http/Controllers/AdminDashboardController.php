@@ -47,23 +47,32 @@ class AdminDashboardController extends Controller
     ]);
     }
 
-    public function todayAttendance()
+   public function todayAttendance()
 {
     $today = Carbon::today();
-
-    // All staff except admin & saleshead
     $roles = ['salesman', 'it', 'account', 'store', 'office_boy'];
-    $allStaff = User::whereIn('role', $roles)->orderBy('name')->get();
 
-    // Get all attendance records for today
-    $attendanceToday = Attendance::whereDate('date', $today)->pluck('salesman_id')->toArray();
+    // Eager load today's attendance only
+    $allStaff = User::whereIn('role', $roles)
+        ->with(['attendances' => function($query) use ($today) {
+            $query->whereDate('date', $today);
+        }])
+        ->orderBy('name')
+        ->get();
 
-    // Split into present / absent
-    $presentStaff = $allStaff->whereIn('id', $attendanceToday);
-    $absentStaff  = $allStaff->whereNotIn('id', $attendanceToday);
+    // Map through staff to attach the specific record for easier access in Blade
+    $presentStaff = $allStaff->filter(function($user) {
+        return $user->attendances->isNotEmpty();
+    })->map(function($user) {
+        // Create a temporary property for the blade to read easily
+        $user->today_record = $user->attendances->first();
+        return $user;
+    });
 
-    return view('admin.attendance.today', compact(
-        'presentStaff', 'absentStaff', 'today'
-    ));
+    $absentStaff = $allStaff->filter(function($user) {
+        return $user->attendances->isEmpty();
+    });
+
+    return view('admin.attendance.today', compact('presentStaff', 'absentStaff', 'today'));
 }
 }
