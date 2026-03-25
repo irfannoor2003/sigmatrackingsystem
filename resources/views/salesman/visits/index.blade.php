@@ -89,27 +89,13 @@
 </form>
 
             {{-- PRINT BUTTON --}}
-            <button onclick="window.print()"
-                class="px-5 py-2 rounded-xl
-               bg-gradient-to-r from-pink-500 to-purple-500
-               text-white font-semibold
-               flex items-center justify-center
-               hover:opacity-90 transition
-               print:hidden">
-
-                {{-- Printer Icon --}}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-                    <polyline points="6 9 6 2 18 2 18 9" />
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5
-                         a2 2 0 0 1 2-2h16
-                         a2 2 0 0 1 2 2v5
-                         a2 2 0 0 1-2 2h-2" />
-                    <rect x="6" y="14" width="12" height="8" />
-                </svg>
-
-                Print
-            </button>
+            <div>
+  <a href="{{ route('visits.export.monthly', request()->all()) }}"
+   class="px-4 py-2 rounded-xl bg-green-500 text-white font-semibold shadow hover:bg-green-600 flex items-center justify-center">
+    <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+    Export Excel
+</a>
+</div>
 
         </div>
 
@@ -247,7 +233,7 @@
                                     <line x1="8" y1="2" x2="8" y2="6" />
                                     <line x1="3" y1="10" x2="21" y2="10" />
                                 </svg>
-                                Started At
+                                Started
                             </div>
                         </th>
 
@@ -349,34 +335,42 @@
                                         </button>
                                     </form>
                                 @else
-                                    <div class="flex flex-col gap-2">
-                                        <span class="text-green-300 font-semibold flex items-center">
-                                            {{-- Lucide Icon: check-check --}}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-check-check mr-1">
-                                                <path d="M18 6 7 17l-5-5" />
-                                                <path d="m19 12-5 5-2-2" />
-                                            </svg>
-                                            Completed
-                                        </span>
+<div class="flex items-center gap-3 justify-center">
 
-                                        <a href="{{ route('salesman.visits.show', $v->id) }}"
-                                            class="px-3 py-2 rounded-lg bg-blue-500/30 border border-blue-400/40
-                                               text-blue-100 text-sm text-center hover:bg-blue-500/40 transition flex items-center justify-center">
-                                            {{-- Lucide Icon: eye --}}
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-eye mr-1">
-                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                                <circle cx="12" cy="12" r="3" />
-                                            </svg>
-                                            View
-                                        </a>
-                                    </div>
-                                @endif
+    {{-- VIEW --}}
+    <a href="{{ route('salesman.visits.show', $v->id) }}"
+       title="View Visit"
+       class="p-2 rounded-lg bg-blue-500/20 border border-blue-400/40
+              text-blue-200 hover:bg-blue-500/30 transition">
+        {{-- Lucide: eye --}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+        </svg>
+    </a>
+
+    {{-- EDIT (only current + previous month) --}}
+    @if(
+        $v->status === 'completed' &&
+        $v->started_at->gte(now()->subMonth()->startOfMonth())
+    )
+        <a href="{{ route('salesman.visits.edit', $v->id) }}"
+           title="Edit Visit"
+           class="p-2 rounded-lg bg-yellow-500/20 border border-yellow-400/40
+                  text-yellow-200 hover:bg-yellow-500/30 transition">
+            {{-- Lucide: pencil --}}
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.85 2.85 0 1 1 4 4L7 21H3v-4L17 3Z"/>
+            </svg>
+        </a>
+    @endif
+
+</div>
+@endif
 
                             </td>
 

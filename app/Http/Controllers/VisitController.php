@@ -203,4 +203,60 @@ if ($request->hasFile('images')) {
 
         return view('salesman.visits.show', compact('visit'));
     }
+    public function edit(Visit $visit)
+{
+    // ownership check
+    if ($visit->salesman_id !== Auth::id()) {
+        abort(403);
+    }
+
+    // only completed visits editable
+    if ($visit->status !== 'completed') {
+        return back()->with('error', 'Only completed visits can be edited.');
+    }
+
+    // month lock (allow current + previous only)
+    $allowedFrom = now()->subMonth()->startOfMonth();
+
+    if ($visit->started_at->lt($allowedFrom)) {
+        return back()->with('error', 'You cannot edit older visits.');
+    }
+
+    $customers = Customer::orderBy('name')->get();
+
+    return view('salesman.visits.edit', compact('visit', 'customers'));
+}
+public function update(Request $request, Visit $visit)
+{
+    if ($visit->salesman_id !== Auth::id()) {
+        abort(403);
+    }
+
+    if ($visit->status !== 'completed') {
+        return back()->with('error', 'Invalid visit status.');
+    }
+
+    $allowedFrom = now()->subMonth()->startOfMonth();
+    if ($visit->started_at->lt($allowedFrom)) {
+        return back()->with('error', 'Visit editing period expired.');
+    }
+
+    $request->validate([
+        'customer_id' => 'required|exists:customers,id',
+        'purpose'     => 'required|string|max:255',
+        'notes'       => 'nullable|string|max:1000',
+        'distance_km' => 'nullable|numeric|min:0',
+    ]);
+
+    $visit->update([
+        'customer_id' => $request->customer_id,
+        'purpose'     => $request->purpose,
+        'notes'       => $request->notes,
+        'distance_km' => $request->distance_km,
+    ]);
+
+    return redirect()
+        ->route('salesman.visits.index')
+        ->with('success', 'Visit updated successfully.');
+}
 }

@@ -29,6 +29,8 @@ use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\HRDashboardController;
 use App\Http\Controllers\SalesHeadDashboardController;
 use App\Http\Controllers\HR\StaffController as HRStaffController;
+use App\Http\Controllers\VisitExportController;
+
 
 
 
@@ -205,7 +207,7 @@ Route::middleware(['auth', 'role:salesman'])
             ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
         Route::resource('visits', VisitController::class)
-            ->only(['index', 'create', 'store', 'show']);
+         ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
         Route::post('/visits/{id}/complete', [VisitController::class, 'complete'])
             ->name('visits.complete');
@@ -359,3 +361,21 @@ Route::prefix('staff')->name('staff.')->group(function () {
             });
             Route::post('/holiday/store', [HrDashboardController::class, 'storeHoliday'])->name('holiday.store');
 });
+
+
+
+Route::get('/visits/export/monthly', [VisitExportController::class, 'monthly'])
+    ->name('visits.export.monthly')
+    ->middleware('auth');
+
+
+    // ---------------- MANUAL ATTENDANCE ----------------
+Route::middleware(['auth', 'role:admin,hr'])
+    ->prefix('attendance')
+    ->name('attendance.')
+    ->group(function () {
+
+        // Store manual attendance
+        Route::post('/manual/store', [AttendanceController::class, 'manualStore'])
+            ->name('manual.store');
+    });

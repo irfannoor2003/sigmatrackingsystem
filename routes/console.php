@@ -8,15 +8,14 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-
-// 1. Clock-in Reminder at 11:00 AM
-Schedule::command('attendance:reminders')
+// Clock-in Reminder — 11:00 am
+Schedule::command('attendance:clock-in-reminder')
     ->dailyAt('11:00')
     ->timezone('Asia/Karachi')
     ->withoutOverlapping();
 
-// 2. Clock-out Reminder at 6:00 PM (18:00)
-Schedule::command('attendance:reminders')
+// Clock-out Reminder — 6:00 PM
+Schedule::command('attendance:clock-out-reminder')
     ->dailyAt('18:00')
     ->timezone('Asia/Karachi')
     ->withoutOverlapping();
@@ -26,3 +25,10 @@ Schedule::command('attendance:auto-clockout')
     ->dailyAt('20:00')
     ->timezone('Asia/Karachi')
     ->withoutOverlapping();
+
+Schedule::command('cron:test')
+            ->everyMinute()
+            ->timezone('Asia/Karachi');
+
+
+Schedule::command('newsletter:send')->monthly();

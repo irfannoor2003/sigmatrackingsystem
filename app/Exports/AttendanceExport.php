@@ -32,7 +32,7 @@ class AttendanceExport implements FromCollection, WithHeadings
         $end   = Carbon::create($year, $month, 1)->endOfMonth();
 
         /* ================= ATTENDANCE ================= */
-        $attQuery = Attendance::with('salesman')
+        $attQuery = Attendance::with(['salesman', 'markedBy'])
             ->whereBetween('date', [$start, $end]);
 
         if ($this->salesmanId) {
@@ -131,6 +131,7 @@ $holidays = $dbHolidays->toBase()->merge($configHolidays);
                     'Clock Out'      => $attendance?->clock_out?->format('h:i A') ?? '-',
                     'Work Hours'     => $workHours,
                     'Reason / Note'  => $remarks,
+                    'Marked By' => $attendance?->markedBy?->name ?? '-',
                 ]);
 
                 $date->addDay();
@@ -152,6 +153,7 @@ $holidays = $dbHolidays->toBase()->merge($configHolidays);
             'Clock Out',
             'Work Hours',
             'Reason / Note',
+              'Marked By', // 👈 NEW
         ];
     }
 }

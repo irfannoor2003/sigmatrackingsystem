@@ -402,4 +402,38 @@ AttendanceVerification::create([
 
         return back()->with('success', 'Leave requested successfully.');
     }
+    public function manualForm()
+{
+    $staff = User::where('role', 'salesman') // only staff
+                 ->orderBy('name')
+                 ->get();
+
+    return view('attendance.manual', compact('staff'));
+}
+
+
+public function manualStore(Request $request)
+{
+    $request->validate([
+        'salesman_id'   => 'required|exists:users,id',
+        'date'      => 'required|date',
+        'clock_in'  => 'required',
+        'clock_out' => 'nullable',
+        'note'    => 'nullable|string|max:255',
+    ]);
+
+    $attendance = \App\Models\Attendance::updateOrCreate(
+    ['salesman_id' => $request->salesman_id, 'date' => $request->date],
+    [
+        'clock_in'      => $request->clock_in,
+        'clock_out'     => $request->clock_out,
+        'manual_visit'  => true,
+        'note'          => $request->note,
+        'status'        => 'present',
+'marked_by'     => auth()->id(),
+    ]
+);
+
+    return back()->with('success', 'Manual attendance saved successfully.');
+}
 }

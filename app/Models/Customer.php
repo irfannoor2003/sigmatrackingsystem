@@ -22,6 +22,8 @@ class Customer extends Model
     'category_id',
     'image',
     'landmark',
+     'last_newsletter_sent_at',
+     'welcome_email_sent_at',
 ];
 
 
@@ -45,4 +47,16 @@ class Customer extends Model
     {
         return $this->belongsTo(User::class, 'salesman_id');
     }
+    protected static function booted()
+{
+    static::created(function ($customer) {
+        if (!empty($customer->email) && !$customer->welcome_email_sent_at) {
+            \Illuminate\Support\Facades\Mail::to($customer->email)
+                ->send(new \App\Mail\CustomerWelcome($customer));
+
+            $customer->update(['welcome_email_sent_at' => now()]);
+        }
+    });
+}
+
 }

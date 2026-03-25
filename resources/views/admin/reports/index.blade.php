@@ -11,13 +11,15 @@
 }
 </style>
 
-<div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg">
+<div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg  md:w-[85%] w-full ">
 
     <h1 class="text-2xl font-bold text-white mb-6 tracking-wide flex items-center">
         <i data-lucide="bar-chart-3" class="w-7 h-7 mr-3 text-pink-400"></i> Salesmen Visits Report
     </h1>
 
     <form method="GET" class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+        <input type="hidden" name="month" value="{{ request('month', now()->month) }}">
+<input type="hidden" name="year" value="{{ request('year', now()->year) }}">
 
         <div class="relative flex items-center">
             <i data-lucide="users" class="absolute left-3 w-5 h-5 text-white/50 pointer-events-none"></i>
@@ -74,13 +76,20 @@
                 class="px-4 py-2 rounded-xl bg-white/20 border border-white/30 text-white font-semibold shadow hover:bg-white/30 w-full sm:w-auto flex items-center justify-center">
                 <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print
             </button>
-        </div>
 
+        </div>
+<div>
+ <a href="{{ route('visits.export.monthly', request()->all()) }}"
+   class="px-4 py-2 rounded-xl bg-green-500 text-white font-semibold shadow hover:bg-green-600 flex items-center justify-center">
+    <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+    Export Excel
+</a>
+</div>
     </form>
 
 
-    <div class="overflow-x-auto mt-4 hidden md:block">
-        <table class="w-full border border-white/20 rounded-xl overflow-hidden">
+   <div class="mt-4 hidden md:block overflow-x-auto w-full ">
+       <table class="border border-white/20 rounded-xl report-table min-w-full">
             <thead class="bg-white/10 backdrop-blur-xl border-b border-white/20">
     <tr>
         <th class="p-3 text-left text-white text-sm print:hidden">
@@ -130,6 +139,12 @@
                 Km
             </div>
         </th>
+        <th class="p-3 text-left text-white text-sm">
+    <div class="flex items-center gap-2">
+        <i data-lucide="map-pin" class="w-4 h-4 text-white/60"></i>
+        Address
+    </div>
+</th>
 
         <th class="p-3 text-left text-white text-sm">
             <div class="flex items-center gap-2">
@@ -168,7 +183,9 @@
                         </td>
                         <td class="p-2 text-white/90">{{ $v->notes }}</td>
                         <td class="p-2 text-white/90">{{ $v->distance_km }}</td>
-
+<td class="p-2 text-white/90">
+    {{ $v->customer->address ?? '-' }}
+</td>
                         <td class="p-2 text-white/90">{{ $v->started_at->format('Y-m-d H:i') }}</td>
                     </tr>
 
@@ -197,9 +214,17 @@
                 <i data-lucide="user" class="w-5 h-5 mr-2 text-pink-300"></i> {{ $v->salesman->name }}
             </div>
 
-            <div class="text-white/70 text-sm mb-3 flex items-center">
-                <i data-lucide="building" class="w-4 h-4 mr-2"></i> Customer: {{ $v->customer->name }}
-            </div>
+            <div class="text-white/70 text-sm mb-2 flex items-center">
+    <i data-lucide="building" class="w-4 h-4 mr-2"></i>
+    Customer: {{ $v->customer->name }}
+</div>
+
+@if($v->customer->address)
+    <div class="text-white/60 text-xs mb-3 flex items-center ml-6">
+        <i data-lucide="map-pin" class="w-3 h-3 mr-2"></i>
+        {{ $v->customer->address }}
+    </div>
+@endif
 
             <div class="grid grid-cols-1 gap-3">
 
@@ -319,6 +344,21 @@
         [data-lucide] {
             display: none !important;
         }
+        /* Desktop table: keep everything in one line */
+
     }
+
+/* Kill Chrome window horizontal scrollbar */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Desktop table: keep everything one line */
+.report-table th,
+.report-table td {
+    white-space: nowrap;
+}
+
 </style>
 @endsection

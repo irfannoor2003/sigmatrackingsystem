@@ -106,6 +106,44 @@ input[type="time"]::-webkit-calendar-picker-indicator {
                     <button class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold">Save Manual Visit</button>
                 </form>
             </div>
+           {{-- MANUAL ATTENDANCE --}}
+<div class="glass p-6 rounded-3xl border border-white/20 shadow">
+    <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+        <i data-lucide="edit" class="w-5 h-5 text-yellow-400"></i> Manual Attendance
+    </h3>
+
+        <form method="POST" action="{{ route('attendance.manual.store') }}" class="space-y-3">
+        @csrf
+        {{-- Hidden User ID (optional if route already has it) --}}
+        <input type="hidden" name="salesman_id" value="{{ $user->id }}">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div>
+                <label class="text-xs text-white/50 uppercase block mb-1">Date</label>
+                <input type="date" name="date" required class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
+            </div>
+            <div>
+                <label class="text-xs text-white/50 uppercase block mb-1">Note / Reason</label>
+                <input type="text" name="note" placeholder="Reason for manual attendance" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div>
+                <label class="text-xs text-white/50 uppercase block mb-1">Clock In</label>
+                <input type="time" name="clock_in" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
+            </div>
+            <div>
+                <label class="text-xs text-white/50 uppercase block mb-1">Clock Out</label>
+                <input type="time" name="clock_out" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
+            </div>
+        </div>
+
+        <button class="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-600 text-white font-bold mt-2">
+            Save Manual Attendance
+        </button>
+    </form>
+</div>
         </div>
 
         {{-- CALENDAR --}}
@@ -146,9 +184,15 @@ input[type="time"]::-webkit-calendar-picker-indicator {
                                         @if($attendance->auto_clock_out)
                                             <span class="badge bg-blue-500/30 text-blue-300">Auto</span>
                                         @endif
-                                        @if($attendance->manual_visit)
-                                            <span class="badge bg-purple-500/30 text-purple-300" title="{{ $attendance->note }}">Manual</span>
-                                        @endif
+                                    @if($attendance->manual_visit)
+    <span class="badge bg-purple-500/30 text-purple-300"
+          title="{{ $attendance->note ?? '' }}">
+        Manual
+        @if($attendance->marked_by)
+            by {{ $attendance->markedBy->name ?? 'N/A' }}
+        @endif
+    </span>
+@endif
                                         @if($attendance->status === 'leave')
                                             <span class="badge bg-red-500/30 text-red-300" title="{{ $attendance->note }}">Leave</span>
                                         @endif

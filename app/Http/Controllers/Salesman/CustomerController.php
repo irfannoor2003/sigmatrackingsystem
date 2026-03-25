@@ -43,38 +43,57 @@ class CustomerController extends Controller
     /* =========================================================
         Store customer
     ========================================================== */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name'            => 'required|string|max:255',
-            'contact_person'  => 'required|string|max:255',
-            'phone1'          => 'nullable|string|max:20',
-            'phone2'          => 'nullable|string|max:20',
-            'email'           => 'nullable|email|max:255',
-            'address'         => 'required|string|max:255',
-            'city_id'         => 'required|exists:cities,id',
-            'industry_id'     => 'required|exists:industries,id',
-            'category_id'     => 'required|exists:categories,id',
-            'image'           => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
+   public function store(Request $request)
+{
+    // 1️⃣ Validate input
+    $request->validate([
+        'name'            => 'required|string|max:255',
+        'contact_person'  => 'required|string|max:255',
+        'phone1'          => 'nullable|string|max:20',
+        'phone2'          => 'nullable|string|max:20',
+        'email'           => 'nullable|email|max:255',
+        'address'         => 'required|string|max:255',
+        'city_id'         => 'required|exists:cities,id',
+        'industry_id'     => 'required|exists:industries,id',
+        'category_id'     => 'required|exists:categories,id',
+        'image'           => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+    ]);
 
-        $imagePath = null;
+    // 2️⃣ Normalize the name for duplicate checking
+    $normalizedName = trim(strtolower($request->name));
 
-        if ($request->hasFile('image')) {
+    // 3️⃣ Check for existing customer by name
+    $existingCustomer = Customer::whereRaw('LOWER(name) = ?', [$normalizedName])->first();
 
-            $image = $request->file('image');
-            $filename = time().'_'.$image->getClientOriginalName();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/storage/customers';
+    if ($existingCustomer) {
+        $similarCustomers = Customer::where('name', 'like', '%' . $request->name . '%')
+            ->take(5)
+            ->pluck('name');
 
-            if (!file_exists($destination)) {
-                mkdir($destination, 0755, true);
-            }
+        $suggestions = $similarCustomers->count()
+            ? ' Existing Customer Name: ' . $similarCustomers->join(', ')
+            : '';
 
-            $image->move($destination, $filename);
+        return back()
+            ->withErrors(['duplicate' => 'This contact person already exists.' . $suggestions])
+            ->withInput();
+    }
 
-            $imagePath = 'storage/customers/' . $filename;
+    // 4️⃣ Handle image upload
+    $imagePath = null;
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $filename = time().'_'.$image->getClientOriginalName();
+        $destination = $_SERVER['DOCUMENT_ROOT'] . '/storage/customers';
+        if (!file_exists($destination)) {
+            mkdir($destination, 0755, true);
         }
+        $image->move($destination, $filename);
+        $imagePath = 'storage/customers/' . $filename;
+    }
 
+    // 5️⃣ Insert inside try/catch to handle rare race conditions
+    try {
         Customer::create([
             'salesman_id'     => Auth::id(),
             'name'            => $request->name,
@@ -88,11 +107,27 @@ class CustomerController extends Controller
             'category_id'     => $request->category_id,
             'image'           => $imagePath,
         ]);
+    } catch (\Illuminate\Database\QueryException $e) {
+        if ($e->getCode() === '23000') { // duplicate entry
+            $similarCustomers = Customer::where('name', 'like', '%' . $request->name . '%')
+                ->take(5)
+                ->pluck('name');
 
-        return redirect()
-            ->route('salesman.customers.index')
-            ->with('success', 'Customer added successfully.');
+            $suggestions = $similarCustomers->count()
+                ? ' Existing Customer Name: ' . $similarCustomers->join(', ')
+                : '';
+
+            return back()
+                ->withErrors(['duplicate' => 'This contact person already exists' . $suggestions])
+                ->withInput();
+        }
+        throw $e; // other database errors
     }
+
+    return redirect()
+        ->route('salesman.customers.index')
+        ->with('success', 'Customer added successfully.');
+}
 
     /* =========================================================
         Show single customer (only own)

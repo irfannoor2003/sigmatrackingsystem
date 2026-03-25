@@ -31,6 +31,7 @@
                     class="px-4 py-2 rounded-xl bg-gray-700 text-white">
                 Print
             </button>
+
         </form>
     </div>
 

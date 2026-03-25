@@ -22,6 +22,11 @@
       enctype="multipart/form-data" class="space-y-5">
     @csrf
 
+    @if($errors->has('duplicate'))
+    <div class="mb-4 p-3 bg-red-700/30 text-red-100 rounded-lg border border-red-400">
+        {{ $errors->first('duplicate') }}
+    </div>
+@endif
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <div>
@@ -46,7 +51,7 @@
                 placeholder="Enter customer name"
                 class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
                 placeholder-white/50 focus:bg-white/20 outline-none"
-                required>
+                required value="{{ old('name') }}">
         </div>
 
         <div>
@@ -62,62 +67,64 @@
                 placeholder="Enter contact person name"
                 class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
                 placeholder-white/50 focus:bg-white/20 outline-none"
-                required>
+                required value="{{ old('contact_person') }}">
         </div>
 
     <div>
-        <label class="block text-sm text-white/80 mb-1 flex items-center">
-            {{-- Lucide Icon: phone --}}
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone mr-1 text-white/50">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-            Mobile 1
-        </label>
+    <label class="block text-sm text-white/80 mb-1 flex items-center">
+        {{-- Lucide Icon: phone --}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone mr-1 text-white/50">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Mobile 1
+    </label>
 
-        <div class="flex items-center bg-white/10 backdrop-blur-xl border border-white/20
-                     rounded-lg overflow-hidden">
-            <span class="px-4 py-3 text-white bg-white/5 border-r border-white/10">
-                +92-
-            </span>
+    <div class="flex items-center bg-white/10 backdrop-blur-xl border border-white/20
+                 rounded-lg overflow-hidden">
+        <span class="px-4 py-3 text-white bg-white/5 border-r border-white/10">
+            +92-
+        </span>
 
-            <input type="text"
-                   id="phone1_local"
-                   maxlength="10"
-                   inputmode="numeric"
-                   placeholder="3001234567"
-                   class="w-full px-4 py-3 bg-transparent text-white placeholder-white/40
-                          outline-none">
-        </div>
-
-        <input type="hidden" name="phone1" id="phone1">
+        <input type="text"
+               id="phone1_local"
+               maxlength="10"
+               inputmode="numeric"
+               placeholder="3001234567"
+               class="w-full px-4 py-3 bg-transparent text-white placeholder-white/40
+                      outline-none"
+               value="{{ old('phone1') ? preg_replace('/^\+92-/', '', old('phone1')) : '' }}">
     </div>
+
+    <input type="hidden" name="phone1" id="phone1" value="{{ old('phone1') }}">
+</div>
 
     <div>
-        <label class="block text-sm text-white/80 mb-1 flex items-center">
-            {{-- Lucide Icon: phone --}}
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone mr-1 text-white/50">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-            Mobile 2
-        </label>
+    <label class="block text-sm text-white/80 mb-1 flex items-center">
+        {{-- Lucide Icon: phone --}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone mr-1 text-white/50">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Mobile 2
+    </label>
 
-        <div class="flex items-center bg-white/10 backdrop-blur-xl border border-white/20
-                     rounded-lg overflow-hidden">
-            <span class="px-4 py-3 text-white bg-white/5 border-r border-white/10">
-                +92-
-            </span>
+    <div class="flex items-center bg-white/10 backdrop-blur-xl border border-white/20
+                 rounded-lg overflow-hidden">
+        <span class="px-4 py-3 text-white bg-white/5 border-r border-white/10">
+            +92-
+        </span>
 
-            <input type="text"
-                   id="phone2_local"
-                   maxlength="10"
-                   inputmode="numeric"
-                   placeholder="3001234567 (optional)"
-                   class="w-full px-4 py-3 bg-transparent text-white placeholder-white/40
-                          outline-none">
-        </div>
-
-        <input type="hidden" name="phone2" id="phone2">
+        <input type="text"
+               id="phone2_local"
+               maxlength="10"
+               inputmode="numeric"
+               placeholder="3001234567 (optional)"
+               class="w-full px-4 py-3 bg-transparent text-white placeholder-white/40
+                      outline-none"
+               value="{{ old('phone2') ? preg_replace('/^\+92-/', '', old('phone2')) : '' }}">
     </div>
+
+    <input type="hidden" name="phone2" id="phone2" value="{{ old('phone2') }}">
+</div>
 
 
         <div>
@@ -133,7 +140,7 @@
                 placeholder="Enter email address"
                 class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
                 placeholder-white/50 focus:bg-white/20 outline-none"
-                >
+                value="{{ old('email') }}">
         </div>
 
         <div class="md:col-span-2">
@@ -149,7 +156,7 @@
                 placeholder="Enter full address"
                 class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
                 placeholder-white/50 focus:bg-white/20 outline-none"
-                required>
+                required value="{{ old('address') }}">
         </div>
 
 
@@ -164,62 +171,70 @@
                 Industry
             </label>
             <select name="industry_id"
-                class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
-                focus:bg-white/20 outline-none"
-                required>
-                <option value="" class="text-black">Select industry</option>
-                @foreach($industries as $industry)
-                    <option value="{{ $industry->id }}" class="text-black">
-                        {{ $industry->name }}
-                    </option>
-                @endforeach
-            </select>
+        class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
+        focus:bg-white/20 outline-none"
+        required>
+    <option value="" class="text-black">Select industry</option>
+    @foreach($industries as $industry)
+        <option value="{{ $industry->id }}"
+            class="text-black"
+            {{ old('industry_id') == $industry->id ? 'selected' : '' }}>
+            {{ $industry->name }}
+        </option>
+    @endforeach
+</select>
         </div>
 
         <div>
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                {{-- Lucide Icon: tag --}}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag mr-1 text-white/50">
-                    <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
-                    <path d="M7 7h.01"/>
-                </svg>
-                Category
-            </label>
-            <select name="category_id"
-                class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
-                focus:bg-white/20 outline-none"
-                required>
-                <option value="" class="text-black">Select category</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}" class="text-black">
-                        {{ $category->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+    <label class="block text-sm text-white/80 mb-1 flex items-center">
+        {{-- Lucide Icon: tag --}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag mr-1 text-white/50">
+            <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
+            <path d="M7 7h.01"/>
+        </svg>
+        Category
+    </label>
 
-        <div>
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                {{-- Lucide Icon: map --}}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map mr-1 text-white/50">
-                    <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
-                    <line x1="9" x2="9" y1="3" y2="18"/>
-                    <line x1="15" x2="15" y1="6" y2="21"/>
-                </svg>
-                City
-            </label>
-            <select name="city_id"
-                class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
-                focus:bg-white/20 outline-none"
-                required>
-                <option value="" class="text-black">Select city</option>
-                @foreach($cities as $city)
-                    <option value="{{ $city->id }}" class="text-black">
-                        {{ $city->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+    <select name="category_id"
+            class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
+            focus:bg-white/20 outline-none"
+            required>
+        <option value="" class="text-black">Select category</option>
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}"
+                class="text-black"
+                {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+       <div>
+    <label class="block text-sm text-white/80 mb-1 flex items-center">
+        {{-- Lucide Icon: map --}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map mr-1 text-white/50">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+            <line x1="9" x2="9" y1="3" y2="18"/>
+            <line x1="15" x2="15" y1="6" y2="21"/>
+        </svg>
+        City
+    </label>
+
+    <select name="city_id"
+            class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
+            focus:bg-white/20 outline-none"
+            required>
+        <option value="" class="text-black">Select city</option>
+        @foreach($cities as $city)
+            <option value="{{ $city->id }}"
+                class="text-black"
+                {{ old('city_id') == $city->id ? 'selected' : '' }}>
+                {{ $city->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
         <div>
             <label class="block text-sm text-white/80 mb-1 flex items-center">

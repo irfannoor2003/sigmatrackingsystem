@@ -3,13 +3,15 @@
 @section('title','All Salesmen Visits Report')
 
 @section('content')
+
 <style>
     input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Changes a black icon to white */
+    filter: invert(1); /* Makes the calendar icon white */
+    cursor: pointer;
 }
 </style>
 
-<div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg">
+<div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-lg w-full md:w-[85%]">
 
     <h1 class="text-2xl font-bold text-white mb-6 tracking-wide flex items-center">
         <i data-lucide="bar-chart-3" class="w-7 h-7 mr-3 text-pink-400"></i> Salesmen Visits Report
@@ -73,12 +75,18 @@
                 <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print
             </button>
         </div>
-
+<div>
+  <a href="{{ route('visits.export.monthly', request()->all()) }}"
+   class="px-4 py-2 rounded-xl bg-green-500 text-white font-semibold shadow hover:bg-green-600 flex items-center justify-center">
+    <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+    Export Excel
+</a>
+</div>
     </form>
 
 
-    <div class="overflow-x-auto mt-4 hidden md:block">
-        <table class="w-full border border-white/20 rounded-xl overflow-hidden">
+   <div class="mt-4 hidden md:block overflow-x-auto w-full ">
+       <table class="border border-white/20 rounded-xl report-table min-w-full">
             <thead class="bg-white/10 backdrop-blur-xl border-b border-white/20">
     <tr>
         <th class="p-3 text-left text-white text-sm print:hidden">
@@ -128,6 +136,12 @@
                 Km
             </div>
         </th>
+        <th class="p-3 text-left text-white text-sm">
+    <div class="flex items-center gap-2">
+        <i data-lucide="map-pin" class="w-4 h-4 text-white/60"></i>
+        Address
+    </div>
+</th>
 
         <th class="p-3 text-left text-white text-sm">
             <div class="flex items-center gap-2">
@@ -148,7 +162,8 @@
                         <td class="p-2 text-white/90">{{ $v->customer->name }}</td>
 
                         <td class="p-2 text-white/90">
-                            <a href="{{ route('salehead.visits.show', $v->id) }}"
+
+                                <a href="{{ route('salehead.visits.show', $v->id) }}"
                                class="text-indigo-300 hover:underline flex items-center">
                                 <i data-lucide="link" class="w-3 h-3 mr-1"></i> {{ $v->purpose }}
                             </a>
@@ -166,7 +181,9 @@
                         </td>
                         <td class="p-2 text-white/90">{{ $v->notes }}</td>
                         <td class="p-2 text-white/90">{{ $v->distance_km }}</td>
-
+<td class="p-2 text-white/90">
+    {{ $v->customer->address ?? '-' }}
+</td>
                         <td class="p-2 text-white/90">{{ $v->started_at->format('Y-m-d H:i') }}</td>
                     </tr>
 
@@ -195,15 +212,23 @@
                 <i data-lucide="user" class="w-5 h-5 mr-2 text-pink-300"></i> {{ $v->salesman->name }}
             </div>
 
-            <div class="text-white/70 text-sm mb-3 flex items-center">
-                <i data-lucide="building" class="w-4 h-4 mr-2"></i> Customer: {{ $v->customer->name }}
-            </div>
+            <div class="text-white/70 text-sm mb-2 flex items-center">
+    <i data-lucide="building" class="w-4 h-4 mr-2"></i>
+    Customer: {{ $v->customer->name }}
+</div>
+
+@if($v->customer->address)
+    <div class="text-white/60 text-xs mb-3 flex items-center ml-6">
+        <i data-lucide="map-pin" class="w-3 h-3 mr-2"></i>
+        {{ $v->customer->address }}
+    </div>
+@endif
 
             <div class="grid grid-cols-1 gap-3">
 
                 <div class="bg-white/5 p-3 rounded-xl">
                     <div class="text-white/60 text-xs flex items-center"><i data-lucide="target" class="w-4 h-4 mr-2"></i> Purpose</div>
-                    <a href="{{ route('salehead.visits.show', $v->id) }}"
+                  <a href="{{ route('salehead.visits.show', $v->id) }}"
                        class="text-indigo-300 text-sm flex items-center">
                        <i data-lucide="link" class="w-3 h-3 mr-1"></i> {{ $v->purpose }}
                     </a>
@@ -317,6 +342,23 @@
         [data-lucide] {
             display: none !important;
         }
+        /* Desktop table: keep everything in one line */
+
     }
+
+/* Kill Chrome window horizontal scrollbar */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Desktop table: keep everything one line */
+.report-table th,
+.report-table td {
+    white-space: nowrap;
+}
+
 </style>
 @endsection
+
+

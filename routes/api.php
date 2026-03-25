@@ -10,16 +10,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias([
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
-    ]);
-      $middleware->validateCsrfTokens(except: [
-        'iclock/*', // This allows all ADMS requests to bypass CSRF
-    ]);
+    ->withMiddleware(function (Middleware $middleware) {
+        // THIS IS THE FIX:
+        $middleware->validateCsrfTokens(except: [
+            'iclock/*',
+            'api/iclock/*',
+        ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
-
-

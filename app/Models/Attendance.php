@@ -36,6 +36,7 @@ class Attendance extends Model
 
         'reminder_sent',
         'note',
+        'marked_by',
     ];
 
     /* =========================
@@ -177,4 +178,12 @@ class Attendance extends Model
             default  => 'Unknown'
         };
     }
+    public function marker()
+{
+    return $this->belongsTo(User::class, 'marked_by');
+}
+public function markedBy()
+{
+    return $this->belongsTo(User::class, 'marked_by');
+}
 }

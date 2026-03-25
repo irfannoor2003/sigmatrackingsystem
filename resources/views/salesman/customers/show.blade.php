@@ -116,6 +116,17 @@
                         </span>
                         <span class="text-white">{{ $customer->industry?->name ?? 'N/A' }}</span>
                     </div>
+                     <div class="flex justify-between bg-white/10 py-3 px-4 rounded-xl items-center">
+                        <span class="text-white/70 flex items-center">
+                            {{-- Lucide Icon: briefcase --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase mr-2">
+                                <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                            </svg>
+                            Category
+                        </span>
+                        <span class="text-white">{{ $customer->category?->name ?? 'N/A' }}</span>
+                    </div>
 
                     <div class="flex justify-between bg-white/10 py-3 px-4 rounded-xl items-start">
                         <span class="text-white/70 flex items-center mt-0.5">

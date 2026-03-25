@@ -18,110 +18,113 @@ class UsersSeeder extends Seeder
             'role' => 'admin'
         ]);
         User::create([
-            'name' => 'Hurrera Malik2',
-            'email' => 'hurrera@sigmagroup.com.pk2',
+            'name' => 'Hurrera Malik',
+            'email' => 'hurrera@sigmagroup.com.pk',
             'password' => Hash::make('Hurrera@Admin$2026'),
             'role' => 'admin'
         ]);
         User::create([
-            'name' => 'Umar Arshad2',
-            'email' => 'sales@sigmagroup.com.pk2',
+            'name' => 'Umar Arshad',
+            'email' => 'sales@sigmagroup.com.pk',
             'password' => Hash::make('Umar%Admin^2026'),
             'role' => 'admin'
         ]);
         User::create([
-            'name' => 'Awais Anwar2',
-            'email' => 'awais@sigmagroup.com.pk2',
+            'name' => 'Awais Anwar',
+            'email' => 'awais@sigmagroup.com.pk',
             'password' => Hash::make('Awais!Sales#2025'),
             'role' => 'salesman'
         ]);
         User::create([
-            'name' => 'Sajjad Ali2',
-            'email' => 'sajjad@sigmagroup.com.pk2',
+            'name' => 'Sajjad Ali',
+            'email' => 'sajjad@sigmagroup.com.pk',
             'password' => Hash::make('Sajjad@Sales$2025'),
             'role' => 'salesman'
         ]);
         User::create([
-            'name' => 'Irfan Ashraf2',
-            'email' => 'irfan@sigmagroup.com.pk2',
+            'name' => 'Irfan Ashraf',
+            'email' => 'irfan@sigmagroup.com.pk',
              'password' => Hash::make('Irfan%Sales^2025'),
             'role' => 'salesman'
         ]);
         User::create([
-            'name' => 'Muhammad Ahmed2',
-            'email' => 'ahmad@sigmagroup.com.pk2',
+            'name' => 'Muhammad Ahmed',
+            'email' => 'ahmad@sigmagroup.com.pk',
              'password' => Hash::make('Ahmed&Sales*2025'),
             'role' => 'salesman'
         ]);
         User::create([
-            'name' => 'Muhammad Farhan Malik2',
-            'email' => 'farhanmalik1176yt@gmail.com2',
- 'password' => Hash::make('Farhan(Sales)2025'),
+            'name' => 'Muhammad Farhan Malik',
+            'email' => 'farhanmalik1176yt@gmail.com',
+            'password' => Hash::make('Farhan(Sales)2025'),
             'role' => 'salesman'
         ]);
          User::create([
-            'name' => 'Moeen Khalid2 ',
-            'email' => 'moeenkhalid92@gmail.com2',
+            'name' => 'Moeen Khalid ',
+            'email' => 'moeenkhalid92@gmail.com',
              'password' => Hash::make('Moeen_Sales+2025'),
             'role' => 'salesman'
-        ]);User::create([
-            'name' => 'Umar Arshad 22 ',
-            'email' => 'coolcapri07@gmail.com2',
+        ]);
+        User::create([
+            'name' => 'Umar Arshad 2 ',
+            'email' => 'coolcapri07@gmail.com',
              'password' => Hash::make('Umar!Sales@2026'),
             'role' => 'salesman'
-        ]);User::create([
-            'name' => 'Hurrera Malik 22  ',
-            'email' => 'hurreramalik11@gmail.com2',
+        ]);
+        User::create([
+            'name' => 'Hurrera Malik 2 ',
+            'email' => 'hurreramalik11@gmail.com',
              'password' => Hash::make('Hurrera#Sales%2026'),
             'role' => 'salesman'
         ]);
         User::create([
-            'name' => 'Irfan Noor2 ',
-            'email' => 'techby79@gmail.com2',
+            'name' => 'Irfan Noor ',
+            'email' => 'techby79@gmail.com',
              'password' => Hash::make('Irfan!It@2025'),
             'role' => 'it'
         ]);
         User::create([
-            'name' => 'Muhammad Mubashir2 ',
-            'email' => 'sigmamubashir@gmail.com2',
+            'name' => 'Muhammad Mubashir ',
+            'email' => 'sigmamubashir@gmail.com',
              'password' => Hash::make('Mubashir%It^2025'),
             'role' => 'it'
         ]);
          User::create([
-            'name' => 'Hunzla Malik 32  ',
-            'email' => 'muhammadhunzla3@gmail.com2',
+            'name' => 'Hunzla Malik 3  ',
+            'email' => 'muhammadhunzla3@gmail.com',
              'password' => Hash::make('Hunzla#It$2025'),
             'role' => 'it'
         ]);
          User::create([
-            'name' => 'Moazam Shahid2   ',
-            'email' => 'Moazam@sigmagroup.com.pk2',
+            'name' => 'Moazam Shahid  ',
+            'email' => 'Moazam@sigmagroup.com.pk',
              'password' => Hash::make('Moazam!Ac@2025'),
             'role' => 'account'
         ]);
         User::create([
-            'name' => 'Ariba Fiaz2  ',
-            'email' => 'Ariba@sigmagroup.com.pk2',
+            'name' => 'Ariba Fiaz  ',
+            'email' => 'Ariba@sigmagroup.com.pk',
              'password' => Hash::make('Miss#Ac$2025'),
             'role' => 'account'
         ]);
         User::create([
-            'name' => 'Arif Hussain2   ',
-            'email' => 'arifhussain19810@gmail.com2',
+            'name' => 'Arif Hussain  ',
+            'email' => 'arifhussain19810@gmail.com',
              'password' => Hash::make('Arif!St@2025'),
             'role' => 'store'
         ]);
         User::create([
-            'name' => 'Musharaf Naeem2  ',
-            'email' => 'musharafnaeem997@gmail.com2',
+            'name' => 'Musharaf Naeem  ',
+            'email' => 'musharafnaeem997@gmail.com',
              'password' => Hash::make('Musharaf#St$2025'),
             'role' => 'store'
         ]);
         User::create([
-            'name' => 'Haseeb Chand2 ',
-            'email' => 'hc9533678@gmail.com2',
+            'name' => 'Haseeb Chand ',
+            'email' => 'hc9533678@gmail.com',
              'password' => Hash::make('Haseeb!Ob@2025'),
             'role' => 'office_boy'
         ]);
+
     }
 }

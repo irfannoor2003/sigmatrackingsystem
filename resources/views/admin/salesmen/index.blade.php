@@ -48,21 +48,21 @@
         <th class="p-3">
             <div class="flex items-center gap-2">
                 <i data-lucide="users" class="w-4 h-4 text-white/50"></i>
-                Customers (Total)
+                Customers
             </div>
         </th>
 
         <th class="p-3">
             <div class="flex items-center gap-2">
                 <i data-lucide="user-plus" class="w-4 h-4 text-indigo-300"></i>
-                Customers (This Month)
+                Customers (In Month)
             </div>
         </th>
 
         <th class="p-3">
             <div class="flex items-center gap-2">
                 <i data-lucide="map-pin" class="w-4 h-4 text-purple-300"></i>
-                Visits (This Month)
+                Visits (In Month)
             </div>
         </th>
 

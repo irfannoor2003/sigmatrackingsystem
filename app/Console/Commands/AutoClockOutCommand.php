@@ -12,58 +12,53 @@ use Exception;
 
 class AutoClockOutCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     * @var string
-     */
     protected $signature = 'attendance:auto-clockout';
-
-    /**
-     * The console command description.
-     * @var string
-     */
     protected $description = 'Automatically clock out users who forgot to clock out at 8:00 PM';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
         $today = Carbon::today();
         $clockOutThreshold = $today->copy()->setTime(20, 0, 0); // 8:00 PM
 
-        // Use chunking to handle large datasets efficiently
+        // Skip non-working days
+        if (\App\Helpers\AttendanceHelper::isNonWorkingDay($today->toDateString())) {
+            $this->info('Non-working day. Auto clock-out skipped.');
+            return;
+        }
+
         Attendance::with('user')
             ->whereDate('date', $today->toDateString())
-            ->whereNotNull('clock_in')
-            ->whereNull('clock_out')
-            ->where('status', 'present')
-            ->where('auto_clock_out', 0)
+            ->whereNotNull('clock_in')      // Must have clocked in
+            ->whereNull('clock_out')        // Not clocked out yet
+            ->where('status', 'present')    // Only present users
+            ->where('auto_clock_out', 0)    // Not already auto clocked out
             ->chunk(100, function ($attendances) use ($clockOutThreshold) {
                 foreach ($attendances as $attendance) {
                     try {
                         $clockInTime = Carbon::parse($attendance->clock_in);
 
-                        // If they clocked in AFTER 8PM, we shouldn't set a clock_out that is earlier than clock_in
-                        // This uses the later of the two times as a safety measure
-                        $finalClockOut = $clockInTime->gt($clockOutThreshold) ? $clockInTime : $clockOutThreshold;
+                        // Prevent clock_out earlier than clock_in
+                        $finalClockOut = $clockInTime->gt($clockOutThreshold)
+                            ? $clockInTime
+                            : $clockOutThreshold;
 
                         $totalMinutes = $clockInTime->diffInMinutes($finalClockOut);
 
-                        $attendance->update([
-                            'clock_out' => $finalClockOut->toTimeString(),
-                            'total_minutes' => $totalMinutes,
-                            'auto_clock_out' => 1,
-                        ]);
+                        // Update attendance safely
+                        $attendance->clock_out = $finalClockOut;
+                        $attendance->total_minutes = $totalMinutes;
+                        $attendance->auto_clock_out = 1;
+                        $attendance->save();
 
-                        // Send Email if user exists
+                        // Send email
                         if ($attendance->user?->email) {
-                            Mail::to($attendance->user->email)->send(new AutoClockOutMail($attendance));
+                            Mail::to($attendance->user->email)
+                                ->send(new AutoClockOutMail($attendance));
                         }
 
                     } catch (Exception $e) {
-                        Log::error("Failed to auto clock-out attendance ID {$attendance->id}: " . $e->getMessage());
-                        $this->error("Error processing ID {$attendance->id}");
+                        Log::error("Failed auto clock-out for attendance ID {$attendance->id}: " . $e->getMessage());
+                        $this->error("Error processing attendance ID {$attendance->id}");
                     }
                 }
             });

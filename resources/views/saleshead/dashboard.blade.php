@@ -60,8 +60,8 @@
     <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
         <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-purple-500/20 rounded-lg">
-                    <i data-lucide="history" class="w-5 h-5 text-purple-400"></i>
+                <div class="p-2 bg-[#ff2ba7]/20 rounded-lg">
+                    <i data-lucide="history" class="w-5 h-5 text-[#ff2ba7]"></i>
                 </div>
                 <h3 class="text-lg font-bold text-white tracking-wide">Live Visit Activity Feed</h3>
             </div>
@@ -72,11 +72,11 @@
 
         <div class="p-6">
             <div class="relative space-y-6">
-                <div class="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/50 via-white/10 to-transparent"></div>
+
 
                 @forelse($visitActivities as $v)
                     <div class="relative flex items-center gap-6 group">
-                        <div class="z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl bg-slate-900 border border-white/20 text-purple-400 shadow-xl group-hover:border-purple-500 transition-colors">
+                        <div class="z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl bg-[#ff2ba7]/10 border border-[#ff2ba7] text-[#ff2ba7] shadow-xl transition-colors">
                             <i data-lucide="map-pin" class="w-5 h-5"></i>
                         </div>
 
