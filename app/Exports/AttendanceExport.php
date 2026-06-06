@@ -6,7 +6,6 @@ use App\Models\Attendance;
 use App\Models\Holiday;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -15,23 +14,49 @@ class AttendanceExport implements FromCollection, WithHeadings
     protected $salesmanId;
     protected $month;
     protected $year;
+    protected $startDate;
+    protected $endDate;
 
-    public function __construct($salesmanId = null, $month = null, $year = null)
-    {
+    public function __construct(
+        $salesmanId = null,
+        $month = null,
+        $year = null,
+        $startDate = null,
+        $endDate = null
+    ) {
         $this->salesmanId = $salesmanId;
-        $this->month     = $month;
-        $this->year      = $year;
+        $this->month      = $month;
+        $this->year       = $year;
+        $this->startDate  = $startDate;
+        $this->endDate    = $endDate;
     }
 
     public function collection()
     {
-        $month = $this->month ?? now()->month;
-        $year  = $this->year ?? now()->year;
+        /*
+        |--------------------------------------------------------------------------
+        | DATE RANGE OR MONTH EXPORT
+        |--------------------------------------------------------------------------
+        */
+        if ($this->startDate && $this->endDate) {
 
-        $start = Carbon::create($year, $month, 1)->startOfMonth();
-        $end   = Carbon::create($year, $month, 1)->endOfMonth();
+            $start = Carbon::parse($this->startDate)->startOfDay();
+            $end   = Carbon::parse($this->endDate)->endOfDay();
 
-        /* ================= ATTENDANCE ================= */
+        } else {
+
+            $month = $this->month ?? now()->month;
+            $year  = $this->year ?? now()->year;
+
+            $start = Carbon::create($year, $month, 1)->startOfMonth();
+            $end   = Carbon::create($year, $month, 1)->endOfMonth();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ATTENDANCE
+        |--------------------------------------------------------------------------
+        */
         $attQuery = Attendance::with(['salesman', 'markedBy'])
             ->whereBetween('date', [$start, $end]);
 
@@ -40,40 +65,69 @@ class AttendanceExport implements FromCollection, WithHeadings
         }
 
         $attendances = $attQuery->get()
-            ->keyBy(fn ($a) =>
-                $a->salesman_id . '_' . Carbon::parse($a->date)->format('Y-m-d')
-            );
+            ->keyBy(function ($attendance) {
+                return $attendance->salesman_id . '_' .
+                    Carbon::parse($attendance->date)->format('Y-m-d');
+            });
 
-        /* ================= HOLIDAYS ================= */
+        /*
+        |--------------------------------------------------------------------------
+        | HOLIDAYS FROM DATABASE
+        |--------------------------------------------------------------------------
+        */
+        $dbHolidays = Holiday::whereBetween('date', [$start, $end])
+            ->get()
+            ->keyBy(function ($holiday) {
+                return Carbon::parse($holiday->date)->format('Y-m-d');
+            });
 
-// DB holidays
-$dbHolidays = Holiday::whereBetween('date', [$start, $end])
-    ->get()
-    ->keyBy(fn ($h) => Carbon::parse($h->date)->format('Y-m-d'));
+        /*
+        |--------------------------------------------------------------------------
+        | PAKISTAN CONFIG HOLIDAYS
+        |--------------------------------------------------------------------------
+        */
+        $configHolidays = collect();
 
-// Config Pakistan holidays (MM-DD)
-$configHolidays = collect(config('pakistan_holidays'))
-    ->mapWithKeys(function ($title, $md) use ($year) {
+        $currentYear = $start->year;
 
-        $date = Carbon::createFromFormat('Y-m-d', $year . '-' . $md);
+        while ($currentYear <= $end->year) {
 
-        return [
-            $date->format('Y-m-d') => (object)[
-                'title' => $title
-            ]
-        ];
-    });
+            $yearHolidays = collect(config('pakistan_holidays', []))
+                ->mapWithKeys(function ($title, $md) use ($currentYear) {
 
-// 🔥 IMPORTANT FIX HERE
-$holidays = $dbHolidays->toBase()->merge($configHolidays);
+                    $date = Carbon::createFromFormat(
+                        'Y-m-d',
+                        $currentYear . '-' . $md
+                    );
 
+                    return [
+                        $date->format('Y-m-d') => (object) [
+                            'title' => $title
+                        ]
+                    ];
+                });
 
-        /* ================= SALESMEN ================= */
+            $configHolidays = $configHolidays->merge($yearHolidays);
+
+            $currentYear++;
+        }
+
+        $holidays = $dbHolidays->toBase()->merge($configHolidays);
+
+        /*
+        |--------------------------------------------------------------------------
+        | STAFF LIST
+        |--------------------------------------------------------------------------
+        */
         $salesmen = $this->salesmanId
             ? User::where('id', $this->salesmanId)->get()
             : User::whereIn('role', [
-                'salesman','it','account','store','office_boy'
-            ])->get();
+                'salesman',
+                'it',
+                'account',
+                'store',
+                'office_boy'
+            ])->orderBy('name')->get();
 
         $rows = collect();
 
@@ -89,49 +143,71 @@ $holidays = $dbHolidays->toBase()->merge($configHolidays);
                 $attendance = $attendances->get($attKey);
                 $holiday    = $holidays->get($dateKey);
 
-                /* ================= STATUS PRIORITY ================= */
-              if ($holiday) {
-    $status  = 'Holiday';
-    $remarks = $holiday->title;
+                /*
+                |--------------------------------------------------------------------------
+                | STATUS
+                |--------------------------------------------------------------------------
+                */
+                if ($holiday) {
 
-} elseif ($date->isSunday()) {
-    $status  = 'Sunday';
-    $remarks = 'Weekly Off';
+                    $status  = 'Holiday';
+                    $remarks = $holiday->title;
 
-} elseif ($attendance && $attendance->status === 'leave') {
-    $status  = 'Leave';
-    $remarks = $attendance->note ?: '--';
+                } elseif ($date->isSunday()) {
 
-} elseif ($attendance && $attendance->short_leave) {
-    $status  = 'Short Leave';
-    $remarks = $attendance->note ?: 'Late arrival / Early leave';
+                    $status  = 'Sunday';
+                    $remarks = 'Weekly Off';
 
-} elseif ($attendance) {
-    $status  = 'Present';
-    $remarks = $attendance->note ?: '--';
+                } elseif ($attendance && $attendance->status === 'leave') {
 
-} else {
-    $status  = 'Absent';
-    $remarks = '--';
-}
+                    $status  = 'Leave';
+                    $remarks = $attendance->note ?: '--';
 
-                /* ================= WORK HOURS ================= */
-                $workHours = ($attendance && $attendance->total_minutes)
-                    ? floor($attendance->total_minutes / 60) . ':' .
-                      str_pad($attendance->total_minutes % 60, 2, '0', STR_PAD_LEFT)
-                    : '0:00';
+                } elseif ($attendance && $attendance->short_leave) {
+
+                    $status  = 'Short Leave';
+                    $remarks = $attendance->note ?: 'Late arrival / Early leave';
+
+                } elseif ($attendance) {
+
+                    $status  = 'Present';
+                    $remarks = $attendance->note ?: '--';
+
+                } else {
+
+                    $status  = 'Absent';
+                    $remarks = '--';
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | WORK HOURS
+                |--------------------------------------------------------------------------
+                */
+                $workHours = '0:00';
+
+                if ($attendance && $attendance->total_minutes) {
+                    $workHours =
+                        floor($attendance->total_minutes / 60) . ':' .
+                        str_pad(
+                            $attendance->total_minutes % 60,
+                            2,
+                            '0',
+                            STR_PAD_LEFT
+                        );
+                }
 
                 $rows->push([
-                    'Date'           => $date->format('d M Y'),
-                    'Day'            => $date->format('l'),
-                    'Name'           => $salesman->name,
-                    'Role'           => ucfirst($salesman->role),
-                    'Status'         => $status,
-                    'Clock In'       => $attendance?->clock_in?->format('h:i A') ?? '-',
-                    'Clock Out'      => $attendance?->clock_out?->format('h:i A') ?? '-',
-                    'Work Hours'     => $workHours,
-                    'Reason / Note'  => $remarks,
-                    'Marked By' => $attendance?->markedBy?->name ?? '-',
+                    'Date'          => $date->format('d M Y'),
+                    'Day'           => $date->format('l'),
+                    'Name'          => $salesman->name,
+                    'Role'          => ucfirst($salesman->role),
+                    'Status'        => $status,
+                    'Clock In'      => $attendance?->clock_in?->format('h:i A') ?? '-',
+                    'Clock Out'     => $attendance?->clock_out?->format('h:i A') ?? '-',
+                    'Work Hours'    => $workHours,
+                    'Reason / Note' => $remarks,
+                    'Marked By'     => $attendance?->markedBy?->name ?? '-',
                 ]);
 
                 $date->addDay();
@@ -153,7 +229,7 @@ $holidays = $dbHolidays->toBase()->merge($configHolidays);
             'Clock Out',
             'Work Hours',
             'Reason / Note',
-              'Marked By', // 👈 NEW
+            'Marked By',
         ];
     }
 }

@@ -11,10 +11,12 @@
             opacity: 0.9;
             cursor: pointer;
         }
+
         input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Makes the calendar icon white */
-    cursor: pointer;
-}
+            filter: invert(1);
+            /* Makes the calendar icon white */
+            cursor: pointer;
+        }
 
         .glass {
             background: rgba(255, 255, 255, 0.05);
@@ -37,14 +39,14 @@
 
         {{-- HEADER --}}
         <div class="relative glass p-8 rounded-2xl border border-white/20 shadow-2xl mb-8 overflow-hidden">
-    <!-- Decorative blurred circle -->
-    <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400/20 blur-3xl rounded-full hidden lg:block"></div>
+            <!-- Decorative blurred circle -->
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400/20 blur-3xl rounded-full hidden lg:block"></div>
 
-    <div class="relative flex flex-col lg:flex-row lg:items-center gap-4">
+            <div class="relative flex flex-col lg:flex-row lg:items-center gap-4">
 
-        <div class="bg-white/10 p-3 rounded-2xl">
-            <i data-lucide="clipboard-list" class="w-8 h-8 text-[#ff2ba6]"></i>
-        </div>
+                <div class="bg-white/10 p-3 rounded-2xl">
+                    <i data-lucide="clipboard-list" class="w-8 h-8 text-[#ff2ba6]"></i>
+                </div>
 
                 <div>
                     <h2 class="text-3xl font-extrabold text-white">Attendance Reports</h2>
@@ -56,27 +58,103 @@
                 <div class="flex flex-col sm:flex-row gap-3 lg:ml-auto w-full lg:w-auto">
 
                     @if (auth()->user()->role === 'admin')
-                        <button onclick="openHolidayModal()"
-                            class="w-full sm:w-auto sm:ml-auto
-flex items-center justify-center gap-2
-px-6 py-3 rounded-2xl
-bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-hover:scale-105 transition
-text-white font-bold shadow-xl
-">
-                            <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                            Mark Holiday
-                        </button>
+                                        <button onclick="openHolidayModal()" class="w-full sm:w-auto sm:ml-auto
+                        flex items-center justify-center gap-2
+                        px-6 py-3 rounded-2xl
+                        bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
+                        hover:scale-105 transition
+                        text-white font-bold shadow-xl
+                        ">
+                                            <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                                            Mark Holiday
+                                        </button>
                     @endif
-                    <a href="{{ route('admin.attendance.export.all', ['month' => $monthInput]) }}"
-                        class="inline-flex items-center justify-center px-5 py-3 rounded-2xl
-       bg-green-600 hover:bg-green-700
-       text-white font-semibold text-sm shadow"
->
+                    <a href="{{ route('admin.attendance.export.all', ['month' => $monthInput]) }}" class="inline-flex items-center justify-center px-5 py-3 rounded-2xl
+           bg-green-600 hover:bg-green-700
+           text-white font-semibold text-sm shadow">
                         Export All (Excel)
                     </a>
                 </div>
             </div>
+        </div>
+
+        {{-- DATE RANGE EXPORT --}}
+        <div class="glass p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl mb-8">
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="bg-white/10 p-3 rounded-xl">
+                    <i data-lucide="file-spreadsheet" class="w-6 h-6 text-emerald-400"></i>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-white">
+                        Export Attendance by Date Range
+                    </h3>
+                    <p class="text-sm text-white/50">
+                        Select a start date and end date to export attendance records.
+                    </p>
+                </div>
+            </div>
+
+            <form method="GET" action="{{ route('admin.attendance.export.range') }}">
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+
+                    {{-- Start Date --}}
+                    <div>
+                        <label class="text-xs text-white/50 mb-1 block">
+                            Start Date
+                        </label>
+
+                        <input type="date" name="start_date" required class="w-full px-4 py-3 rounded-2xl
+                                  bg-black/40 border border-white/10
+                                  text-white">
+                    </div>
+
+                    {{-- End Date --}}
+                    <div>
+                        <label class="text-xs text-white/50 mb-1 block">
+                            End Date
+                        </label>
+
+                        <input type="date" name="end_date" required class="w-full px-4 py-3 rounded-2xl
+                                  bg-black/40 border border-white/10
+                                  text-white">
+                    </div>
+
+                    {{-- Optional Staff --}}
+                    <div>
+                        <label class="text-xs text-white/50 mb-1 block">
+                            Staff (Optional)
+                        </label>
+
+                        <select name="staff"
+                            class="bg-white/10 text-white border border-white/20 p-3 rounded-xl w-full focus:ring-2 focus:ring-[#ff2ba6]/50 transition outline-none">
+
+                            <option value="">All Staff</option>
+
+                            @foreach ($allStaff as $user)
+                                <option value="{{ $user->id }}" class="text-black">
+                                    {{ $user->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Export Button --}}
+                    <div>
+                        <button type="submit" class="w-full px-6 py-3 rounded-2xl
+                               bg-gradient-to-r from-emerald-500 to-green-600
+                               hover:scale-105 transition
+                               text-white font-bold shadow-xl">
+
+                            Export Excel
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
         </div>
 
         {{-- FILTERS --}}
@@ -90,9 +168,8 @@ text-white font-bold shadow-xl
                     <label class="text-xs text-white/50 mb-1 block">Month</label>
                     <div class="relative">
                         <i data-lucide="calendar" class="absolute left-4 top-3 w-5 h-5 text-white/40"></i>
-                        <input type="month" name="month" value="{{ $monthInput }}"
-                            class="w-full pl-12 px-4 py-3 rounded-2xl
-                               bg-black/40 border border-white/10 text-white">
+                        <input type="month" name="month" value="{{ $monthInput }}" class="w-full pl-12 px-4 py-3 rounded-2xl
+                                   bg-black/40 border border-white/10 text-white">
                     </div>
                 </div>
 
@@ -106,7 +183,8 @@ text-white font-bold shadow-xl
 
                             <option value="" class="text-black">All Staff</option>
                             @foreach ($allStaff as $user)
-                                <option value="{{ $user->id }}" {{ ($staffId ?? '') == $user->id ? 'selected' : '' }} class="text-black">
+                                <option value="{{ $user->id }}" {{ ($staffId ?? '') == $user->id ? 'selected' : '' }}
+                                    class="text-black">
                                     {{ $user->name }} ({{ ucfirst($user->role) }})
                                 </option>
                             @endforeach
@@ -116,9 +194,8 @@ text-white font-bold shadow-xl
 
                 {{-- Buttons --}}
                 <div class="flex gap-3">
-                    <button
-                        class="px-6 py-3 rounded-2xl font-bold text-white
-                           bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]">
+                    <button class="px-6 py-3 rounded-2xl font-bold text-white
+                               bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]">
                         Apply
                     </button>
 
@@ -224,8 +301,8 @@ text-white font-bold shadow-xl
                                 <td class="text-center">
                                     <a href="{{ route('admin.attendance.staff', ['id' => $user->id, 'month' => $monthInput]) }}"
                                         class="inline-flex items-center gap-1 px-4 py-2 rounded-xl
-                                      bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-                                      hover:scale-105 transition text-white text-xs font-bold">
+                                              bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
+                                              hover:scale-105 transition text-white text-xs font-bold">
                                         <i data-lucide="eye" class="w-4 h-4"></i>
                                         View
                                     </a>
@@ -243,80 +320,78 @@ text-white font-bold shadow-xl
             </div>
         </div>
     </div>
-{{-- ▌▌ MOBILE VIEW (CARDS) --}}
-<div class="md:hidden space-y-4 mb-6">
+    {{-- ▌▌ MOBILE VIEW (CARDS) --}}
+    <div class="md:hidden space-y-4 mb-6">
 
-    @forelse($staff as $u)
+        @forelse($staff as $u)
+            <div class="p-4 bg-white/10 rounded-xl border border-white/10 shadow">
 
-        <div class="p-4 bg-white/10 rounded-xl border border-white/10 shadow">
-
-            {{-- Name --}}
-            <div class="text-lg font-semibold text-white flex items-center">
-                <i data-lucide="user" class="w-5 h-5 mr-2 text-pink-300"></i>
-                {{ $u->name }}
-            </div>
-
-            {{-- Email --}}
-            <div class="text-white/70 text-sm flex items-center">
-                <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
-                {{ $u->email }}
-            </div>
-
-            {{-- Stats --}}
-            <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
-
-                <div class="bg-white/5 p-3 rounded-lg">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
-                        Present
-                    </div>
-                    <div class="text-emerald-300 font-semibold text-lg">
-                        {{ $u->monthAttendance }}
-                    </div>
+                {{-- Name --}}
+                <div class="text-lg font-semibold text-white flex items-center">
+                    <i data-lucide="user" class="w-5 h-5 mr-2 text-pink-300"></i>
+                    {{ $u->name }}
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-lg">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
-                        Leaves
-                    </div>
-                    <div class="text-rose-300 font-semibold text-lg">
-                        {{ $u->monthLeaves }}
-                    </div>
+                {{-- Email --}}
+                <div class="text-white/70 text-sm flex items-center">
+                    <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
+                    {{ $u->email }}
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-lg col-span-2">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="badge-check" class="w-4 h-4 mr-2"></i>
-                        Role
+                {{-- Stats --}}
+                <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+
+                    <div class="bg-white/5 p-3 rounded-lg">
+                        <div class="text-white/60 flex items-center">
+                            <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                            Present
+                        </div>
+                        <div class="text-emerald-300 font-semibold text-lg">
+                            {{ $u->monthAttendance }}
+                        </div>
                     </div>
-                    <div class="text-white font-semibold">
-                        {{ ucfirst($u->role) }}
+
+                    <div class="bg-white/5 p-3 rounded-lg">
+                        <div class="text-white/60 flex items-center">
+                            <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
+                            Leaves
+                        </div>
+                        <div class="text-rose-300 font-semibold text-lg">
+                            {{ $u->monthLeaves }}
+                        </div>
                     </div>
+
+                    <div class="bg-white/5 p-3 rounded-lg col-span-2">
+                        <div class="text-white/60 flex items-center">
+                            <i data-lucide="badge-check" class="w-4 h-4 mr-2"></i>
+                            Role
+                        </div>
+                        <div class="text-white font-semibold">
+                            {{ ucfirst($u->role) }}
+                        </div>
+                    </div>
+
+                </div>
+
+                {{-- Action --}}
+                <div class="mt-4">
+                    <a href="{{ route('admin.attendance.staff', ['id' => $u->id, 'month' => $monthInput]) }}" class="block text-center py-2 rounded-lg
+                                  bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
+                                  text-white text-sm font-semibold">
+                        <i data-lucide="eye" class="inline w-4 h-4 mr-1"></i>
+                        View Attendance
+                    </a>
                 </div>
 
             </div>
 
-            {{-- Action --}}
-            <div class="mt-4">
-                <a href="{{ route('admin.attendance.staff', ['id' => $u->id, 'month' => $monthInput]) }}"
-                   class="block text-center py-2 rounded-lg
-                          bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-                          text-white text-sm font-semibold">
-                    <i data-lucide="eye" class="inline w-4 h-4 mr-1"></i>
-                    View Attendance
-                </a>
+        @empty
+            <div class="text-center text-white/40 py-10">
+                No records found
             </div>
+        @endforelse
 
-        </div>
-
-    @empty
-        <div class="text-center text-white/40 py-10">
-            No records found
-        </div>
-    @endforelse
-
-</div>
+    </div>
 
     {{-- HOLIDAY MODAL --}}
     <div id="holidayModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
@@ -358,9 +433,8 @@ text-white font-bold shadow-xl
                     class="w-full mb-4 px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
 
                 {{-- SUBMIT BUTTON --}}
-                <button type="submit"
-                    class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-fuchsia-600
-               text-white font-bold">
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-fuchsia-600
+                   text-white font-bold">
                     Save Holiday
                 </button>
             </form>

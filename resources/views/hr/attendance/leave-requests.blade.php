@@ -139,6 +139,9 @@
             </div>
         @endforelse
     </div>
+    <div class="mt-6">
+    {{ $leaves->links() }}
+</div>
 
 </div>
 @endsection

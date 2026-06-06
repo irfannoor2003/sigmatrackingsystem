@@ -253,4 +253,35 @@ class HrDashboardController extends Controller
     return view('hr.attendance.today', compact('todayDate', 'presentStaff', 'absentStaff'));
 }
 
+/**
+ * Export Attendance By Date Range (HR)
+ */
+public function exportRange(Request $request)
+{
+    $request->validate([
+        'start_date' => 'required|date',
+        'end_date'   => 'required|date|after_or_equal:start_date',
+        'staff'      => 'nullable|exists:users,id',
+    ]);
+
+    $startDate = $request->start_date;
+    $endDate   = $request->end_date;
+    $staffId   = $request->staff;
+
+    $fileName = $staffId
+        ? "attendance_staff_{$staffId}_{$startDate}_to_{$endDate}.xlsx"
+        : "attendance_all_{$startDate}_to_{$endDate}.xlsx";
+
+    return Excel::download(
+        new AttendanceExport(
+            $staffId,
+            null,
+            null,
+            $startDate,
+            $endDate
+        ),
+        $fileName
+    );
+}
+
 }

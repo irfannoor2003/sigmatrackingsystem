@@ -79,6 +79,86 @@ text-white font-bold shadow-xl
             </div>
         </div>
 
+{{-- DATE RANGE EXPORT --}}
+        <div class="glass p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl mb-8">
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="bg-white/10 p-3 rounded-xl">
+                    <i data-lucide="file-spreadsheet" class="w-6 h-6 text-emerald-400"></i>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-white">
+                        Export Attendance by Date Range
+                    </h3>
+                    <p class="text-sm text-white/50">
+                        Select a start date and end date to export attendance records.
+                    </p>
+                </div>
+            </div>
+
+            <form action="{{ route('hr.attendance.export.range') }}" method="GET">
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+
+                    {{-- Start Date --}}
+                    <div>
+                        <label class="text-xs text-white/50 mb-1 block">
+                            Start Date
+                        </label>
+
+                        <input type="date" name="start_date" required class="w-full px-4 py-3 rounded-2xl
+                                  bg-black/40 border border-white/10
+                                  text-white">
+                    </div>
+
+                    {{-- End Date --}}
+                    <div>
+                        <label class="text-xs text-white/50 mb-1 block">
+                            End Date
+                        </label>
+
+                        <input type="date" name="end_date" required class="w-full px-4 py-3 rounded-2xl
+                                  bg-black/40 border border-white/10
+                                  text-white">
+                    </div>
+
+                    {{-- Optional Staff --}}
+                    <div>
+                        <label class="text-xs text-white/50 mb-1 block">
+                            Staff (Optional)
+                        </label>
+
+                        <select name="staff"
+                            class="bg-white/10 text-white border border-white/20 p-3 rounded-xl w-full focus:ring-2 focus:ring-[#ff2ba6]/50 transition outline-none">
+
+                            <option value="">All Staff</option>
+
+                            @foreach ($allStaff as $user)
+                                <option value="{{ $user->id }}" class="text-black">
+                                    {{ $user->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Export Button --}}
+                    <div>
+                        <button type="submit" class="w-full px-6 py-3 rounded-2xl
+                               bg-gradient-to-r from-emerald-500 to-green-600
+                               hover:scale-105 transition
+                               text-white font-bold shadow-xl">
+
+                            Export Excel
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+
+
         {{-- FILTERS --}}
         <form method="GET" action="{{ route('hr.attendance.index') }}"
             class="glass p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl mb-8">

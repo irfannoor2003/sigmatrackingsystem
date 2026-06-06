@@ -126,6 +126,29 @@
                             <i data-lucide="building-2" class="w-5 h-5"></i>
                             All Customers
                         </a>
+                        <a href="https://expense.sessigmasoft.com/"
+                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
+   hover:bg-white/10 transition-all duration-300
+   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active' : '' }}">
+
+                            <i data-lucide="wallet" class="w-5 h-5 "></i>
+
+                            <span>All Expenses</span>
+
+                            <span
+                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
+                                NEW
+                            </span>
+
+                            <span class="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
+                                <span
+                                    class="absolute -left-full top-0 h-full w-1/2
+            bg-gradient-to-r from-transparent via-white/20 to-transparent
+            skew-x-[-20deg]
+            group-hover:animate-[shine_0.8s_ease]"></span>
+                            </span>
+                        </a>
 
                         <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
 
@@ -137,160 +160,173 @@
                         </a>
                     @endif
 
- @if ($role === 'saleshead')
-
-
-   {{-- Dashboard --}}
-<a href="{{ route('salehead.dashboard') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                    @if ($role === 'saleshead')
+                        {{-- Dashboard --}}
+                        <a href="{{ route('salehead.dashboard') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
-    <i data-lucide="layout-dashboard"></i>
-    Dashboard
-</a>
+                            <i data-lucide="layout-dashboard"></i>
+                            Dashboard
+                        </a>
 
-{{-- Salesman Visits --}}
-<a href="{{ route('salehead.reports.index') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- Salesman Visits --}}
+                        <a href="{{ route('salehead.reports.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
-    <i data-lucide="clipboard-list"></i>
-    Salesman Visits
-</a>
+                            <i data-lucide="clipboard-list"></i>
+                            Salesman Visits
+                        </a>
 
 
-{{-- All Customers --}}
-<a href="{{ route('salehead.customers.index') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- All Customers --}}
+                        <a href="{{ route('salehead.customers.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
-    <i data-lucide="building-2"></i>
-    All Customers
-</a>
+                            <i data-lucide="building-2"></i>
+                            All Customers
+                        </a>
+                    @endif
 
-@endif
-
-@if (auth()->user()->role === 'hr')
-
-    <a href="{{ route('hr.dashboard') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                    @if (auth()->user()->role === 'hr')
+                        <a href="{{ route('hr.dashboard') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.dashboard') ? 'sidebar-active' : '' }}">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        Dashboard
-    </a>
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            Dashboard
+                        </a>
 
-    <a href="{{ route('hr.staff.index') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        <a href="{{ route('hr.staff.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.staff.*') ? 'sidebar-active' : '' }}">
-        <i data-lucide="users-round" class="w-5 h-5"></i>
-        All Staff
-    </a>
+                            <i data-lucide="users-round" class="w-5 h-5"></i>
+                            All Staff
+                        </a>
 
-    <a href="{{ route('hr.attendance.index') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        <a href="{{ route('hr.attendance.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.attendance.index') ? 'sidebar-active' : '' }}">
-        <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-        Attendance Reports
-    </a>
+                            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                            Attendance Reports
+                        </a>
 
-    <a href="{{ route('hr.attendance.leave-requests') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        <a href="{{ route('hr.attendance.leave-requests') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.attendance.leave-requests') ? 'sidebar-active' : '' }}">
-        <i data-lucide="mail" class="w-5 h-5"></i>
-        Leave Messages
-    </a>
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                            Leave Messages
+                        </a>
+                        <a href="https://expense.sessigmasoft.com/"
+                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
+   hover:bg-white/10 transition-all duration-300
+   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active' : '' }}">
 
-@endif
+                            <i data-lucide="wallet" class="w-5 h-5 "></i>
+
+                            <span>All Expenses</span>
+
+                            <span
+                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
+                                NEW
+                            </span>
+
+                            <span class="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
+                                <span
+                                    class="absolute -left-full top-0 h-full w-1/2
+            bg-gradient-to-r from-transparent via-white/20 to-transparent
+            skew-x-[-20deg]
+            group-hover:animate-[shine_0.8s_ease]"></span>
+                            </span>
+                        </a>
+                    @endif
 
 
-                   @if (auth()->user()->role === 'salesman')
-
-    {{-- Dashboard --}}
-    <a href="{{ route('salesman.dashboard') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                    @if (auth()->user()->role === 'salesman')
+                        {{-- Dashboard --}}
+                        <a href="{{ route('salesman.dashboard') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.dashboard') ? 'sidebar-active' : '' }}">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        Dashboard
-    </a>
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            Dashboard
+                        </a>
 
-    {{-- Attendance --}}
-    <a href="{{ route('salesman.attendance.index') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- Attendance --}}
+                        <a href="{{ route('salesman.attendance.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.attendance.*') ? 'sidebar-active' : '' }}">
-        <i data-lucide="clock" class="w-5 h-5"></i>
-        Attendance
-    </a>
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                            Attendance
+                        </a>
 
-    {{-- My Customers --}}
-    <a href="{{ route('salesman.customers.index') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- My Customers --}}
+                        <a href="{{ route('salesman.customers.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.customers.index') ? 'sidebar-active' : '' }}">
-        <i data-lucide="briefcase" class="w-5 h-5"></i>
-        My Customers
-    </a>
+                            <i data-lucide="briefcase" class="w-5 h-5"></i>
+                            My Customers
+                        </a>
 
-    {{-- Add Customer --}}
-    <a href="{{ route('salesman.customers.create') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- Add Customer --}}
+                        <a href="{{ route('salesman.customers.create') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.customers.create') ? 'sidebar-active' : '' }}">
-        <i data-lucide="user-plus" class="w-5 h-5"></i>
-        Add Customer
-    </a>
+                            <i data-lucide="user-plus" class="w-5 h-5"></i>
+                            Add Customer
+                        </a>
 
-    {{-- Start Visit --}}
-    <a href="{{ route('salesman.visits.create') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- Start Visit --}}
+                        <a href="{{ route('salesman.visits.create') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.visits.create') ? 'sidebar-active' : '' }}">
-        <i data-lucide="map-pin" class="w-5 h-5"></i>
-        Start Visit
-    </a>
+                            <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            Start Visit
+                        </a>
 
-    {{-- My Visits --}}
-    <a href="{{ route('salesman.visits.index') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- My Visits --}}
+                        <a href="{{ route('salesman.visits.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.visits.index') ? 'sidebar-active' : '' }}">
-        <i data-lucide="calendar-check" class="w-5 h-5"></i>
-        My Visits
-    </a>
+                            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                            My Visits
+                        </a>
 
-    {{-- Old Customers --}}
-    <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
+                        {{-- Old Customers --}}
+                        <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
 
-    {{-- Import Old Customers (URL-based active) --}}
-    <a href="{{ route('salesman.old-customers.import') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- Import Old Customers (URL-based active) --}}
+                        <a href="{{ route('salesman.old-customers.import') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->is('salesman/old-customers/import*') ? 'sidebar-active' : '' }}">
-        <i data-lucide="upload" class="w-5 h-5"></i>
-        Import Old Customers
-    </a>
+                            <i data-lucide="upload" class="w-5 h-5"></i>
+                            Import Old Customers
+                        </a>
 
-    {{-- View Old Customers --}}
-    <a href="{{ route('salesman.old-customers.index') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- View Old Customers --}}
+                        <a href="{{ route('salesman.old-customers.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.old-customers.index') ? 'sidebar-active' : '' }}">
-        <i data-lucide="database" class="w-5 h-5"></i>
-        View Old Customers
-    </a>
+                            <i data-lucide="database" class="w-5 h-5"></i>
+                            View Old Customers
+                        </a>
+                    @endif
 
-@endif
-
-               @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
-
-
-    {{-- Staff Dashboard --}}
-    <a href="{{ route('staff.dashboard') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                    @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
+                        {{-- Staff Dashboard --}}
+                        <a href="{{ route('staff.dashboard') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('staff.dashboard') ? 'sidebar-active' : '' }}">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        Dashboard
-    </a>
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            Dashboard
+                        </a>
 
-    {{-- Attendance --}}
-    <a href="{{ route('staff.attendance.index') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{-- Attendance --}}
+                        <a href="{{ route('staff.attendance.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active' : '' }}">
-        <i data-lucide="clock" class="w-5 h-5"></i>
-        Attendance
-    </a>
-
-@endif
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                            Attendance
+                        </a>
+                    @endif
 
 
 
@@ -437,6 +473,20 @@
                                     <i data-lucide="building-2" class="w-5 h-5"></i>
                                     All Customers
                                 </a>
+                                <a href="https://expense.sessigmasoft.com/"
+   class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
+   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active-mobile' : '' }}">
+
+    <i data-lucide="wallet"
+        class="w-5 h-5 "></i>
+
+    <span>All Expenses</span>
+
+    <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
+        NEW
+    </span>
+</a>
 
                                 <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
 
@@ -451,158 +501,163 @@
 
 
                             @if (auth()->user()->role === 'salesman')
-
-    {{-- Dashboard --}}
-    <a href="{{ route('salesman.dashboard') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- Dashboard --}}
+                                <a href="{{ route('salesman.dashboard') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('salesman.dashboard') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        Dashboard
-    </a>
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                                    Dashboard
+                                </a>
 
-    {{-- Attendance --}}
-    <a href="{{ route('salesman.attendance.index') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- Attendance --}}
+                                <a href="{{ route('salesman.attendance.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('salesman.attendance.*') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="clock" class="w-5 h-5"></i>
-        Attendance
-    </a>
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    Attendance
+                                </a>
 
-    {{-- My Customers --}}
-    <a href="{{ route('salesman.customers.index') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- My Customers --}}
+                                <a href="{{ route('salesman.customers.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('salesman.customers.index') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="briefcase" class="w-5 h-5"></i>
-        My Customers
-    </a>
+                                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                                    My Customers
+                                </a>
 
-    {{-- Add Customer --}}
-    <a href="{{ route('salesman.customers.create') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- Add Customer --}}
+                                <a href="{{ route('salesman.customers.create') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('salesman.customers.create') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="user-plus" class="w-5 h-5"></i>
-        Add Customer
-    </a>
+                                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                                    Add Customer
+                                </a>
 
-    {{-- Start Visit --}}
-    <a href="{{ route('salesman.visits.create') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- Start Visit --}}
+                                <a href="{{ route('salesman.visits.create') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('salesman.visits.create') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="map-pin" class="w-5 h-5"></i>
-        Start Visit
-    </a>
+                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                    Start Visit
+                                </a>
 
-    {{-- My Visits --}}
-    <a href="{{ route('salesman.visits.index') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- My Visits --}}
+                                <a href="{{ route('salesman.visits.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('salesman.visits.index') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="calendar-check" class="w-5 h-5"></i>
-        My Visits
-    </a>
+                                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                                    My Visits
+                                </a>
 
-    <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
+                                <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
 
-    {{-- Import Old Customers --}}
-    <a href="{{ route('salesman.old-customers.import') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                {{-- Import Old Customers --}}
+                                <a href="{{ route('salesman.old-customers.import') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->is('salesman/old-customers/import*') ? 'sidebar-active-mobile' : '' }}">
-    <i data-lucide="upload" class="w-5 h-5"></i>
-    Import Old Customers
-</a>
+                                    <i data-lucide="upload" class="w-5 h-5"></i>
+                                    Import Old Customers
+                                </a>
 
 
-    {{-- View Old Customers --}}
-    <a href="{{ route('salesman.old-customers.index') }}"
-       class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                {{-- View Old Customers --}}
+                                <a href="{{ route('salesman.old-customers.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
        {{ request()->routeIs('salesman.old-customers.index') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="database" class="w-5 h-5"></i>
-        View Old Customers
-    </a>
-
-@endif
-@if ($role === 'saleshead')
-
-
-   {{-- Dashboard --}}
-<a href="{{ route('salehead.dashboard') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                    <i data-lucide="database" class="w-5 h-5"></i>
+                                    View Old Customers
+                                </a>
+                            @endif
+                            @if ($role === 'saleshead')
+                                {{-- Dashboard --}}
+                                <a href="{{ route('salehead.dashboard') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
-    <i data-lucide="layout-dashboard"></i>
-    Dashboard
-</a>
+                                    <i data-lucide="layout-dashboard"></i>
+                                    Dashboard
+                                </a>
 
 
-{{-- Salesman Visits --}}
-<a href="{{ route('salehead.reports.index') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                {{-- Salesman Visits --}}
+                                <a href="{{ route('salehead.reports.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
-    <i data-lucide="clipboard-list"></i>
-    Salesman Visits
-</a>
+                                    <i data-lucide="clipboard-list"></i>
+                                    Salesman Visits
+                                </a>
 
 
 
-{{-- All Customers --}}
-<a href="{{ route('salehead.customers.index') }}"
-   class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                {{-- All Customers --}}
+                                <a href="{{ route('salehead.customers.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
    {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
-    <i data-lucide="building-2"></i>
-    All Customers
-</a>
+                                    <i data-lucide="building-2"></i>
+                                    All Customers
+                                </a>
+                            @endif
 
-@endif
-
-@if (auth()->user()->role === 'hr')
-
-    <a href="{{ route('hr.dashboard') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                            @if (auth()->user()->role === 'hr')
+                                <a href="{{ route('hr.dashboard') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.dashboard') ? 'sidebar-active' : '' }}">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        Dashboard
-    </a>
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                                    Dashboard
+                                </a>
 
-    <a href="{{ route('hr.staff.index') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                <a href="{{ route('hr.staff.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.staff.*') ? 'sidebar-active' : '' }}">
-        <i data-lucide="users-round" class="w-5 h-5"></i>
-        All Staff
-    </a>
+                                    <i data-lucide="users-round" class="w-5 h-5"></i>
+                                    All Staff
+                                </a>
 
-    <a href="{{ route('hr.attendance.index') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                <a href="{{ route('hr.attendance.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.attendance.index') ? 'sidebar-active' : '' }}">
-        <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-        Attendance Reports
-    </a>
+                                    <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                                    Attendance Reports
+                                </a>
 
-   <a href="{{ route('hr.attendance.leave-requests') }}"
-        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                                <a href="{{ route('hr.attendance.leave-requests') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
         {{ request()->routeIs('hr.attendance.leave-requests') ? 'sidebar-active' : '' }}">
-        <i data-lucide="mail" class="w-5 h-5"></i>
-        Leave Messages
-    </a>
+                                    <i data-lucide="mail" class="w-5 h-5"></i>
+                                    Leave Messages
+                                </a>
+                                <a href="https://expense.sessigmasoft.com/"
+   class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
+   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active-mobile' : '' }}">
 
-@endif
+    <i data-lucide="wallet"
+        class="w-5 h-5 "></i>
 
-                    @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
+    <span>All Expenses</span>
 
-    {{-- Staff Dashboard --}}
-    <a href="{{ route('staff.dashboard') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+    <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
+        NEW
+    </span>
+</a>
+                            @endif
+
+                            @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
+                                {{-- Staff Dashboard --}}
+                                <a href="{{ route('staff.dashboard') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('staff.dashboard') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-        Dashboard
-    </a>
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                                    Dashboard
+                                </a>
 
-    {{-- Attendance --}}
-    <a href="{{ route('staff.attendance.index') }}"
-       class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                {{-- Attendance --}}
+                                <a href="{{ route('staff.attendance.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
-        <i data-lucide="clock" class="w-5 h-5"></i>
-        Attendance
-    </a>
-
-@endif
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    Attendance
+                                </a>
+                            @endif
 
 
 

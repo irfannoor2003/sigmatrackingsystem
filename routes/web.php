@@ -17,6 +17,7 @@ use App\Http\Controllers\VisitController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ReportController;
 
+
 // Admin
 use App\Http\Controllers\Admin\AttendanceReportController;
 use App\Http\Controllers\Admin\ManualVisitController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\HRDashboardController;
 use App\Http\Controllers\SalesHeadDashboardController;
 use App\Http\Controllers\HR\StaffController as HRStaffController;
 use App\Http\Controllers\VisitExportController;
+
 
 
 
@@ -156,6 +158,9 @@ Route::middleware(['auth', 'role:admin'])
 
             Route::post('/manual-visit/{user}', [ManualVisitController::class, 'store'])
                 ->name('manual.visit.store');
+
+            Route::get('/export/range', [AttendanceReportController::class, 'exportRange'])
+                ->name('export.range');
 
         });
 
@@ -358,6 +363,9 @@ Route::prefix('staff')->name('staff.')->group(function () {
 
             Route::get('/export/single/{id}', [HrDashboardController::class, 'exportExcel'])
             ->name('export.single');
+
+            Route::get('/export/range', [HrDashboardController::class, 'exportRange'])
+            ->name('export.range');
             });
             Route::post('/holiday/store', [HrDashboardController::class, 'storeHoliday'])->name('holiday.store');
 });
@@ -379,3 +387,14 @@ Route::middleware(['auth', 'role:admin,hr'])
         Route::post('/manual/store', [AttendanceController::class, 'manualStore'])
             ->name('manual.store');
     });
+
+
+// ========================================
+// ZKTeco SenseFace Device Routes (NO AUTH)
+// ========================================
+use App\Http\Controllers\ZKTecoController;
+
+
+Route::match(['GET','POST'], '/iclock/cdata', [ZKTecoController::class, 'cdata']);
+Route::match(['GET','POST'], '/iclock/devicecmd', [ZKTecoController::class, 'deviceCmd']);
+Route::match(['GET','POST'], '/iclock/getrequest', [ZKTecoController::class, 'getRequest']);
