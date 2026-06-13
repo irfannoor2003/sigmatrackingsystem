@@ -119,4 +119,22 @@ class StaffController extends Controller
         ->with('success', 'Staff deleted successfully.');
 }
 
+    public function block(User $staff)
+    {
+        $staff->block();
+
+        return redirect()
+            ->route('admin.staff.index')
+            ->with('success', 'Staff blocked and notified.');
+    }
+
+    public function unblock(User $staff)
+    {
+        $staff->unblock();
+
+        return redirect()
+            ->route('admin.staff.index')
+            ->with('success', 'Staff unblocked and notified.');
+    }
+
 }

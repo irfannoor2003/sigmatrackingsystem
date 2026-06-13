@@ -63,16 +63,15 @@ class Attendance extends Model
         return $this->belongsTo(User::class, 'salesman_id');
     }
 
-    // Alias (optional but kept for compatibility)
     public function user()
     {
         return $this->belongsTo(User::class, 'salesman_id');
     }
 
     public function office()
-{
-    return $this->belongsTo(Office::class);
-}
+    {
+        return $this->belongsTo(Office::class);
+    }
 
     /* =========================
         ACCESSORS (UI HELPERS)
@@ -82,30 +81,21 @@ class Attendance extends Model
      * Human-readable attendance status
      */
     public function getDisplayStatusAttribute(): string
-    {
-        if ($this->status === 'leave') {
-            return 'On Leave';
-        }
+{
+    if ($this->status === 'leave') return 'On Leave';
+    if ($this->manual_visit) return 'Manual Visit';
 
-        if ($this->manual_visit) {
-            return 'Manual Visit';
-        }
+    // ✅ Device punch methods
+    if ($this->checkin_method === 'device') return 'Face Verified';
+    if ($this->checkin_method === 'finger') return 'Fingerprint Verified';
+    if ($this->checkin_method === 'card')   return 'Card Verified';
 
-        if ($this->short_leave) {
-            return 'Short Leave';
-        }
+    if ($this->short_leave) return 'Short Leave';
+    if ($this->clock_in && !$this->clock_out) return 'Working';
+    if ($this->clock_in && $this->clock_out) return 'Completed';
 
-        if ($this->clock_in && !$this->clock_out) {
-            return 'Working';
-        }
-
-        if ($this->clock_in && $this->clock_out) {
-            return 'Completed';
-        }
-
-        return 'Not Clocked';
-    }
-
+    return 'Not Clocked';
+}
     /**
      * Live working minutes
      */
@@ -169,21 +159,26 @@ class Attendance extends Model
     /**
      * UI Badge for check-in method
      */
-    public function getCheckinBadgeAttribute(): string
-    {
-        return match ($this->checkin_method) {
-            'qr'     => 'QR + GPS',
-            'gps'    => 'GPS',
-            'manual' => 'Manual',
-            default  => 'Unknown'
-        };
-    }
+  public function getCheckinBadgeAttribute(): string
+{
+    return match ($this->checkin_method) {
+        'qr'     => 'QR + GPS',
+        'gps'    => 'GPS',
+        'manual' => 'Manual',
+        'device' => 'Face',           // ✅ face
+        'finger' => 'Fingerprint',    // ✅ finger
+        'card'   => 'Card / RFID',    // ✅ card
+        default  => 'Unknown',
+    };
+}
+
     public function marker()
-{
-    return $this->belongsTo(User::class, 'marked_by');
-}
-public function markedBy()
-{
-    return $this->belongsTo(User::class, 'marked_by');
-}
+    {
+        return $this->belongsTo(User::class, 'marked_by');
+    }
+
+    public function markedBy()
+    {
+        return $this->belongsTo(User::class, 'marked_by');
+    }
 }

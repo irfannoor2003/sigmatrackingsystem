@@ -48,6 +48,13 @@ class AuthenticatedSessionController extends Controller
         }
     }
 
+    // Prevent blocked users from logging in (check before attempting auth)
+    if ($user && method_exists($user, 'isBlocked') && $user->isBlocked()) {
+        return back()->withErrors([
+            'email' => 'This account has been blocked. Contact admin.',
+        ]);
+    }
+
     // ❌ Invalid credentials
     if (!Auth::attempt($credentials)) {
         return back()->withErrors([

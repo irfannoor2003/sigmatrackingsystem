@@ -11,15 +11,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+
+        // Your existing role middleware
         $middleware->alias([
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
-    ]);
-      $middleware->validateCsrfTokens(except: [
-        'iclock/*', // This allows all ADMS requests to bypass CSRF
-    ]);
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+
+        // ZKTeco device routes excluded from CSRF
+        $middleware->validateCsrfTokens(except: [
+            'iclock/*',
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
-
-

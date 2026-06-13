@@ -28,6 +28,10 @@ class AttendanceController extends Controller
             'salesman','it','account','store','office_boy'
         ])) abort(403);
 
+        if (method_exists($user, 'isBlocked') && $user->isBlocked()) {
+            abort(403, 'Your account is blocked. Contact admin.');
+        }
+
         return $user;
     }
 

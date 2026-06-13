@@ -78,4 +78,20 @@ class SalesmanController extends Controller
 
         return back()->with('success', 'Salesman deleted successfully.');
     }
+
+    public function block($id)
+    {
+        $salesman = User::where('role', 'salesman')->findOrFail($id);
+        $salesman->block();
+
+        return back()->with('success', 'Salesman blocked and notified.');
+    }
+
+    public function unblock($id)
+    {
+        $salesman = User::where('role', 'salesman')->findOrFail($id);
+        $salesman->unblock();
+
+        return back()->with('success', 'Salesman unblocked and notified.');
+    }
 }

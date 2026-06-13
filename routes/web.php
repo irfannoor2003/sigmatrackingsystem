@@ -124,6 +124,12 @@ Route::middleware(['auth', 'role:admin'])
         /* ---------------- Salesmen ---------------- */
         Route::resource('salesmen', AdminSalesmanController::class)
             ->except(['show']);
+        // Block / unblock
+        Route::post('salesmen/{salesman}/block', [AdminSalesmanController::class, 'block'])
+            ->name('salesmen.block');
+
+        Route::post('salesmen/{salesman}/unblock', [AdminSalesmanController::class, 'unblock'])
+            ->name('salesmen.unblock');
 
         /* ---------------- Attendance ---------------- */
         Route::prefix('attendance')->name('attendance.')->group(function () {
@@ -188,6 +194,12 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])
             ->name('staff.destroy');
+
+            Route::post('/staff/{staff}/block', [StaffController::class, 'block'])
+                ->name('staff.block');
+
+            Route::post('/staff/{staff}/unblock', [StaffController::class, 'unblock'])
+                ->name('staff.unblock');
 
 
         /* ---------------- Old Customers ---------------- */

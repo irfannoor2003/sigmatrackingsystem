@@ -106,7 +106,14 @@
 
                     <tr class="hover:bg-white/5 transition">
                         <td class="p-2 text-white">{{ $s->id }}</td>
-                        <td class="p-2 text-white">{{ $s->name }}</td>
+                        <td class="p-2 text-white">
+                            <div class="flex items-center">
+                                <span>{{ $s->name }}</span>
+                                @if($s->is_blocked)
+                                    <span class="ml-2 inline-block px-2 py-0.5 text-xs rounded-full bg-red-600 text-white font-semibold">Blocked</span>
+                                @endif
+                            </div>
+                        </td>
                         <td class="p-2 text-white/90">{{ $s->email }}</td>
                         <td class="p-2 text-white/80">{{ $totalCustomers }}</td>
                         <td class="p-2 text-indigo-300 font-semibold">{{ $customersMonthly }}</td>
@@ -133,6 +140,29 @@
                     class="px-3 py-1 rounded-lg bg-red-500/20 text-red-300
                            hover:bg-red-500/30 transition flex items-center text-sm">
                 <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
+            </button>
+        </form>
+
+        {{-- Block / Unblock --}}
+        <form method="POST" action="{{ route('admin.salesmen.block', $s->id) }}"
+              onsubmit="return confirm('{{ $s->is_blocked ? 'Are you sure you want to unblock this user?' : 'Are you sure you want to block this user?' }}')">
+            @csrf
+            <button type="submit"
+                    class="px-3 py-1 rounded-lg transition flex items-center text-sm {{ $s->is_blocked ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30' }}">
+                @if($s->is_blocked)
+                    <!-- Unlock SVG -->
+                    <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11V7a3 3 0 10-6 0v4" />
+                        <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                @else
+                    <!-- Lock SVG -->
+                    <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a3 3 0 00-6 0v4" />
+                        <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                @endif
+                {{ $s->is_blocked ? 'Unblock' : 'Block' }}
             </button>
         </form>
 
@@ -226,6 +256,28 @@
                 class="w-full py-2 rounded-lg bg-red-500/20 text-red-300
                        hover:bg-red-500/30 transition flex items-center justify-center text-sm">
             <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
+        </button>
+    </form>
+
+    {{-- Block / Unblock --}}
+    <form method="POST" action="{{ route('admin.salesmen.block', $s->id) }}" class="flex-1"
+          onsubmit="return confirm('{{ $s->is_blocked ? 'Are you sure you want to unblock this user?' : 'Are you sure you want to block this user?' }}')">
+        @csrf
+        <button type="submit"
+                class="w-full py-2 rounded-lg transition flex items-center justify-center text-sm {{ $s->is_blocked ? 'bg-green-500/20 text-green-300 hover:bg-green-500/30' : 'bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30' }}">
+            @if($s->is_blocked)
+                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11V7a3 3 0 10-6 0v4" />
+                    <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                </svg>
+                Unblock
+            @else
+                <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a3 3 0 00-6 0v4" />
+                    <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                </svg>
+                Block
+            @endif
         </button>
     </form>
 

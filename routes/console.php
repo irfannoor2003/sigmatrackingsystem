@@ -26,9 +26,14 @@ Schedule::command('attendance:auto-clockout')
     ->timezone('Asia/Karachi')
     ->withoutOverlapping();
 
-Schedule::command('cron:test')
-            ->everyMinute()
-            ->timezone('Asia/Karachi');
+// Schedule::command('cron:test')
+            // ->everyMinute()
+            // ->timezone('Asia/Karachi');
 
+// 🔥 ZKTeco Device Sync (MOST IMPORTANT)
+Schedule::command('attendance:sync-zkteco')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->runInBackground();
 
 Schedule::command('newsletter:send')->monthly();

@@ -82,7 +82,15 @@
                                     <div class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold uppercase shadow-lg">
                                         {{ substr($user->name, 0, 2) }}
                                     </div>
-                                    <span class="font-semibold text-white/90">{{ $user->name }}</span>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-semibold text-white/90">{{ $user->name }}</span>
+                                            @if($user->is_blocked)
+                                                <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-red-600 text-white font-semibold">Blocked</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-white/60 text-xs">{{ $user->email }}</div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="p-4 text-white/70 text-sm italic">{{ $user->email }}</td>
@@ -101,6 +109,30 @@
            title="Attendance">
             <i data-lucide="calendar-check" class="w-4 h-4"></i>
         </a>
+    @endif
+
+    @if($user->role !== 'admin')
+          <form method="POST" action="{{ $user->is_blocked ? route('admin.staff.unblock', $user->id) : route('admin.staff.block', $user->id) }}"
+              onsubmit="return confirm('{{ $user->is_blocked ? 'Are you sure you want to unblock this staff member?' : 'Are you sure you want to block this staff member?' }}')">
+            @csrf
+            <button type="submit"
+                    class="p-2 rounded-lg transition {{ $user->is_blocked ? 'bg-green-500/20 border border-green-400/30 text-green-200 hover:bg-green-500/30' : 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-500/40' }}"
+                    title="Block/Unblock">
+                @if($user->is_blocked)
+                    <!-- Unlock SVG -->
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11V7a3 3 0 10-6 0v4" />
+                        <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                @else
+                    <!-- Lock SVG -->
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a3 3 0 00-6 0v4" />
+                        <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                    </svg>
+                @endif
+            </button>
+        </form>
     @endif
 
     <a href="{{ route('admin.staff.edit', $user->id) }}"
@@ -165,6 +197,27 @@
                                 <i data-lucide="calendar-check" class="w-4 h-4"></i>
                                 Attendance
                             </a>
+                        @endif
+                        @if($user->role !== 'admin')
+                                <form method="POST" action="{{ $user->is_blocked ? route('admin.staff.unblock', $user->id) : route('admin.staff.block', $user->id) }}" class="flex items-center justify-center gap-2 py-2.5 rounded-xl"
+                                    onsubmit="return confirm('{{ $user->is_blocked ? 'Are you sure you want to unblock this staff member?' : 'Are you sure you want to block this staff member?' }}')">
+                                @csrf
+                                <button type="submit" class="w-full rounded-xl transition {{ $user->is_blocked ? 'bg-green-500/20 border border-green-400/30 text-green-200 hover:bg-green-500/30' : 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-500/30' }} text-xs font-semibold">
+                                    @if($user->is_blocked)
+                                        <svg class="w-4 h-4 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11V7a3 3 0 10-6 0v4" />
+                                            <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                                        </svg>
+                                        Unblock
+                                    @else
+                                        <svg class="w-4 h-4 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a3 3 0 00-6 0v4" />
+                                            <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                                        </svg>
+                                        Block
+                                    @endif
+                                </button>
+                            </form>
                         @endif
                         <a href="{{ route('admin.staff.edit', $user->id) }}"
                             class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-200 text-xs font-semibold hover:bg-amber-500/30 transition {{ $user->role === 'admin' ? 'col-span-2' : '' }}">
