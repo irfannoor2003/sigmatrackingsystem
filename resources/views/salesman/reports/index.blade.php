@@ -3,7 +3,7 @@
 @section('title','My Visit Report')
 
 @section('content')
-<div class="p-8">
+<div class="p-0">
     <h1 class="text-2xl font-bold mb-4">My Visit Report</h1>
 
     <table class="table-auto w-full border">

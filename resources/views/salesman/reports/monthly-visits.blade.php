@@ -8,7 +8,7 @@
     $displayMonth = \Carbon\Carbon::createFromFormat('Y-m', $monthInput)->format('F Y');
 @endphp
 
-<div class="max-w-6xl mx-auto mt-10 px-4">
+<div class="max-w-6xl mx-auto mt-10 p-0">
 
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">

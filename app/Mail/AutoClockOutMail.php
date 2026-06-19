@@ -18,7 +18,8 @@ class AutoClockOutMail extends Mailable
 
     public function build()
     {
-        return $this->subject('⏰ Auto Clock-Out at 8:00 PM')
+        return $this->subject('Auto Clock-Out at 8:00 PM')
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.auto_clock_out');
     }
 }

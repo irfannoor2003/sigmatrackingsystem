@@ -18,6 +18,12 @@ class OldCustomersImport implements
 {
     public int $inserted = 0;
     public int $skipped  = 0;
+    private ?int $salesmanId;
+
+    public function __construct(?int $salesmanId = null)
+    {
+        $this->salesmanId = $salesmanId;
+    }
 
     public function model(array $row)
     {
@@ -50,7 +56,7 @@ class OldCustomersImport implements
             'contact'        => isset($row['contact'])
                                     ? trim((string) $row['contact'])
                                     : null,
-            'salesman_id'    => Auth::id(),
+            'salesman_id'    => $this->salesmanId ?? Auth::id(),
         ]);
     }
 

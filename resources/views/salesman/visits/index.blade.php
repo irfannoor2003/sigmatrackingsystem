@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <div class="p-0 sm:p-6 ">
+    <div class="p-0">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
 
@@ -266,6 +266,7 @@
                                 <span
                                     class="px-3 py-1 rounded-lg text-xs
                                 @if ($v->status == 'started') bg-yellow-500/20 border border-yellow-400/40 text-yellow-200
+                                @elseif ($v->status == 'blocked') bg-red-500/20 border border-red-400/40 text-red-200
                                 @else
                                     bg-green-500/20 border border-green-400/40 text-green-200 @endif
                             ">
@@ -274,8 +275,8 @@
                             </td>
 
                             <td class="p-3 max-w-xs">
-                                <div class="break-words whitespace-pre-line max-h-24 overflow-y-auto pr-1">
-                                    {{ $v->notes ?? '-' }}
+                                <div class="break-words whitespace-pre-line truncate max-w-[120px]" title="{{ $v->notes ?? '' }}">
+                                    {{ \Illuminate\Support\Str::limit($v->notes ?? '-', 10) }}
                                 </div>
                             </td>
 
@@ -447,6 +448,7 @@
                             <span
                                 class="px-3 py-1 rounded-lg text-xs
                             @if ($v->status == 'started') bg-yellow-500/20 border border-yellow-400/40 text-yellow-200
+                            @elseif ($v->status == 'blocked') bg-red-500/20 border border-red-400/40 text-red-200
                             @else
                                 bg-green-500/20 border border-green-400/40 text-green-200 @endif
                         ">

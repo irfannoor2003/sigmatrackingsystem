@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="p-4 px-0 md:p-6 text-white">
+<div class="p-0 text-white">
 
     <h1 class="text-3xl font-bold mb-6 tracking-wide flex items-center">
         <i data-lucide="notebook-tabs" class="w-8 h-8 mr-3 text-pink-400"></i> Visit Details
@@ -32,17 +32,24 @@
                     <strong class="text-white mr-2">Status:</strong>
 
                     @if($visit->status == 'started')
-                        <span class="inline-flex items-center text-yellow-300">
-                            <i data-lucide="loader-2" class="w-4 h-4 mr-1"></i>
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-yellow-500/30 bg-yellow-500/10 text-yellow-400">
+                            <i data-lucide="loader-2" class="w-3 h-3 mr-1"></i>
                             {{ ucfirst($visit->status) }}
                         </span>
                     @elseif($visit->status == 'completed')
-                        <span class="inline-flex items-center text-green-400">
-                            <i data-lucide="check-square" class="w-4 h-4 mr-1"></i>
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-green-500/30 bg-green-500/10 text-green-400">
+                            <i data-lucide="check-square" class="w-3 h-3 mr-1"></i>
+                            {{ ucfirst($visit->status) }}
+                        </span>
+                    @elseif($visit->status == 'blocked')
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-red-500/30 bg-red-500/10 text-red-400">
+                            <i data-lucide="shield-off" class="w-3 h-3 mr-1"></i>
                             {{ ucfirst($visit->status) }}
                         </span>
                     @else
-                        {{ ucfirst($visit->status) }}
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-gray-500/30 bg-gray-500/10 text-gray-400">
+                            {{ ucfirst($visit->status) }}
+                        </span>
                     @endif
                 </p>
             </div>

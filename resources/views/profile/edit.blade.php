@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="p-6">
+<div class="p-0">
 
     <h1 class="text-2xl font-semibold mb-6 text-white">
         Profile Settings

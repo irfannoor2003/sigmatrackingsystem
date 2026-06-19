@@ -20,6 +20,7 @@ class CustomerWelcome extends Mailable
     public function build()
     {
         return $this->subject('Welcome to Our Company!')
+                    ->replyTo(config('mail.from.address'), config('mail.from.name'))
                     ->view('emails.customer_welcome');
     }
 }

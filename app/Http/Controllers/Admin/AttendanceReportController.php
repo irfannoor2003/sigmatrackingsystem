@@ -181,10 +181,19 @@ class AttendanceReportController extends Controller
             $calendar->push($dayData);
         }
 
+        $totalPresents  = $calendar->where('status', 'present')->count();
+        $totalAbsents   = $calendar->where('status', 'absent')->count();
+        $totalLeaves    = $calendar->where('status', 'leave')->count();
+        $totalShortLeaves = $calendar->where('status', 'short_leave')->count();
+
         return view('admin.attendance.staff', compact(
             'user',
             'calendar',
-            'monthInput'
+            'monthInput',
+            'totalPresents',
+            'totalAbsents',
+            'totalLeaves',
+            'totalShortLeaves'
         ));
     }
 

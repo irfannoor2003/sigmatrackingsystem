@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="max-w-4xl mx-auto mt-10 p-4"> <div class="bg-white/10 backdrop-blur-xl border border-white/20
+<div class="max-w-4xl mx-auto mt-10 p-0"> <div class="bg-white/10 backdrop-blur-xl border border-white/20
                  rounded-3xl shadow-2xl p-6 md:p-8"> <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 tracking-wide flex items-center">
             {{-- Lucide Icon: file-text --}}
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text mr-3 text-[#ff2ba6]">

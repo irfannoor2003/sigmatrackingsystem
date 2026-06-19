@@ -17,7 +17,7 @@ $todayDate = $today ?? now();
 .badge { font-size: 9px; padding: 2px 4px; border-radius: 4px; }
 </style>
 
-<div class="max-w-6xl mx-auto px-3 sm:px-0 pb-24">
+<div class="max-w-6xl mx-auto pb-24">
 
     {{-- HEADER --}}
     <div class="glass p-6 rounded-3xl border border-white/20 shadow-xl mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

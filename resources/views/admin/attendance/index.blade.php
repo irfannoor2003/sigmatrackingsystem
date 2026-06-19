@@ -35,7 +35,7 @@
         $displayMonth = Carbon::createFromFormat('Y-m', $monthInput ?? now()->format('Y-m'))->format('F Y');
     @endphp
 
-    <div class="max-w-6xl mx-auto mt-12 px-0 sm:px-4">
+    <div class="max-w-6xl mx-auto mt-12 p-0">
 
         {{-- HEADER --}}
         <div class="relative glass p-8 rounded-2xl border border-white/20 shadow-2xl mb-8 overflow-hidden">
@@ -208,46 +208,81 @@
         </form>
 
         {{-- INSIGHTS --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-            <div class="glass p-6 rounded-2xl border border-emerald-400/30 hover:scale-[1.02] transition">
-                <p class="text-xs text-emerald-300">Star Performer</p>
-                <h3 class="text-xl text-white font-bold mt-1">
-                    {{ $bestAttendance?->salesman?->name ?? '--' }}
-                </h3>
-                <p class="text-sm text-emerald-200 flex items-center gap-1">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i>
-                    {{ $bestAttendance->presents ?? 0 }} days
-                </p>
+            <div class="relative glass p-4 rounded-2xl border border-emerald-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Star Performer</p>
+                        <div class="bg-emerald-500/10 p-1.5 rounded-lg">
+                            <i data-lucide="trophy" class="w-3.5 h-3.5 text-emerald-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-sm text-white font-bold mb-1.5">
+                        {{ $bestAttendance?->salesman?->name ?? '--' }}
+                    </h3>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-2xl font-extrabold text-emerald-400">{{ $bestAttendance->presents ?? 0 }}</span>
+                        <span class="text-[10px] text-emerald-300/70 font-medium uppercase">days</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="glass p-6 rounded-2xl border border-rose-400/30 hover:scale-[1.02] transition">
-                <p class="text-xs text-rose-300">Most Leaves</p>
-                <h3 class="text-xl text-white font-bold mt-1">
-                    {{ $mostLeaves?->salesman?->name ?? '--' }}
-                </h3>
-                <p class="text-sm text-rose-200 flex items-center gap-1">
-                    <i data-lucide="x-circle" class="w-4 h-4"></i>
-                    {{ $mostLeaves->leaves ?? 0 }} leaves
-                </p>
+            <div class="relative glass p-4 rounded-2xl border border-rose-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-rose-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider">Most Leaves</p>
+                        <div class="bg-rose-500/10 p-1.5 rounded-lg">
+                            <i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-sm text-white font-bold mb-1.5">
+                        {{ $mostLeaves?->salesman?->name ?? '--' }}
+                    </h3>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-2xl font-extrabold text-rose-400">{{ $mostLeaves->leaves ?? 0 }}</span>
+                        <span class="text-[10px] text-rose-300/70 font-medium uppercase">leaves</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="glass p-6 rounded-2xl border border-sky-400/30 hover:scale-[1.02] transition">
-                <p class="text-xs text-sky-300">Hardest Worker</p>
-                <h3 class="text-xl text-white font-bold mt-1">
-                    {{ $hardestWorker?->salesman?->name ?? '--' }}
-                </h3>
-                <p class="text-sm text-sky-200 flex items-center gap-1">
-                    <i data-lucide="clock" class="w-4 h-4"></i>
-                    {{ number_format(($hardestWorker->minutes ?? 0) / 60, 1) }} hrs
-                </p>
+            <div class="relative glass p-4 rounded-2xl border border-sky-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-sky-500/20 to-sky-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">Hardest Worker</p>
+                        <div class="bg-sky-500/10 p-1.5 rounded-lg">
+                            <i data-lucide="clock" class="w-3.5 h-3.5 text-sky-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-sm text-white font-bold mb-1.5">
+                        {{ $hardestWorker?->salesman?->name ?? '--' }}
+                    </h3>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-2xl font-extrabold text-sky-400">{{ number_format(($hardestWorker->minutes ?? 0) / 60, 1) }}</span>
+                        <span class="text-[10px] text-sky-300/70 font-medium uppercase">hours</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="glass p-6 rounded-2xl border border-purple-400/30 hover:scale-[1.02] transition">
-                <p class="text-xs text-purple-300">Attendance Health</p>
-                <h3 class="text-3xl text-white font-extrabold">
-                    {{ $attendanceRate }}%
-                </h3>
+            <div class="relative glass p-4 rounded-2xl border border-purple-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="relative">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Attendance Health</p>
+                        <div class="bg-purple-500/10 p-1.5 rounded-lg">
+                            <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-purple-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 mb-1.5">
+                        <span class="text-2xl font-extrabold text-purple-400">{{ $attendanceRate }}%</span>
+                    </div>
+                    <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full bg-gradient-to-r from-purple-500/40 to-purple-400/20" style="width: {{ $attendanceRate }}%"></div>
+                    </div>
+                </div>
             </div>
         </div>
 

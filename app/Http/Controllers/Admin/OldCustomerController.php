@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\OldCustomer;
 use App\Models\User;
+use App\Imports\OldCustomersImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OldCustomerController extends Controller
 {
@@ -40,5 +42,38 @@ class OldCustomerController extends Controller
             ->get();
 
         return view('admin.old-customers.index', compact('customers', 'salesmen'));
+    }
+
+    public function importForm()
+    {
+        $salesmen = User::where('role', 'salesman')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.old-customers.import', compact('salesmen'));
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file'        => 'required|mimes:xlsx,xls,csv',
+            'salesman_id' => 'required|exists:users,id',
+        ]);
+
+        $startTime = microtime(true);
+
+        $import = new OldCustomersImport($request->salesman_id);
+        Excel::import($import, $request->file('file'));
+
+        $timeTaken = round(microtime(true) - $startTime, 2);
+
+        return redirect()
+            ->route('admin.old-customers.index')
+            ->with(
+                'success',
+                "Import completed in {$timeTaken}s. "
+                . "Inserted: {$import->inserted}, "
+                . "Skipped: {$import->skipped}"
+            );
     }
 }

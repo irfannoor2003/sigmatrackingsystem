@@ -18,7 +18,8 @@ class LeaveReasonMail extends Mailable
 
     public function build()
     {
-        return $this->subject('🤒 Staff Leave Request')
+        return $this->subject('Staff Leave Request')
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.leave_reason');
     }
 }

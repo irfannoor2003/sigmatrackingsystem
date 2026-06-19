@@ -17,6 +17,7 @@ class AttendanceClockInVerificationMail extends Mailable
     {
         return $this
             ->subject('Confirm Your Clock-In')
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.attendance-verify');
     }
 }

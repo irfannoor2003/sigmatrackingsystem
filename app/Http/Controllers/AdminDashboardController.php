@@ -35,16 +35,15 @@ class AdminDashboardController extends Controller
             ->limit(6)
             ->get();
 
+        $blockedVisits = Visit::where('status', 'blocked')->count();
+
         return view('admin.dashboard', compact(
             'totalSalesmen',
             'workingToday',
             'attendanceActivities',
-            'visitActivities'
+            'visitActivities',
+            'blockedVisits'
         ));
-         return view('dashboard', [
-        'role' => auth()->user()->role, // pass current role
-        'attendanceActivities' => $attendanceActivities,
-    ]);
     }
 
 public function todayAttendance()

@@ -18,7 +18,8 @@ class ClockInReminderMail extends Mailable
 
     public function build()
     {
-        return $this->subject('⏰ Clock In Reminder')
+        return $this->subject('Clock In Reminder')
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.clock_in_reminder');
     }
 }

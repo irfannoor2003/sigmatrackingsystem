@@ -31,6 +31,7 @@ use App\Http\Controllers\HRDashboardController;
 use App\Http\Controllers\SalesHeadDashboardController;
 use App\Http\Controllers\HR\StaffController as HRStaffController;
 use App\Http\Controllers\VisitExportController;
+use App\Http\Controllers\Admin\AdminVisitController;
 
 
 
@@ -205,6 +206,19 @@ Route::middleware(['auth', 'role:admin'])
         /* ---------------- Old Customers ---------------- */
         Route::get('/old-customers', [AdminOldCustomerController::class, 'index'])
             ->name('old-customers.index');
+
+        Route::get('/old-customers/import', [AdminOldCustomerController::class, 'importForm'])
+            ->name('old-customers.import.form');
+
+        Route::post('/old-customers/import', [AdminOldCustomerController::class, 'import'])
+            ->name('old-customers.import');
+
+        /* ---------------- Visits ---------------- */
+        Route::get('/visits/blocked', [AdminVisitController::class, 'index'])
+            ->name('visits.blocked');
+
+        Route::post('/visits/{id}/unblock', [AdminVisitController::class, 'unblock'])
+            ->name('visits.unblock');
     });
 
 /*

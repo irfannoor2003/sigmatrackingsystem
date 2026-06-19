@@ -32,7 +32,7 @@ public function index(Request $request)
 {
     $query = Visit::with('customer')
         ->where('salesman_id', Auth::id())
-        ->orderBy('started_at', 'desc');
+        ->orderBy('id', 'desc');
 
     // ================= MONTH FILTER =================
     if ($request->month === 'current') {
@@ -78,6 +78,18 @@ public function index(Request $request)
      */
     public function store(Request $request)
     {
+        // ❌ Check if salesman has any blocked visits
+        $blockedVisit = Visit::where('salesman_id', Auth::id())
+            ->where('status', 'blocked')
+            ->first();
+
+        if ($blockedVisit) {
+            return back()->with(
+                'error',
+                'Access Denied: You have a blocked visit that must be resolved before starting a new visit. Please contact your administrator.'
+            );
+        }
+
         // ❌ Block multiple active visits
         $activeVisit = Visit::where('salesman_id', Auth::id())
             ->where('status', 'started')
@@ -147,8 +159,15 @@ public function index(Request $request)
 {
     $visit = Visit::where('id', $id)
         ->where('salesman_id', Auth::id())
-        ->where('status', 'started')
+        ->whereIn('status', ['started', 'blocked'])
         ->firstOrFail();
+
+    if ($visit->status === 'blocked') {
+        return back()->with(
+            'error',
+            'This visit is blocked and cannot be completed by the salesman. Please contact your administrator.'
+        );
+    }
 
     $request->validate([
         'notes' => 'nullable|string|max:1000',

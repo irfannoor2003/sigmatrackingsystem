@@ -3,7 +3,7 @@
 @section('title', 'Leave Requests')
 
 @section('content')
-<div class="max-w-7xl mx-auto mt-10 px-4">
+<div class="max-w-7xl mx-auto mt-10 p-0">
 
     {{-- Header --}}
     <div class="flex justify-between items-center mb-6">

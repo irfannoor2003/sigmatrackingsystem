@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <div class=" p-0 md:p-6">
+    <div class="p-0">
 
         {{-- Header with Lucide Icon --}}
         <h1 class="text-3xl font-bold text-white mb-6 tracking-wide flex items-center">

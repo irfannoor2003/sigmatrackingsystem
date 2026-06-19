@@ -20,6 +20,7 @@ class UserBlocked extends Mailable
     public function build()
     {
         return $this->subject('Your account has been blocked')
+                    ->replyTo(config('mail.from.address'), config('mail.from.name'))
                     ->view('emails.user_blocked')
                     ->with(['user' => $this->user]);
     }

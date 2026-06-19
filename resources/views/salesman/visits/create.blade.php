@@ -42,7 +42,7 @@
     }
 </style>
 
-<div class="max-w-xl mx-auto p-0 md:p-6">
+<div class="max-w-xl mx-auto p-0">
 
     <h1 class="text-3xl font-bold text-white mb-6 tracking-wide flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal mr-3 text-[#ff2ba6]">

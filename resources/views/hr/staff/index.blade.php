@@ -3,7 +3,7 @@
 @section('title', 'Staff Management')
 
 @section('content')
-    <div class="p-4 px-0 sm:p-6">
+    <div class="p-0">
 
         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide">

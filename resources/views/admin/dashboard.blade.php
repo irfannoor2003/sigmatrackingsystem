@@ -31,68 +31,136 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
     <!-- Total Staff -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-        <i data-lucide="briefcase" class="w-8 h-8 text-cyan-400 absolute top-4 right-4"></i>
-        <h3 class="text-sm font-medium text-white/80">Total Staff</h3>
-        <p class="text-4xl font-extrabold text-white mt-2">{{ $totalStaff }}</p>
-        <span class="text-xs text-white/60 mt-2 inline-block">Sales · IT · Accounts · Store · Office_boy </span>
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-cyan-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Total Staff</h3>
+                <p class="text-3xl font-black text-white mt-1 tracking-tight">{{ $totalStaff }}</p>
+                <span class="text-[10px] text-white/40 inline-block">Sales · IT · Accounts · Store · Office_boy</span>
+            </div>
+            <div class="bg-cyan-500/10 p-3 rounded-2xl group-hover:rotate-12 transition-transform">
+                <i data-lucide="briefcase" class="w-7 h-7 text-cyan-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-cyan-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-cyan-500" style="width: 100%"></div>
+        </div>
     </div>
 
-   <!-- Staff Working Today -->
-<div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-    <i data-lucide="check-circle" class="w-8 h-8 text-green-400 absolute top-4 right-4"></i>
-    <h3 class="text-sm font-medium text-white/80">Working Today</h3>
-    <p class="text-4xl font-extrabold text-white mt-2">{{ $todayWorkingStaff }}</p>
-    <span class="text-xs text-white/60 mt-2 inline-block">Marked present today</span>
-
-    <!-- See Details Link -->
-    <a href="{{ route('admin.attendance.today') }}"
-       class="mt-4 inline-block text-xs text-white/80 underline hover:text-white">
-        See Details
-    </a>
-</div>
-
+    <!-- Staff Working Today -->
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-green-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Working Today</h3>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <p class="text-3xl font-black text-white tracking-tight">{{ $todayWorkingStaff }}</p>
+                    <a href="{{ route('admin.attendance.today') }}" class="text-[10px] font-bold text-white/40 underline hover:text-green-400 uppercase tracking-tighter transition-colors">
+                        Details
+                    </a>
+                </div>
+            </div>
+            <div class="bg-green-500/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+                <i data-lucide="check-circle" class="w-7 h-7 text-green-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-green-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-green-500" style="width: {{ ($totalStaff > 0) ? ($todayWorkingStaff / $totalStaff) * 100 : 0 }}%"></div>
+        </div>
+    </div>
 
     <!-- Salesmen -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-        <i data-lucide="users" class="w-8 h-8 text-blue-400 absolute top-4 right-4"></i>
-        <h3 class="text-sm font-medium text-white/80">Salesmen</h3>
-        <p class="text-4xl font-extrabold text-white mt-2">
-            {{ User::where('role','salesman')->count() }}
-        </p>
-        <a href="{{ route('admin.salesmen.index') }}"
-           class="text-xs text-white/80 underline mt-3 inline-block hover:text-white">
-            Open Section
-        </a>
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-blue-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Salesmen</h3>
+                <p class="text-3xl font-black text-white mt-1 tracking-tight">
+                    {{ User::where('role','salesman')->count() }}
+                </p>
+                <a href="{{ route('admin.salesmen.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-blue-400 uppercase tracking-tighter transition-colors inline-block">
+                    Open Section
+                </a>
+            </div>
+            <div class="bg-blue-500/10 p-3 rounded-2xl group-hover:rotate-12 transition-transform">
+                <i data-lucide="users" class="w-7 h-7 text-blue-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-blue-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-blue-500" style="width: {{ ($totalStaff > 0) ? (User::where('role','salesman')->count() / $totalStaff) * 100 : 0 }}%"></div>
+        </div>
     </div>
 
     <!-- Customers -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-        <i data-lucide="contact" class="w-8 h-8 text-green-400 absolute top-4 right-4"></i>
-        <h3 class="text-sm font-medium text-white/80">Customers</h3>
-        <p class="text-4xl font-extrabold text-white mt-2">{{ Customer::count() }}</p>
-        <a href="{{ route('admin.customers.index') }}"
-           class="text-xs text-white/80 underline mt-3 inline-block hover:text-white">
-            View Customers
-        </a>
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-emerald-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Customers</h3>
+                <p class="text-3xl font-black text-white mt-1 tracking-tight">{{ Customer::count() }}</p>
+                <a href="{{ route('admin.customers.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-emerald-400 uppercase tracking-tighter transition-colors inline-block">
+                    View Customers
+                </a>
+            </div>
+            <div class="bg-emerald-500/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+                <i data-lucide="contact" class="w-7 h-7 text-emerald-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-emerald-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-emerald-500" style="width: 100%"></div>
+        </div>
     </div>
 
     <!-- Visits This Month -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-        <i data-lucide="calendar" class="w-8 h-8 text-yellow-400 absolute top-4 right-4"></i>
-        <h3 class="text-sm font-medium text-white/80">Visits This Month</h3>
-        <p class="text-4xl font-extrabold text-white mt-2">
-            {{ Visit::whereMonth('created_at', now()->month)->count() }}
-        </p>
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-yellow-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Visits This Month</h3>
+                <p class="text-3xl font-black text-white mt-1 tracking-tight">
+                    {{ Visit::whereMonth('created_at', now()->month)->count() }}
+                </p>
+            </div>
+            <div class="bg-yellow-500/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+                <i data-lucide="calendar" class="w-7 h-7 text-yellow-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-yellow-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-yellow-500" style="width: 100%"></div>
+        </div>
     </div>
 
     <!-- Today Visits -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg relative">
-        <i data-lucide="sun" class="w-8 h-8 text-orange-400 absolute top-4 right-4"></i>
-        <h3 class="text-sm font-medium text-white/80">Today's Visits</h3>
-        <p class="text-4xl font-extrabold text-white mt-2">
-            {{ Visit::whereDate('created_at', now()->toDateString())->count() }}
-        </p>
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-orange-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Today's Visits</h3>
+                <p class="text-3xl font-black text-white mt-1 tracking-tight">
+                    {{ Visit::whereDate('created_at', now()->toDateString())->count() }}
+                </p>
+            </div>
+            <div class="bg-orange-500/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+                <i data-lucide="sun" class="w-7 h-7 text-orange-400 animate-pulse"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-orange-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-orange-500" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <!-- Blocked Visits -->
+    <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-red-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Blocked Visits</h3>
+                <p class="text-3xl font-black text-white mt-1 tracking-tight">{{ $blockedVisits }}</p>
+                <a href="{{ route('admin.visits.blocked') }}" class="text-[10px] font-bold text-white/40 underline hover:text-red-400 uppercase tracking-tighter transition-colors inline-block">
+                    View Blocked Visits
+                </a>
+            </div>
+            <div class="bg-red-500/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
+                <i data-lucide="alert-circle" class="w-7 h-7 text-red-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-red-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-red-500" style="width: 100%"></div>
+        </div>
     </div>
 
 </div>

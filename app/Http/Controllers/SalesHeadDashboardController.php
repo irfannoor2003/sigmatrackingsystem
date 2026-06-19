@@ -27,6 +27,7 @@ class SalesHeadDashboardController extends Controller
         $endOfMonth = Carbon::now()->endOfMonth();
 
         $totalCustomers = Customer::count();
+        $totalSalesmen = User::where('role', 'salesman')->count();
 
         $visitsThisMonth = Visit::with('salesman', 'customer')
             ->whereBetween('started_at', [$startOfMonth, $endOfMonth])
@@ -45,6 +46,7 @@ class SalesHeadDashboardController extends Controller
 
         return view('saleshead.dashboard', compact(
             'totalCustomers',
+            'totalSalesmen',
             'visitsThisMonth',
             'todayVisits',
             'visitActivities'

@@ -56,6 +56,15 @@
                 </code>
             </div>
 
+            <a href="http://portal.sessigmasoft.com/uploads/old_customers_import_file.xlsx"
+               download
+               class="w-full py-3 rounded-xl border border-white/20 bg-white/5
+                      font-semibold hover:bg-white/10 transition
+                      flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                Download Import Template
+            </a>
+
             <button type="submit"
                 class="w-full py-3 rounded-xl
                        bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6]

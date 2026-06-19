@@ -21,7 +21,8 @@ class ClockOutReminderMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('⏰ Clock Out Reminder')
+        return $this->subject('Clock Out Reminder')
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.clockout_reminder');
     }
 }

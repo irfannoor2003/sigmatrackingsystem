@@ -372,7 +372,16 @@ AttendanceVerification::create([
         $date->addDay();
     }
 
-    return view($this->viewPath('history'), compact('calendar', 'monthInput'));
+    $calendarCollect = collect($calendar);
+    $totalPresents    = $calendarCollect->where('status', 'present')->count();
+    $totalAbsents     = $calendarCollect->where('status', 'absent')->count();
+    $totalLeaves      = $calendarCollect->where('status', 'leave')->count();
+    $totalShortLeaves = $calendarCollect->filter(fn ($day) => $day['attendance'] && $day['attendance']->short_leave)->count();
+
+    return view($this->viewPath('history'), compact(
+        'calendar', 'monthInput',
+        'totalPresents', 'totalAbsents', 'totalLeaves', 'totalShortLeaves'
+    ));
 }
 
 

@@ -3,7 +3,7 @@
 @section('title', 'Staff Management')
 
 @section('content')
-    <div class="p-4 px-0 sm:p-6">
+    <div class="p-0">
 
         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide">
@@ -120,16 +120,16 @@
                     title="Block/Unblock">
                 @if($user->is_blocked)
                     <!-- Unlock SVG -->
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11V7a3 3 0 10-6 0v4" />
-                        <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <rect x="5" y="11" width="14" height="10" rx="2" stroke-width="2"/>
+    <path d="M16 11V7a4 4 0 00-8 0" stroke-width="2"/>
+</svg>
                 @else
                     <!-- Lock SVG -->
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a3 3 0 00-6 0v4" />
-                        <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <rect x="5" y="11" width="14" height="10" rx="2" stroke-width="2"/>
+    <path d="M8 11V7a4 4 0 118 0v4" stroke-width="2"/>
+</svg>
                 @endif
             </button>
         </form>
@@ -190,40 +190,53 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-white/10">
+                    <div class="flex flex-col gap-2 pt-4 border-t border-white/10">
                         @if($user->role !== 'admin')
                             <a href="{{ route('admin.attendance.staff', $user->id) }}"
-                                class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold hover:bg-blue-500/30 transition">
+                                class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold hover:bg-blue-500/30 transition w-full">
                                 <i data-lucide="calendar-check" class="w-4 h-4"></i>
                                 Attendance
                             </a>
                         @endif
+                        <a href="{{ route('admin.staff.edit', $user->id) }}"
+                            class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-200 text-xs font-semibold hover:bg-amber-500/30 transition w-full">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            Edit Staff
+                        </a>
                         @if($user->role !== 'admin')
-                                <form method="POST" action="{{ $user->is_blocked ? route('admin.staff.unblock', $user->id) : route('admin.staff.block', $user->id) }}" class="flex items-center justify-center gap-2 py-2.5 rounded-xl"
-                                    onsubmit="return confirm('{{ $user->is_blocked ? 'Are you sure you want to unblock this staff member?' : 'Are you sure you want to block this staff member?' }}')">
+                            <form method="POST" action="{{ $user->is_blocked ? route('admin.staff.unblock', $user->id) : route('admin.staff.block', $user->id) }}"
+                                onsubmit="return confirm('{{ $user->is_blocked ? 'Are you sure you want to unblock this staff member?' : 'Are you sure you want to block this staff member?' }}')">
                                 @csrf
-                                <button type="submit" class="w-full rounded-xl transition {{ $user->is_blocked ? 'bg-green-500/20 border border-green-400/30 text-green-200 hover:bg-green-500/30' : 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-500/30' }} text-xs font-semibold">
+                                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl transition {{ $user->is_blocked ? 'bg-green-500/20 border border-green-400/30 text-green-200 hover:bg-green-500/30' : 'bg-yellow-500/20 border border-yellow-400/30 text-yellow-200 hover:bg-yellow-500/30' }} text-xs font-semibold">
                                     @if($user->is_blocked)
-                                        <svg class="w-4 h-4 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11V7a3 3 0 10-6 0v4" />
-                                            <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <rect x="5" y="11" width="14" height="10" rx="2" stroke-width="2"/>
+                                            <path d="M16 11V7a4 4 0 00-8 0" stroke-width="2"/>
                                         </svg>
                                         Unblock
                                     @else
-                                        <svg class="w-4 h-4 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a3 3 0 00-6 0v4" />
-                                            <rect width="12" height="8" x="6" y="11" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <rect x="5" y="11" width="14" height="10" rx="2" stroke-width="2"/>
+                                            <path d="M8 11V7a4 4 0 118 0v4" stroke-width="2"/>
                                         </svg>
                                         Block
                                     @endif
                                 </button>
                             </form>
                         @endif
-                        <a href="{{ route('admin.staff.edit', $user->id) }}"
-                            class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-amber-500/20 border border-amber-400/30 text-amber-200 text-xs font-semibold hover:bg-amber-500/30 transition {{ $user->role === 'admin' ? 'col-span-2' : '' }}">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                            Edit Staff
-                        </a>
+                        @if($user->role !== 'admin' && auth()->id() !== $user->id)
+                            <form action="{{ route('admin.staff.destroy', $user->id) }}"
+                                  method="POST"
+                                  onsubmit="return confirm('Are you sure you want to delete this staff member?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/20 border border-red-400/30 text-red-200 text-xs font-semibold hover:bg-red-500/40 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    Delete
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             @empty

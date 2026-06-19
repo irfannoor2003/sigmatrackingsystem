@@ -33,6 +33,7 @@ class PromotionMail extends Mailable
     public function build()
     {
         $mail = $this->subject($this->subjectText)
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.promotion');
 
         if ($this->attachmentPath) {

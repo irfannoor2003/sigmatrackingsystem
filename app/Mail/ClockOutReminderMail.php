@@ -19,7 +19,8 @@ class ClockOutReminderMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Attendance Reminder – Clock Out')
+        return $this->subject('Attendance Reminder - Clock Out')
+            ->replyTo(config('mail.from.address'), config('mail.from.name'))
             ->view('emails.clock_out_reminder');
     }
 }

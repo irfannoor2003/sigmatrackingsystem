@@ -12,6 +12,13 @@
         Imported Customers (Old)
     </h1>
 
+    @if(session('success'))
+        <div class="mb-4 p-3 rounded-xl bg-green-500/20 text-green-300 flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+
     {{-- Filters --}}
    <form method="GET" class="flex flex-col md:flex-row gap-4 mb-6">
 
@@ -46,6 +53,12 @@
 
     {{-- Action Bar --}}
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
+        <a href="{{ route('admin.old-customers.import.form') }}"
+            class="px-5 py-3 rounded-xl bg-gradient-to-r from-[#ff2ba6] to-[#ff5fcf]
+                   font-semibold flex items-center justify-center gap-2">
+            <i data-lucide="upload" class="w-5 h-5"></i>
+            Import CSV
+        </a>
         <button id="send-old-email-btn" disabled
             class="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500/50 to-indigo-500/50
                    font-semibold disabled:opacity-50 flex items-center justify-center gap-2">

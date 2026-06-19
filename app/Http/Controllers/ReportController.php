@@ -76,6 +76,28 @@ private function allowOnly(array $roles)
     {
         $this->allowOnly(['admin', 'saleshead']);
 
+        // Today's stats
+        $todayStart = Carbon::now()->startOfDay();
+        $todayEnd = Carbon::now()->endOfDay();
+
+        $todayVisits = Visit::whereBetween('started_at', [$todayStart, $todayEnd])->count();
+        $todayCompleted = Visit::whereBetween('started_at', [$todayStart, $todayEnd])->where('status', 'completed')->count();
+        $todayPending = Visit::whereBetween('started_at', [$todayStart, $todayEnd])->where('status', 'started')->count();
+        $todayBlocked = Visit::whereBetween('started_at', [$todayStart, $todayEnd])->where('status', 'blocked')->count();
+
+        $todaySalesmen = Visit::whereBetween('started_at', [$todayStart, $todayEnd])
+            ->with('salesman')
+            ->get()
+            ->pluck('salesman.name')
+            ->unique()
+            ->values();
+
+        $todayCompanies = Visit::whereBetween('started_at', [$todayStart, $todayEnd])
+            ->with('customer')
+            ->get()
+            ->pluck('customer.name')
+            ->unique()
+            ->values();
 
         $query = Visit::with(['customer', 'salesman']);
 
@@ -96,7 +118,7 @@ private function allowOnly(array $roles)
         }
 
         // PAGINATION FIXED HERE
-        $visits = $query->orderBy('started_at', 'desc')
+        $visits = $query->orderBy('id', 'desc')
                         ->paginate(10)   // you can change the number
                         ->appends($request->query()); // keeps filters
 
@@ -109,7 +131,16 @@ private function allowOnly(array $roles)
 
         $salesmen = User::where('role', 'salesman')->get();
 
-        return view('admin.reports.index', compact('visits', 'salesmen'));
+        return view('admin.reports.index', compact(
+            'visits',
+            'salesmen',
+            'todayVisits',
+            'todayCompleted',
+            'todayPending',
+            'todayBlocked',
+            'todaySalesmen',
+            'todayCompanies'
+        ));
     }
 
     // Admin single visit details

@@ -6,7 +6,7 @@
 
 <div class="space-y-6">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
         <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-green-500/50">
             <div class="p-6 flex items-center justify-between">
@@ -21,6 +21,20 @@
             </div>
             <div class="h-1 w-full bg-green-500/20 absolute bottom-0 left-0">
                 <div class="h-full bg-green-500 w-1/3"></div> </div>
+        </div>
+
+        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-[#ff2ba7]/50">
+            <div class="p-6 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#ff2ba7] mb-1">Team</p>
+                    <h3 class="text-white/70 text-sm font-medium">Total Salesmen</h3>
+                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $totalSalesmen }}</p>
+                </div>
+                <div class="bg-[#ff2ba7]/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform">
+                    <i data-lucide="user-check" class="w-8 h-8 text-[#ff2ba7]"></i>
+                </div>
+            </div>
+            <div class="h-1 w-full bg-[#ff2ba7]/20 absolute bottom-0 left-0"></div>
         </div>
 
         <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-yellow-500/50">

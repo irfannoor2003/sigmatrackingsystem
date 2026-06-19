@@ -30,10 +30,41 @@ Schedule::command('attendance:auto-clockout')
             // ->everyMinute()
             // ->timezone('Asia/Karachi');
 
-// 🔥 ZKTeco Device Sync (MOST IMPORTANT)
-Schedule::command('attendance:sync-zkteco')
-    ->everyMinute()
-    ->withoutOverlapping()
-    ->runInBackground();
+// 🔥 ZKTeco Device Sync (MOST IMPORTANT) - Command not implemented yet
+// Schedule::command('attendance:sync-zkteco')
+//     ->everyMinute()
+//     ->withoutOverlapping()
+//     ->runInBackground();
 
 Schedule::command('newsletter:send')->monthly();
+
+// Visit 5 PM Reminder — runs once at 17:00
+Schedule::command('visit:send-reminder-5pm')
+    ->dailyAt('17:00')
+    ->timezone('Asia/Karachi')
+    ->withoutOverlapping();
+
+// Visit 5:30 PM Reminder — runs once at 17:30
+Schedule::command('visit:send-reminder-530pm')
+    ->dailyAt('17:30')
+    ->timezone('Asia/Karachi')
+    ->withoutOverlapping();
+
+// Visit 8 PM Block — runs once at 20:00
+Schedule::command('visit:block-after-8pm')
+    ->dailyAt('20:00')
+    ->timezone('Asia/Karachi')
+    ->withoutOverlapping();
+
+// Visit Management - Cleanup old reminder flags
+Schedule::command('visit:cleanup-reminders')
+    ->weekly()
+    ->sundays()
+    ->timezone('Asia/Karachi')
+    ->withoutOverlapping();
+
+// Visit Management - Cleanup old audit logs
+Schedule::command('visit:cleanup-audit-logs')
+    ->monthlyOn(1)
+    ->timezone('Asia/Karachi')
+    ->withoutOverlapping();

@@ -21,14 +21,21 @@ class HrDashboardController extends Controller
         $today = Carbon::today();
         $totalStaff = User::whereNotIn('role', ['admin', 'saleshead'])->count();
 
-        $workingToday = Attendance::whereDate('date', $today)
-    ->where(function ($q) {
-        $q->where('status', 'present')
-          ->orWhere('manual_visit', true);
-    })
-    ->distinct('salesman_id')
-    ->count('salesman_id');
+        $presentCount = Attendance::whereDate('date', $today)
+            ->where(function ($q) {
+                $q->where('status', 'present')
+                  ->orWhere('manual_visit', true);
+            })
+            ->distinct('salesman_id')
+            ->count('salesman_id');
 
+        $leaveCount = Attendance::whereDate('date', $today)
+            ->where('status', 'leave')
+            ->distinct('salesman_id')
+            ->count('salesman_id');
+
+        $absentCount = $totalStaff - $presentCount - $leaveCount;
+        if ($absentCount < 0) $absentCount = 0;
 
         $attendanceActivities = Attendance::with('salesman')
             ->latest()
@@ -37,7 +44,9 @@ class HrDashboardController extends Controller
 
         return view('hr.dashboard', compact(
             'totalStaff',
-            'workingToday',
+            'presentCount',
+            'leaveCount',
+            'absentCount',
             'attendanceActivities'
         ));
     }
@@ -147,7 +156,15 @@ class HrDashboardController extends Controller
             $calendar->push($dayData);
         }
 
-        return view('hr.attendance.staff', compact('user', 'calendar', 'monthInput'));
+        $totalPresents  = $calendar->where('status', 'present')->count();
+        $totalAbsents   = $calendar->where('status', 'absent')->count();
+        $totalLeaves    = $calendar->where('status', 'leave')->count();
+        $totalShortLeaves = $calendar->where('status', 'short_leave')->count();
+
+        return view('hr.attendance.staff', compact(
+            'user', 'calendar', 'monthInput',
+            'totalPresents', 'totalAbsents', 'totalLeaves', 'totalShortLeaves'
+        ));
     }
 
     /**

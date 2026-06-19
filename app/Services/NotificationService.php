@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Models\Visit;
 
 class NotificationService
 {
@@ -96,6 +98,54 @@ Log::info('WhatsApp Debug', [
                 'error' => $e->getMessage(),
             ]);
 
+            return false;
+        }
+    }
+
+    public static function sendEmailVisitReminder(string $to, string $salesmanName, Visit $visit): bool
+    {
+        try {
+            Mail::to($to)->send(new \App\Mail\VisitReminder($salesmanName, $visit));
+            Log::info('Visit reminder email sent', ['to' => $to, 'visit_id' => $visit->id]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed sending visit reminder email', [
+                'error' => $e->getMessage(),
+                'to' => $to,
+                'visit_id' => $visit->id,
+            ]);
+            return false;
+        }
+    }
+
+    public static function sendEmailVisitBlocked(string $to, string $salesmanName, Visit $visit): bool
+    {
+        try {
+            Mail::to($to)->send(new \App\Mail\VisitBlocked($salesmanName, $visit));
+            Log::info('Visit blocked email sent', ['to' => $to, 'visit_id' => $visit->id]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed sending visit blocked email', [
+                'error' => $e->getMessage(),
+                'to' => $to,
+                'visit_id' => $visit->id,
+            ]);
+            return false;
+        }
+    }
+
+    public static function sendEmailVisitUnblocked(string $to, string $salesmanName, Visit $visit, string $adminName): bool
+    {
+        try {
+            Mail::to($to)->send(new \App\Mail\VisitUnblocked($salesmanName, $visit, $adminName));
+            Log::info('Visit unblocked email sent', ['to' => $to, 'visit_id' => $visit->id]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed sending visit unblocked email', [
+                'error' => $e->getMessage(),
+                'to' => $to,
+                'visit_id' => $visit->id,
+            ]);
             return false;
         }
     }

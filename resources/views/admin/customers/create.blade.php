@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="max-w-xl mx-auto p-6">
+<div class="max-w-xl mx-auto p-0">
 
     <h1 class="text-3xl font-extrabold text-white mb-6 tracking-wide flex items-center gap-3">
         <i data-lucide="user-plus" class="w-7 h-7 text-[var(--hf-magenta-light)]"></i>

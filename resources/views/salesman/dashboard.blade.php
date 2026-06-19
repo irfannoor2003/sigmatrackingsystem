@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="p-0 md:p-6">
+<div class="p-0">
 
     <!-- Page Title -->
     <h1 class="text-3xl font-bold text-white tracking-wide mb-8">

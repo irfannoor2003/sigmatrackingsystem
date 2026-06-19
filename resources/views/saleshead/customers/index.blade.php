@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <div class="p-4 px-0 sm:p-6">
+    <div class="p-0">
 
         <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide mb-6">
             <i data-lucide="building-2" class="w-7 h-7 inline mr-2 text-[var(--hf-magenta-light)]"></i>

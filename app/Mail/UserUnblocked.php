@@ -20,6 +20,7 @@ class UserUnblocked extends Mailable
     public function build()
     {
         return $this->subject('Your account has been unblocked')
+                    ->replyTo(config('mail.from.address'), config('mail.from.name'))
                     ->view('emails.user_unblocked')
                     ->with(['user' => $this->user]);
     }

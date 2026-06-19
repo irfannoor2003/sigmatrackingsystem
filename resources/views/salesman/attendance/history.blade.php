@@ -27,7 +27,7 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 }
 </style>
 
-<div class="max-w-6xl mx-auto px-3 pb-24 text-white">
+<div class="max-w-6xl mx-auto p-0 pb-24 text-white">
 
     {{-- HEADER --}}
     <div class="glass p-5 sm:p-6 rounded-3xl border border-white/20 shadow-xl mb-5">
@@ -46,6 +46,38 @@ input[type="month"]::-webkit-calendar-picker-indicator {
                 Apply
             </button>
         </form>
+    </div>
+
+    {{-- STATS GRID --}}
+    @php
+        $totalDays = $totalPresents + $totalAbsents + $totalLeaves + $totalShortLeaves;
+    @endphp
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        @foreach([
+            ['Presents', $totalPresents, 'check-circle', 'border-emerald-500/30', 'from-emerald-500/20 to-emerald-600/5', 'text-emerald-400', 'bg-emerald-500/10'],
+            ['Absents', $totalAbsents, 'user-x', 'border-yellow-500/30', 'from-yellow-500/20 to-yellow-600/5', 'text-yellow-400', 'bg-yellow-500/10'],
+            ['Leaves', $totalLeaves, 'ban', 'border-rose-500/30', 'from-rose-500/20 to-rose-600/5', 'text-rose-400', 'bg-rose-500/10'],
+            ['Short Leaves', $totalShortLeaves, 'clock', 'border-orange-500/30', 'from-orange-500/20 to-orange-600/5', 'text-orange-400', 'bg-orange-500/10']
+        ] as [$label, $value, $icon, $borderColor, $gradient, $textColor, $iconBg])
+        <div class="relative glass p-5 rounded-2xl border {{ $borderColor }} hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br {{ $gradient }} opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="relative">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="{{ $textColor }} text-xs font-bold uppercase tracking-wider">{{ $label }}</p>
+                    <div class="{{ $iconBg }} p-2 rounded-xl">
+                        <i data-lucide="{{ $icon }}" class="w-4 h-4 {{ $textColor }}"></i>
+                    </div>
+                </div>
+                <h3 class="text-3xl font-extrabold text-white mb-2">{{ $value }}</h3>
+                @if($totalDays > 0)
+                    <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full bg-gradient-to-r {{ $gradient }} {{ $textColor }}" style="width: {{ round(($value / $totalDays) * 100) }}%"></div>
+                    </div>
+                    <p class="text-[10px] text-white/30 mt-1.5 font-medium">{{ round(($value / $totalDays) * 100) }}% of month</p>
+                @endif
+            </div>
+        </div>
+        @endforeach
     </div>
 
     {{-- CALENDAR --}}

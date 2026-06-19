@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" x-data>
 
 <head>
     <meta charset="utf-8">
@@ -14,33 +14,68 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
 
+
     <style>
         :root {
             --hf-magenta: #d6007b;
             --hf-magenta-light: #ff2ba6;
             --hf-purple: #6A00FF;
-            --hf-dark: #000000;
+            --bg-body: linear-gradient(135deg, #000000, #333333, #000000, #666666);
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #999999;
+            --text-on-accent: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.08);
+            --border-glass: rgba(255, 255, 255, 0.14);
+            --bg-hover: rgba(255, 255, 255, 0.1);
+            --bg-hover-strong: rgba(255, 255, 255, 0.18);
+            --bg-input: rgba(0, 0, 0, 0.4);
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color-strong: rgba(255, 255, 255, 0.2);
+            --mobile-menu-bg: #000000;
+            --accent-glow: rgba(255, 0, 170, 0.4);
+            --sidebar-active-bg: rgba(255, 0, 170, 0.2);
+            --sidebar-active-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
+            --btn-primary-bg: linear-gradient(135deg, #ff2ba6, #d41a8a);
+            --icon-color: #b0b0c8;
+            --table-header-bg: rgba(255, 255, 255, 0.04);
+            --table-border: rgba(255, 255, 255, 0.08);
+            --table-row-hover: rgba(255, 255, 255, 0.04);
+            --badge-text: rgba(255, 255, 255, 0.9);
         }
 
         body {
-            background: linear-gradient(135deg, #000000, #333333, #000000, #666666);
+            background: var(--bg-body);
             background-size: 300% 300%;
-            color: white !important;
+            color: var(--text-primary) !important;
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
         }
 
+        aside { transition: background 0.3s ease, border-color 0.3s ease; }
+
         .sidebar-active {
-            background: rgba(255, 0, 170, 0.2);
+            background: rgba(255, 0, 170, 0.2) !important;
             border-left: 4px solid var(--hf-magenta-light);
             box-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
             color: white !important;
         }
+
+        .sidebar-active-mobile {
+            background: rgba(255, 0, 170, 0.2) !important;
+            box-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
+            color: white !important;
+        }
+
+        header { transition: background 0.3s ease, border-color 0.3s ease; }
 
         .hf-heading {
             font-size: 26px;
@@ -66,13 +101,13 @@
                 <p class="text-xs text-gray-300 mt-1">Salesman Tracking System</p>
             </div>
 
-            <nav class="p-4 flex-1 text-gray-200 ">
+            <nav class="p-4 flex-1 text-gray-200">
 
                 @auth
                     @php
                         $role = auth()->user()->role;
                     @endphp
-                    <div class="mb-6 p-4 rounded-xl glass border border-white/10 ">
+                    <div class="mb-6 p-4 rounded-xl glass border border-white/10">
                         <div class="text-sm text-gray-300">Logged in as:</div>
                         <div class="font-semibold text-white">{{ auth()->user()->name }}</div>
                         <div class="text-xs text-gray-400">{{ auth()->user()->email }}</div>
@@ -150,7 +185,7 @@
                             </span>
                         </a>
 
-                        <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
+                        <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                         <a href="{{ route('admin.old-customers.index') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
@@ -291,7 +326,7 @@
                         </a>
 
                         {{-- Old Customers --}}
-                        <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
+                        <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                         {{-- Import Old Customers (URL-based active) --}}
                         <a href="{{ route('salesman.old-customers.import') }}"
@@ -357,7 +392,7 @@
 
         <div x-data="{ open: false }" class="flex-1">
 
-            <header class="glass border-b border-white/10 shadow-xl relative z-20">
+            <header class="glass border-b border-white/10 shadow-xl relative z-50">
                 <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
 
                     <div class="flex items-center gap-3">
@@ -370,33 +405,36 @@
                         </button>
 
                         <a href="{{ route('dashboard') }}"
-                            class="text-xl md:text-2xl font-extrabold text-white tracking-wide">
+                            class="text-xl md:text-2xl font-extrabold tracking-wide text-white">
                             Sigma Engineering Services<span class="text-[var(--hf-magenta-light)]">.</span>
                         </a>
                     </div>
 
                     @auth
-                        <div
-                            class="hidden md:flex items-center gap-3
-            bg-white/10 backdrop-blur-md border border-white/20
-            px-4 py-2 rounded-xl shadow-lg">
+                        <div class="flex items-center gap-3">
 
-                            <!-- Avatar Icon -->
                             <div
-                                class="w-9 h-9 flex items-center justify-center
-                rounded-full bg-[#ff2ba6]/20 text-[#fff]">
-                                <i data-lucide="user" class="w-5 h-5"></i>
-                            </div>
+                                class="hidden md:flex items-center gap-3
+                bg-white/10 backdrop-blur-md border border-white/20
+                px-4 py-2 rounded-xl shadow-lg">
 
-                            <!-- Text -->
-                            <div class="leading-tight">
-                                <div class="text-sm font-semibold text-[#fff]">
-                                    {{ auth()->user()->name }}
+                                <!-- Avatar Icon -->
+                                <div
+                                    class="w-9 h-9 flex items-center justify-center
+                    rounded-full bg-[#ff2ba6]/20 text-[#fff]">
+                                    <i data-lucide="user" class="w-5 h-5"></i>
                                 </div>
 
-                                <div class="text-xs text-white/60 flex items-center gap-1">
-                                    <i data-lucide="shield" class="w-3 h-3 text-[#ff2ba6]"></i>
-                                    <span class="capitalize">{{ auth()->user()->role }}</span>
+                                <!-- Text -->
+                                <div class="leading-tight">
+                                    <div class="text-sm font-semibold text-[#fff]">
+                                        {{ auth()->user()->name }}
+                                    </div>
+
+                                    <div class="text-xs text-white/60 flex items-center gap-1">
+                                        <i data-lucide="shield" class="w-3 h-3 text-[#ff2ba6]"></i>
+                                        <span class="capitalize">{{ auth()->user()->role }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -405,12 +443,12 @@
                 </div>
 
                 <div x-show="open" x-cloak x-transition
-                    class="md:hidden  border-t border-white/10 absolute top-16 left-0 w-full z-30 bg-black">
+                    class="md:hidden border-t border-white/10 absolute top-16 left-0 w-full z-30 bg-black">
                     <div class="p-4">
 
                         @auth
                             <a href="{{ route('profile.edit') }}"
-                                class="block p-3 mb-4 rounded-xl glass border border-white/10 hover:bg-white/10 transition">
+                                class="block p-3 mb-4 rounded-xl glass border border-white/10">
                                 <div class="text-sm text-gray-300">Logged in as:</div>
                                 <div class="font-semibold text-white">{{ auth()->user()->name }}</div>
                                 <div class="text-xs text-gray-400">{{ auth()->user()->email }}</div>
@@ -488,7 +526,7 @@
     </span>
 </a>
 
-                                <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
+                                <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                                 {{-- Old Customers --}}
                                 <a href="{{ route('admin.old-customers.index') }}"
@@ -549,7 +587,7 @@
                                     My Visits
                                 </a>
 
-                                <div class="mt-4 text-xs uppercase text-gray-400 px-4">Old Customers</div>
+                                <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                                 {{-- Import Old Customers --}}
                                 <a href="{{ route('salesman.old-customers.import') }}"
@@ -674,16 +712,16 @@
                 </div>
             </header>
 
-            <main class="p-6 max-w-7xl mx-auto">
+            <main class="p-2 max-w-7xl mx-auto">
 
                 @if (session('success'))
-                    <div class="mb-4 p-3 glass border border-green-400/40 text-green-300 rounded">
+                    <div class="mb-4 p-3 glass border border-green-400/40 rounded" style="color: #16a34a">
                         {{ session('success') }}
                     </div>
                 @endif
 
                 @if (session('error'))
-                    <div class="mb-4 p-3 glass border border-red-400/40 text-red-300 rounded">
+                    <div class="mb-4 p-3 glass border border-red-400/40 rounded" style="color: #dc2626">
                         {{ session('error') }}
                     </div>
                 @endif
@@ -698,28 +736,11 @@
     @stack('scripts')
     @yield('scripts')
 
-    <style>
-        .sidebar-active-mobile {
-            background: rgba(255, 0, 170, 0.2);
-            /* border-left: 4px solid var(--hf-magenta-light); <-- Removed for mobile */
-            box-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
-            color: white !important;
-        }
-    </style>
-
     <script>
-        function renderLucide() {
-            lucide.createIcons();
-        }
-
-        // Initial render when DOM loads
+        function renderLucide() { lucide.createIcons(); }
         document.addEventListener("DOMContentLoaded", renderLucide);
-
-        // Re-render when Alpine changes DOM
         document.addEventListener("alpine:init", () => {
-            Alpine.effect(() => {
-                renderLucide();
-            });
+            Alpine.effect(() => { renderLucide(); });
         });
     </script>
 
