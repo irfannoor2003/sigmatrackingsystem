@@ -39,7 +39,7 @@ $todayDate = $today ?? now();
         </a>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-6">
+    <div class="grid md:grid-cols-3 gap-6">
 
         {{-- PRESENT STAFF --}}
         <div class="glass p-6 rounded-3xl border border-emerald-400/20 shadow-xl">
@@ -60,6 +60,27 @@ $todayDate = $today ?? now();
             </div>
         </div>
 
+        {{-- ON LEAVE STAFF --}}
+        <div class="glass p-6 rounded-3xl border border-yellow-400/20 shadow-xl">
+            <h3 class="text-2xl font-bold text-yellow-400 flex items-center gap-2 mb-4">
+                <i data-lucide="calendar-off" class="w-6 h-6"></i>
+                On Leave ({{ $leaveStaff->count() }})
+            </h3>
+            <div class="max-h-[400px] overflow-y-auto space-y-2">
+                @forelse($leaveStaff as $staff)
+                    <div class="flex items-center justify-between p-2 rounded-xl hover:bg-yellow-500/10 transition">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="calendar-off" class="w-5 h-5 text-yellow-300"></i>
+                            {{ $staff->name }}
+                        </span>
+                        <span class="badge bg-white/10 text-white text-[10px] px-2 py-0.5 rounded-full">{{ ucfirst($staff->role) }}</span>
+                    </div>
+                @empty
+                    <p class="text-white/30 text-sm text-center py-4">No one on leave today.</p>
+                @endforelse
+            </div>
+        </div>
+
         {{-- ABSENT STAFF --}}
         <div class="glass p-6 rounded-3xl border border-rose-400/20 shadow-xl">
             <h3 class="text-2xl font-bold text-rose-400 flex items-center gap-2 mb-4">
@@ -67,7 +88,7 @@ $todayDate = $today ?? now();
                 Absent ({{ $absentStaff->count() }})
             </h3>
             <div class="max-h-[400px] overflow-y-auto space-y-2">
-                @foreach($absentStaff as $staff)
+                @forelse($absentStaff as $staff)
                     <div class="flex items-center justify-between p-2 rounded-xl hover:bg-rose-500/10 transition">
                         <span class="flex items-center gap-2">
                             <i data-lucide="user-minus" class="w-5 h-5 text-rose-300"></i>
@@ -75,22 +96,29 @@ $todayDate = $today ?? now();
                         </span>
                         <span class="badge bg-white/10 text-white text-[10px] px-2 py-0.5 rounded-full">{{ ucfirst($staff->role) }}</span>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-white/30 text-sm text-center py-4">No absent staff today.</p>
+                @endforelse
             </div>
         </div>
 
     </div>
 
     {{-- STATS FOOTER --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
         <div class="glass p-6 rounded-2xl border border-white/10 shadow-lg text-center">
             <h4 class="text-sm text-white/50">Total Staff</h4>
-            <p class="text-3xl font-extrabold text-white mt-2">{{ $presentStaff->count() + $absentStaff->count() }}</p>
+            <p class="text-3xl font-extrabold text-white mt-2">{{ $presentStaff->count() + $leaveStaff->count() + $absentStaff->count() }}</p>
         </div>
 
         <div class="glass p-6 rounded-2xl border border-white/10 shadow-lg text-center">
             <h4 class="text-sm text-white/50">Present Today</h4>
             <p class="text-3xl font-extrabold text-emerald-400 mt-2">{{ $presentStaff->count() }}</p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl border border-white/10 shadow-lg text-center">
+            <h4 class="text-sm text-white/50">On Leave</h4>
+            <p class="text-3xl font-extrabold text-yellow-400 mt-2">{{ $leaveStaff->count() }}</p>
         </div>
 
         <div class="glass p-6 rounded-2xl border border-white/10 shadow-lg text-center">

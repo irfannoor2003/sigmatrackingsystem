@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Visit;
+use App\Models\VisitPitstop;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -21,14 +22,12 @@ class VisitsFilteredExport implements FromCollection, WithHeadings, WithMapping
     {
         $user = Auth::user();
 
-        $query = Visit::with(['salesman', 'customer']);
+        $query = Visit::with(['salesman', 'customer', 'pitstops.customer', 'pitstops.visit.salesman']);
 
         /** 🔐 ROLE RULES */
         if ($user->role === 'salesman') {
-            // Salesman → ONLY own visits
             $query->where('salesman_id', $user->id);
         } else {
-            // Admin / Sales Head → optional salesman filter
             if (!empty($this->filters['salesman_id'])) {
                 $query->where('salesman_id', $this->filters['salesman_id']);
             }
@@ -48,12 +47,23 @@ class VisitsFilteredExport implements FromCollection, WithHeadings, WithMapping
             $query->where('status', $this->filters['status']);
         }
 
-        return $query->orderBy('started_at')->get();
+        $visits = $query->orderBy('started_at')->get();
+
+        $rows = collect();
+        foreach ($visits as $visit) {
+            $rows->push($visit);
+            foreach ($visit->pitstops as $pitstop) {
+                $rows->push($pitstop);
+            }
+        }
+
+        return $rows;
     }
 
     public function headings(): array
     {
         return [
+            'Type',
             'Visit ID',
             'Salesman',
             'Customer',
@@ -66,18 +76,35 @@ class VisitsFilteredExport implements FromCollection, WithHeadings, WithMapping
         ];
     }
 
-    public function map($v): array
+    public function map($row): array
     {
+        if ($row instanceof VisitPitstop) {
+            $parentSalesman = $row->visit->salesman->name ?? '-';
+            return [
+                "Pitstop of Visit #{$row->visit_id}",
+                $row->visit_id,
+                $parentSalesman,
+                $row->customer->name ?? '-',
+                $row->customer->address ?? '-',
+                $row->purpose,
+                '-',
+                $row->notes,
+                $row->distance_km,
+                $row->visited_at ? $row->visited_at->format('Y-m-d H:i') : '',
+            ];
+        }
+
         return [
-            $v->id,
-            $v->salesman->name ?? '-',
-            $v->customer->name ?? '-',
-            $v->customer->address ?? '-',
-            $v->purpose,
-            ucfirst($v->status),
-            $v->notes,
-            $v->distance_km,
-            $v->started_at->format('Y-m-d H:i'),
+            'Visit',
+            $row->id,
+            $row->salesman->name ?? '-',
+            $row->customer->name ?? '-',
+            $row->customer->address ?? '-',
+            $row->purpose,
+            ucfirst($row->status),
+            $row->notes,
+            $row->distance_km,
+            $row->started_at->format('Y-m-d H:i'),
         ];
     }
 }

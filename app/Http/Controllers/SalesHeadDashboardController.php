@@ -58,7 +58,7 @@ class SalesHeadDashboardController extends Controller
      */
     public function visitsReport(Request $request)
     {
-        $query = Visit::with('salesman', 'customer')->latest();
+        $query = Visit::with('salesman', 'customer', 'pitstops.customer')->latest();
 
         if ($request->salesman_id) {
             $query->where('salesman_id', $request->salesman_id);
@@ -159,7 +159,20 @@ class SalesHeadDashboardController extends Controller
      */
     public function showVisit($id)
     {
-        $visit = Visit::with('salesman', 'customer')->findOrFail($id);
+        $visit = Visit::with('salesman', 'customer', 'pitstops.customer')->findOrFail($id);
         return view('saleshead.visits.show', compact('visit'));
+    }
+
+    /**
+     * Salesmen List (read-only)
+     */
+    public function salesmen()
+    {
+        $salesmen = User::where('role', 'salesman')
+            ->withCount(['customers', 'visits'])
+            ->orderBy('name')
+            ->paginate(10);
+
+        return view('saleshead.salesmen.index', compact('salesmen'));
     }
 }

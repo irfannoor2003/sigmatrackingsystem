@@ -82,6 +82,112 @@
             font-weight: 900;
             letter-spacing: 1px;
         }
+
+        /* ===== PITSTOP ROAD ANIMATION ===== */
+        @keyframes road-flow {
+            0% { background-position: 0 0; }
+            100% { background-position: 24px 0; }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,43,166,0.5); }
+            50% { box-shadow: 0 0 12px 4px rgba(255,43,166,0.35); }
+        }
+        @keyframes float-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        .route-line-h {
+            background-image: repeating-linear-gradient(
+                to right,
+                rgba(255,255,255,0.15) 0px,
+                rgba(255,255,255,0.15) 8px,
+                transparent 8px,
+                transparent 16px
+            );
+            background-size: 24px 3px;
+            animation: road-flow 1s linear infinite;
+        }
+        .route-line-v {
+            background-image: repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0.15) 0px,
+                rgba(255,255,255,0.15) 8px,
+                transparent 8px,
+                transparent 16px
+            );
+            background-size: 3px 24px;
+            animation: road-flow 1s linear infinite;
+        }
+        @keyframes road-flow-v {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 24px; }
+        }
+        .route-line-v {
+            animation: road-flow-v 1s linear infinite;
+        }
+        .route-marker {
+            animation: pulse-glow 2.5s ease-in-out infinite;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .route-marker:hover {
+            transform: scale(1.35);
+            box-shadow: 0 0 20px 6px rgba(255,43,166,0.5);
+        }
+        .route-car {
+            animation: float-bounce 1.8s ease-in-out infinite;
+        }
+        .road-modal {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px) scale(0.95);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .road-node:hover .road-modal,
+        .road-node.active .road-modal {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+        .road-node:hover .road-marker {
+            transform: scale(1.35);
+            box-shadow: 0 0 20px 6px rgba(255,43,166,0.5);
+        }
+        .route-label-h {
+            opacity: 0;
+            transform: translateX(-50%) translateY(4px);
+            transition: all 0.3s ease;
+        }
+        .road-node:hover .route-label-h {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        #road-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 9998;
+            display: none;
+        }
+        #road-modal-overlay.show {
+            display: block;
+        }
+        #road-modal-box {
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(8px) scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            max-width: calc(100vw - 24px);
+        }
+        #road-modal-box.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+            pointer-events: auto;
+        }
     </style>
 
     @stack('head')
@@ -199,7 +305,7 @@
                         {{-- Dashboard --}}
                         <a href="{{ route('salehead.dashboard') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
+    {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
                             <i data-lucide="layout-dashboard"></i>
                             Dashboard
                         </a>
@@ -207,16 +313,23 @@
                         {{-- Salesman Visits --}}
                         <a href="{{ route('salehead.reports.index') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
+    {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
                             <i data-lucide="clipboard-list"></i>
                             Salesman Visits
                         </a>
 
+                        {{-- Salesmen --}}
+                        <a href="{{ route('salehead.salesmen.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+    {{ request()->routeIs('salehead.salesmen.*') ? 'sidebar-active' : '' }}">
+                            <i data-lucide="users"></i>
+                            Salesmen
+                        </a>
 
                         {{-- All Customers --}}
                         <a href="{{ route('salehead.customers.index') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
+    {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
                             <i data-lucide="building-2"></i>
                             All Customers
                         </a>
@@ -610,7 +723,7 @@
                                 {{-- Dashboard --}}
                                 <a href="{{ route('salehead.dashboard') }}"
                                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
+    {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
                                     <i data-lucide="layout-dashboard"></i>
                                     Dashboard
                                 </a>
@@ -619,17 +732,23 @@
                                 {{-- Salesman Visits --}}
                                 <a href="{{ route('salehead.reports.index') }}"
                                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
+    {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
                                     <i data-lucide="clipboard-list"></i>
                                     Salesman Visits
                                 </a>
 
-
+                                {{-- Salesmen --}}
+                                <a href="{{ route('salehead.salesmen.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+    {{ request()->routeIs('salehead.salesmen.*') ? 'sidebar-active' : '' }}">
+                                    <i data-lucide="users"></i>
+                                    Salesmen
+                                </a>
 
                                 {{-- All Customers --}}
                                 <a href="{{ route('salehead.customers.index') }}"
                                     class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
+    {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
                                     <i data-lucide="building-2"></i>
                                     All Customers
                                 </a>

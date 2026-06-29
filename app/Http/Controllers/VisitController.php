@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Visit;
+use App\Models\VisitPitstop;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +31,7 @@ class VisitController extends Controller
 
 public function index(Request $request)
 {
-    $query = Visit::with('customer')
+    $query = Visit::with(['customer', 'pitstops.customer'])
         ->where('salesman_id', Auth::id())
         ->orderBy('id', 'desc');
 
@@ -51,7 +52,9 @@ public function index(Request $request)
 
     $visits = $query->paginate(18)->withQueryString();
 
-    return view('salesman.visits.index', compact('visits'));
+    $customers = Customer::orderBy('name')->get();
+
+    return view('salesman.visits.index', compact('visits', 'customers'));
 }
 
 
@@ -170,10 +173,34 @@ public function index(Request $request)
     }
 
     $request->validate([
+        'lat' => 'required|numeric',
+        'lng' => 'required|numeric',
         'notes' => 'nullable|string|max:1000',
         'distance_km' => 'nullable|numeric|min:0',
         'images.*' => 'nullable|image|max:5120', // optional, max 5MB
     ]);
+
+    $officeLat = config('office.lat');
+    $officeLng = config('office.lng');
+    $radius    = config('office.radius');
+
+    if (!$officeLat || !$officeLng) {
+        return back()->with('error', 'Office location not configured.');
+    }
+
+    $distance = $this->distanceInMeters(
+        $officeLat,
+        $officeLng,
+        $request->lat,
+        $request->lng
+    );
+
+    if ($distance > $radius) {
+        return back()->with(
+            'error',
+            'You must be at the office to complete a visit. You are ' . round($distance) . ' meters away.'
+        );
+    }
 
    $images = [];
 
@@ -216,7 +243,8 @@ if ($request->hasFile('images')) {
      */
     public function show($id)
     {
-        $visit = Visit::where('id', $id)
+        $visit = Visit::with(['pitstops.customer'])
+            ->where('id', $id)
             ->where('salesman_id', Auth::id())
             ->firstOrFail();
 
@@ -278,4 +306,81 @@ public function update(Request $request, Visit $visit)
         ->route('salesman.visits.index')
         ->with('success', 'Visit updated successfully.');
 }
+
+    /**
+     * Add a pitstop (additional customer visit) to an active visit
+     */
+    public function addPitstop(Request $request, $id)
+    {
+        $visit = Visit::where('id', $id)
+            ->where('salesman_id', Auth::id())
+            ->where('status', 'started')
+            ->firstOrFail();
+
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'purpose'     => 'nullable|string|max:255',
+            'notes'       => 'nullable|string|max:1000',
+            'distance_km' => 'nullable|numeric|min:0',
+            'lat'         => 'nullable|numeric',
+            'lng'         => 'nullable|numeric',
+            'images.*'    => 'nullable|image|max:5120',
+        ]);
+
+        $images = [];
+        if ($request->hasFile('images')) {
+            $destination = $_SERVER['DOCUMENT_ROOT'] . '/storage/visit_images';
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+            foreach ($request->file('images') as $image) {
+                $filename = time().'_'.uniqid().'.'.$image->getClientOriginalExtension();
+                $image->move($destination, $filename);
+                $images[] = 'storage/visit_images/' . $filename;
+            }
+        }
+
+        VisitPitstop::create([
+            'visit_id'    => $visit->id,
+            'customer_id' => $request->customer_id,
+            'purpose'     => $request->purpose,
+            'notes'       => $request->notes,
+            'distance_km' => $request->distance_km,
+            'images'      => $images ?: null,
+            'visited_at'  => now(),
+            'lat'         => $request->lat,
+            'lng'         => $request->lng,
+        ]);
+
+        return back()->with('success', 'Additional stop added successfully!');
+    }
+
+    /**
+     * Delete a pitstop
+     */
+    public function deletePitstop($visitId, $pitstopId)
+    {
+        $visit = Visit::where('id', $visitId)
+            ->where('salesman_id', Auth::id())
+            ->where('status', 'started')
+            ->firstOrFail();
+
+        $pitstop = VisitPitstop::where('id', $pitstopId)
+            ->where('visit_id', $visit->id)
+            ->firstOrFail();
+
+        // Delete images from storage
+        if ($pitstop->images) {
+            foreach ($pitstop->images as $imagePath) {
+                $fullPath = $_SERVER['DOCUMENT_ROOT'] . '/' . $imagePath;
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+            }
+        }
+
+        $pitstop->delete();
+
+        return back()->with('success', 'Stop removed.');
+    }
 }

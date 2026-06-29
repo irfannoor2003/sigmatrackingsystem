@@ -122,6 +122,9 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/attendance/today', [AdminDashboardController::class, 'todayAttendance'])
             ->name('attendance.today');
 
+        Route::get('/attendance/late-staff', [AdminDashboardController::class, 'lateStaff'])
+            ->name('attendance.late-staff');
+
         /* ---------------- Salesmen ---------------- */
         Route::resource('salesmen', AdminSalesmanController::class)
             ->except(['show']);
@@ -237,11 +240,20 @@ Route::middleware(['auth', 'role:salesman'])
         Route::resource('customers', SalesmanCustomerController::class)
             ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
+        Route::get('/customers/export/all', [SalesmanCustomerController::class, 'exportAll'])
+            ->name('customers.export.all');
+
         Route::resource('visits', VisitController::class)
          ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
         Route::post('/visits/{id}/complete', [VisitController::class, 'complete'])
             ->name('visits.complete');
+
+        Route::post('/visits/{id}/pitstop', [VisitController::class, 'addPitstop'])
+            ->name('visits.pitstop.add');
+
+        Route::delete('/visits/{visitId}/pitstop/{pitstopId}', [VisitController::class, 'deletePitstop'])
+            ->name('visits.pitstop.delete');
 
         Route::prefix('attendance')->name('attendance.')->group(function () {
             Route::get('/', [AttendanceController::class, 'index'])->name('index');
@@ -264,6 +276,9 @@ Route::middleware(['auth', 'role:salesman'])
 
         Route::post('/old-customers/import', [SalesmanOldCustomerController::class, 'import'])
             ->name('old-customers.import');
+
+        Route::get('/old-customers/export/all', [SalesmanOldCustomerController::class, 'exportAll'])
+            ->name('old-customers.export.all');
     });
 
 /*
@@ -328,6 +343,10 @@ Route::prefix('salehead')->middleware(['auth','role:saleshead'])->name('salehead
     Route::get('/customers/{id}', [SalesHeadDashboardController::class, 'showCustomer'])
         ->name('customers.show');
 
+    // ---------------- Salesmen ----------------
+    Route::get('/salesmen', [SalesHeadDashboardController::class, 'salesmen'])
+        ->name('salesmen.index');
+
 
 });
 
@@ -346,6 +365,9 @@ Route::prefix('hr')
 ;
  Route::get('attendance/today', [HrDashboardController::class, 'todayAttendance'])
             ->name('attendance.today');
+
+    Route::get('attendance/late-staff', [HrDashboardController::class, 'lateStaff'])
+            ->name('attendance.late-staff');
 
     // Staff
     // Staff management

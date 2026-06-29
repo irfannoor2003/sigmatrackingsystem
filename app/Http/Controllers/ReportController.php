@@ -99,7 +99,7 @@ private function allowOnly(array $roles)
             ->unique()
             ->values();
 
-        $query = Visit::with(['customer', 'salesman']);
+        $query = Visit::with(['customer', 'salesman', 'pitstops.customer']);
 
         if ($request->salesman_id) {
             $query->where('salesman_id', $request->salesman_id);
@@ -147,7 +147,7 @@ private function allowOnly(array $roles)
     public function show($id)
     {
          $this->allowOnly(['admin', 'saleshead']);
-        $visit = Visit::with(['salesman', 'customer'])->findOrFail($id);
+        $visit = Visit::with(['salesman', 'customer', 'pitstops.customer'])->findOrFail($id);
 
         return view('admin.reports.show', compact('visit'));
     }

@@ -56,6 +56,7 @@ class StaffController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role'     => 'required|in:' . implode(',', $this->roles),
+            'phone'    => 'nullable|string|max:255',
         ]);
 
         User::create([
@@ -63,6 +64,7 @@ class StaffController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
+            'phone'    => $request->phone,
         ]);
 
         return redirect()
@@ -82,12 +84,14 @@ class StaffController extends Controller
             'email'    => 'required|email|unique:users,email,' . $staff->id,
             'role'     => 'required|in:' . implode(',', $this->roles),
             'password' => 'nullable|min:6',
+            'phone'    => 'nullable|string|max:255',
         ]);
 
         $data = [
             'name'  => $request->name,
             'email' => $request->email,
             'role'  => $request->role,
+            'phone' => $request->phone,
         ];
 
         if ($request->filled('password')) {

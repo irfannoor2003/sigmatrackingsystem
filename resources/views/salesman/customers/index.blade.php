@@ -18,18 +18,19 @@
         </h1>
 
         {{-- Add Customer Button --}}
-        <div class="mb-6 flex justify-between">
+        <div class="mb-6 flex flex-col sm:flex-row justify-between gap-3">
             <a href="{{ route('salesman.customers.create') }}"
                 class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6]
-                   text-white font-semibold shadow hover:opacity-90 transition flex items-center">
-                {{-- Lucide Icon: plus (optional, looks better) --}}
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-plus mr-1">
-                    <path d="M5 12h14" />
-                    <path d="M12 5v14" />
-                </svg>
+                   text-white font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2">
+                <i data-lucide="plus" class="w-5 h-5"></i>
                 Add Customer
+            </a>
+
+            <a href="{{ route('salesman.customers.export.all') }}"
+                class="px-5 py-2 rounded-xl bg-green-600 hover:bg-green-700
+                   text-white font-semibold shadow transition flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                Export Excel
             </a>
         </div>
 

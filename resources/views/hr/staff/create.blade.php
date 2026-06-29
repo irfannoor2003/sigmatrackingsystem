@@ -41,6 +41,17 @@
                     required>
             </div>
 
+            <!-- Phone -->
+            <label class="block text-sm text-white/80 mb-1 flex items-center">
+                <i data-lucide="phone" class="w-4 h-4 mr-2"></i> Phone (WhatsApp)
+            </label>
+            <div class="relative mb-4">
+                <i data-lucide="smartphone" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/50"></i>
+                <input name="phone" type="text" value="{{ old('phone') }}" placeholder="e.g. +923001234567"
+                    class="w-full px-4 py-3 pl-10 rounded-lg bg-white/10 text-white
+                       placeholder-white/50 focus:bg-white/20 outline-none">
+            </div>
+
             <!-- Password -->
             <label class="block text-sm text-white/80 mb-1 flex items-center">
                 <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Password

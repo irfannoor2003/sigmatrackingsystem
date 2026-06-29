@@ -26,43 +26,64 @@ class AutoClockOutCommand extends Command
             return;
         }
 
-        Attendance::with('user')
+        $attendances = Attendance::with('user')
             ->whereDate('date', $today->toDateString())
             ->whereNotNull('clock_in')      // Must have clocked in
             ->whereNull('clock_out')        // Not clocked out yet
             ->where('status', 'present')    // Only present users
             ->where('auto_clock_out', 0)    // Not already auto clocked out
-            ->chunk(100, function ($attendances) use ($clockOutThreshold) {
-                foreach ($attendances as $attendance) {
-                    try {
-                        $clockInTime = Carbon::parse($attendance->clock_in);
+            ->get();
 
-                        // Prevent clock_out earlier than clock_in
-                        $finalClockOut = $clockInTime->gt($clockOutThreshold)
-                            ? $clockInTime
-                            : $clockOutThreshold;
+        $processed = 0;
+        $failed = 0;
 
-                        $totalMinutes = $clockInTime->diffInMinutes($finalClockOut);
+        foreach ($attendances as $attendance) {
+            try {
+                $clockInTime = Carbon::parse($attendance->clock_in);
 
-                        // Update attendance safely
-                        $attendance->clock_out = $finalClockOut;
-                        $attendance->total_minutes = $totalMinutes;
-                        $attendance->auto_clock_out = 1;
-                        $attendance->save();
+                // Prevent clock_out earlier than clock_in
+                $finalClockOut = $clockInTime->gt($clockOutThreshold)
+                    ? $clockInTime
+                    : $clockOutThreshold;
 
-                        // Send email
-                        if ($attendance->user?->email) {
-                            Mail::to($attendance->user->email)
-                                ->send(new AutoClockOutMail($attendance));
-                        }
+                $totalMinutes = $clockInTime->diffInMinutes($finalClockOut);
 
-                    } catch (Exception $e) {
-                        Log::error("Failed auto clock-out for attendance ID {$attendance->id}: " . $e->getMessage());
-                        $this->error("Error processing attendance ID {$attendance->id}");
-                    }
+                // Update and force save
+                $attendance->clock_out = $finalClockOut;
+                $attendance->total_minutes = $totalMinutes;
+                $attendance->auto_clock_out = 1;
+                $saved = $attendance->save();
+
+                if (!$saved) {
+                    Log::error("Auto clock-out save returned false for attendance ID {$attendance->id}");
+                    $failed++;
+                    continue;
                 }
-            });
 
-        $this->info('Auto clock-out process completed.');
+                // Verify the save actually persisted
+                $attendance->refresh();
+                if (!$attendance->clock_out) {
+                    Log::error("Auto clock-out verification failed for attendance ID {$attendance->id} - clock_out is still null after save");
+                    $failed++;
+                    continue;
+                }
+
+                // Send email
+                if ($attendance->user?->email) {
+                    Mail::to($attendance->user->email)
+                        ->send(new AutoClockOutMail($attendance));
+                }
+
+                $processed++;
+
+            } catch (Exception $e) {
+                Log::error("Failed auto clock-out for attendance ID {$attendance->id}: " . $e->getMessage());
+                $this->error("Error processing attendance ID {$attendance->id}");
+                $failed++;
+            }
+        }
+
+        $this->info("Auto clock-out completed. Processed: {$processed}, Failed: {$failed}");
+        Log::info("Auto clock-out completed. Processed: {$processed}, Failed: {$failed}");
     }
 }

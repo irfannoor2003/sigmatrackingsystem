@@ -75,7 +75,60 @@
             </div>
         </div>
 
+        <a href="{{ route('hr.attendance.late-staff') }}" class="block group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-amber-500/50">
+            <div class="p-6 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-1">Late</p>
+                    <h3 class="text-white/70 text-sm font-medium">Late Today</h3>
+                    <div class="flex items-baseline gap-2 mt-2">
+                        <p class="text-4xl font-black text-white tracking-tight">{{ $lateStaff->count() }}</p>
+                        <span class="text-[10px] font-bold text-white/40 underline uppercase tracking-tighter">Details</span>
+                    </div>
+                </div>
+                <div class="bg-amber-500/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform">
+                    <i data-lucide="clock" class="w-8 h-8 text-amber-400"></i>
+                </div>
+            </div>
+            <div class="h-1 w-full bg-amber-500/20 absolute bottom-0 left-0">
+                <div class="h-full bg-amber-500" style="width: {{ ($presentCount > 0) ? ($lateStaff->count() / $presentCount) * 100 : 0 }}%"></div>
+            </div>
+        </a>
+
     </div>
+
+    @if($lateStaff->count() > 0)
+    <div class="bg-white/5 backdrop-blur-xl border border-amber-400/20 rounded-3xl p-6 shadow-xl">
+        <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2 mb-4">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+            Late Staff Today
+            <a href="{{ route('hr.attendance.late-staff') }}" class="ml-auto text-[10px] font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors">
+                {{ $lateStaff->count() }} staff — View All
+            </a>
+        </h3>
+        <div class="max-h-[300px] overflow-y-auto space-y-2">
+            @foreach($lateStaff as $late)
+                @php
+                    $clockInTime = \Carbon\Carbon::parse($late->clock_in);
+                    $lateThreshold = \Carbon\Carbon::today()->setTime(10, 16);
+                    $minutesLate = (int) $clockInTime->diffInMinutes($lateThreshold);
+                @endphp
+                <div class="flex items-center justify-between p-2 rounded-xl hover:bg-amber-500/10 transition">
+                    <span class="flex items-center gap-2 text-sm text-white">
+                        <i data-lucide="user-check" class="w-4 h-4 text-amber-300"></i>
+                        {{ $late->salesman->name ?? 'N/A' }}
+                        <span class="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded-full">{{ ucfirst($late->salesman->role ?? '-') }}</span>
+                    </span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-white/50">{{ $clockInTime->format('h:i A') }}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                            {{ $minutesLate }} min late
+                        </span>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
 
     <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
         <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
@@ -120,7 +173,7 @@
                                 <div class="flex items-center gap-2 mt-1">
                                     <i data-lucide="clock" class="w-3 h-3 text-white/30"></i>
                                     <span class="text-[11px] text-white/50 font-medium tracking-wide">
-                                        {{ $a->updated_at->format('h:i A') }} • {{ $a->updated_at->diffForHumans() }}
+                                        {{ ($a->clock_in ?? $a->updated_at)->format('h:i A') }} • {{ ($a->clock_in ?? $a->updated_at)->diffForHumans() }}
                                     </span>
                                 </div>
                             </div>

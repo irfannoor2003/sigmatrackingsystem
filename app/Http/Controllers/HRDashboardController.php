@@ -19,7 +19,7 @@ class HrDashboardController extends Controller
     public function index()
     {
         $today = Carbon::today();
-        $totalStaff = User::whereNotIn('role', ['admin', 'saleshead'])->count();
+        $totalStaff = User::whereNotIn('role', ['admin', 'hr', 'saleshead'])->count();
 
         $presentCount = Attendance::whereDate('date', $today)
             ->where(function ($q) {
@@ -42,13 +42,43 @@ class HrDashboardController extends Controller
             ->limit(6)
             ->get();
 
+        // Late Staff (clocked in after 10:15 AM)
+        $lateStaff = Attendance::with('salesman')
+            ->whereDate('date', $today)
+            ->where('status', 'present')
+            ->where('clock_in', '>', Carbon::today()->setTime(10, 16))
+            ->get();
+
         return view('hr.dashboard', compact(
             'totalStaff',
             'presentCount',
             'leaveCount',
             'absentCount',
-            'attendanceActivities'
+            'attendanceActivities',
+            'lateStaff'
         ));
+    }
+
+    /**
+     * LATE STAFF PAGE
+     */
+    public function lateStaff()
+    {
+        $today = Carbon::today();
+
+        $lateStaff = Attendance::with('salesman')
+            ->whereDate('date', $today)
+            ->where('status', 'present')
+            ->where('clock_in', '>', Carbon::today()->setTime(10, 16))
+            ->get();
+
+        $allTodayAttendance = Attendance::with('salesman')
+            ->whereDate('date', $today)
+            ->whereNotNull('clock_in')
+            ->get();
+
+        return view('admin.attendance.late-staff', compact('lateStaff', 'today', 'allTodayAttendance'))
+            ->with('backRoute', route('hr.dashboard'));
     }
 
     /**
@@ -88,7 +118,8 @@ class HrDashboardController extends Controller
             ? round(($totalPresents / ($totalStaffCount * $date->daysInMonth)) * 100)
             : 0;
 
-        $staffQuery = User::whereIn('role', $roles);
+        $staffQuery = User::whereIn('role', $roles)
+            ->whereIn('id', $attendanceStats->pluck('salesman_id'));
         if ($staffId) { $staffQuery->where('id', $staffId); }
 
         $staff = $staffQuery->get()->map(function ($user) use ($attendanceStats) {
@@ -161,9 +192,17 @@ class HrDashboardController extends Controller
         $totalLeaves    = $calendar->where('status', 'leave')->count();
         $totalShortLeaves = $calendar->where('status', 'short_leave')->count();
 
+        $totalLates = $calendar->where('status', 'present')->filter(function ($day) {
+            if (!$day['attendance'] || !$day['attendance']->clock_in) {
+                return false;
+            }
+            $lateThreshold = $day['attendance']->date->copy()->setTime(10, 16);
+            return Carbon::parse($day['attendance']->clock_in)->gt($lateThreshold);
+        })->count();
+
         return view('hr.attendance.staff', compact(
             'user', 'calendar', 'monthInput',
-            'totalPresents', 'totalAbsents', 'totalLeaves', 'totalShortLeaves'
+            'totalPresents', 'totalAbsents', 'totalLeaves', 'totalShortLeaves', 'totalLates'
         ));
     }
 
@@ -251,7 +290,7 @@ class HrDashboardController extends Controller
     $todayDate = now(); // Carbon instance
 
     // All staff except admin
-    $allStaff = User::whereNotIn('role', ['admin'])->orderBy('name')->get();
+    $allStaff = User::whereNotIn('role', ['admin', 'hr', 'saleshead'])->orderBy('name')->get();
 
     // Staff present today (including manual visits)
     $presentStaff = Attendance::with('salesman')
@@ -264,10 +303,18 @@ class HrDashboardController extends Controller
         ->map(fn($a) => $a->salesman)
         ->filter(); // remove nulls
 
-    // Absent staff
-    $absentStaff = $allStaff->diff($presentStaff);
+    // Staff on leave today
+    $leaveStaff = Attendance::with('salesman')
+        ->whereDate('date', $todayDate)
+        ->where('status', 'leave')
+        ->get()
+        ->map(fn($a) => $a->salesman)
+        ->filter();
 
-    return view('hr.attendance.today', compact('todayDate', 'presentStaff', 'absentStaff'));
+    // Absent staff (exclude present and leave)
+    $absentStaff = $allStaff->diff($presentStaff)->diff($leaveStaff);
+
+    return view('hr.attendance.today', compact('todayDate', 'presentStaff', 'leaveStaff', 'absentStaff'));
 }
 
 /**

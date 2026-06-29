@@ -56,6 +56,11 @@ class Visit extends Model
         return $this->belongsTo(User::class, 'salesman_id');
     }
 
+    public function pitstops()
+    {
+        return $this->hasMany(VisitPitstop::class)->orderBy('visited_at');
+    }
+
     /* ======================
         STATUS HELPERS
     ====================== */

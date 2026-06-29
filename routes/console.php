@@ -26,6 +26,13 @@ Schedule::command('attendance:auto-clockout')
     ->timezone('Asia/Karachi')
     ->withoutOverlapping();
 
+
+// Retry at 8:30 PM
+Schedule::command('attendance:auto-clockout')
+    ->dailyAt('20:30')          // ← Just add this block
+    ->timezone('Asia/Karachi')
+    ->withoutOverlapping();
+
 // Schedule::command('cron:test')
             // ->everyMinute()
             // ->timezone('Asia/Karachi');

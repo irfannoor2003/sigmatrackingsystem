@@ -10,19 +10,24 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 class CustomersExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $ids;
+    protected $salesmanId;
 
-    public function __construct($ids = null)
+    public function __construct($ids = null, $salesmanId = null)
     {
         $this->ids = $ids;
+        $this->salesmanId = $salesmanId;
     }
 
     public function collection()
     {
         $query = Customer::with(['city', 'industry', 'category', 'salesman']);
 
-        // Export only selected IDs
         if (!empty($this->ids)) {
             $query->whereIn('id', $this->ids);
+        }
+
+        if ($this->salesmanId) {
+            $query->where('salesman_id', $this->salesmanId);
         }
 
         return $query->orderBy('id', 'desc')->get();

@@ -9,6 +9,8 @@ use App\Models\City;
 use App\Models\Industry;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\CustomersExport;
 
 class CustomerController extends Controller
 {
@@ -220,5 +222,13 @@ class CustomerController extends Controller
         return redirect()
             ->route('salesman.customers.index')
             ->with('success', 'Customer updated successfully.');
+    }
+
+    public function exportAll()
+    {
+        return Excel::download(
+            new CustomersExport(null, Auth::id()),
+            'my_customers.xlsx'
+        );
     }
 }

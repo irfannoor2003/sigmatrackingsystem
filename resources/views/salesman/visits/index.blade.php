@@ -236,6 +236,18 @@
                                 Started
                             </div>
                         </th>
+                        <th class="p-3 text-left">
+                            <div class="flex items-center">
+                                {{-- Lucide Icon: map-pinned --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pinned mr-1">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                Stops
+                            </div>
+                        </th>
 
                         <th class="p-3 text-left print:hidden">
                             <div class="flex items-center">
@@ -299,10 +311,43 @@
                                 {{ optional($v->started_at)->format('d M Y, h:i A') ?? '-' }}
                             </td>
 
+                            <td class="p-3 ">
+                                @if($v->pitstops && count($v->pitstops) > 0)
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#ff2ba6] text-white text-[10px] font-bold">{{ count($v->pitstops) }}</span>
+                                        <span class="text-white/80 text-xs">stop{{ count($v->pitstops) > 1 ? 's' : '' }}</span>
+                                    </div>
+                                @else
+                                    <span class="text-white/40 text-xs">-</span>
+                                @endif
+                            </td>
+
                             <td class="p-3 print:hidden">
                                 @if ($v->status == 'started')
+                                    @if($v->pitstops && count($v->pitstops) > 0)
+                                        <div class="mb-2 space-y-1.5">
+                                            @foreach($v->pitstops as $idx => $ps)
+                                                <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5">
+                                                    <span class="shrink-0 w-5 h-5 rounded-full bg-[#ff2ba6]/20 text-[#ff2ba6] text-[10px] font-bold flex items-center justify-center border border-[#ff2ba6]/30">{{ $idx + 1 }}</span>
+                                                    <span class="truncate text-white/80 text-xs flex-1">{{ $ps->customer->name ?? 'N/A' }}</span>
+                                                    <form action="{{ route('salesman.visits.pitstop.delete', [$v->id, $ps->id]) }}" method="POST" onsubmit="return confirm('Remove this stop?')">
+                                                        @csrf @method('DELETE')
+                                                        <button class="shrink-0 w-5 h-5 rounded-full bg-red-500/20 text-red-400 text-[10px] flex items-center justify-center hover:bg-red-500/30 border border-red-400/30 transition">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    <button type="button" onclick="openPitstopModal({{ $v->id }})"
+                                        class="w-full mb-2 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1
+                                            bg-[#ff2ba6]/10 border border-[#ff2ba6]/30 text-[#ff2ba6] hover:bg-[#ff2ba6]/20 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                                        Add Stop
+                                    </button>
                                     <form action="{{ route('salesman.visits.complete', $v->id) }}" method="POST"
-                                        enctype="multipart/form-data">
+                                        enctype="multipart/form-data" id="completeForm_{{ $v->id }}">
                                         @csrf
 
                                         <textarea name="notes"
@@ -320,7 +365,10 @@
                                             {{-- Suggested addition to hint for images only --}}
                                             class="w-full text-white mb-2 bg-white/10 p-2 rounded-lg" required>
 
-                                        <button
+                                        <input type="hidden" name="lat" id="complete_lat_{{ $v->id }}">
+                                        <input type="hidden" name="lng" id="complete_lng_{{ $v->id }}">
+
+                                        <button type="button" onclick="completeVisit('completeForm_{{ $v->id }}', 'complete_lat_{{ $v->id }}', 'complete_lng_{{ $v->id }}')"
                                             class="w-full py-2 rounded-xl text-white font-semibold flex items-center justify-center
                                                 bg-gradient-to-r from-green-500 to-emerald-500
                                                 shadow hover:opacity-90 transition">
@@ -524,8 +572,30 @@
 
                             {{-- IF VISIT IS STARTED --}}
                             @if ($v->status == 'started')
+                                @if($v->pitstops && count($v->pitstops) > 0)
+                                    <div class="mb-3 space-y-1.5">
+                                        @foreach($v->pitstops as $idx => $ps)
+                                            <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                                                <span class="shrink-0 w-6 h-6 rounded-full bg-[#ff2ba6]/20 text-[#ff2ba6] text-[11px] font-bold flex items-center justify-center border border-[#ff2ba6]/30">{{ $idx + 1 }}</span>
+                                                <span class="truncate text-white/80 text-sm flex-1">{{ $ps->customer->name ?? 'N/A' }}</span>
+                                                <form action="{{ route('salesman.visits.pitstop.delete', [$v->id, $ps->id]) }}" method="POST" onsubmit="return confirm('Remove this stop?')">
+                                                    @csrf @method('DELETE')
+                                                    <button class="shrink-0 w-6 h-6 rounded-full bg-red-500/20 text-red-400 text-[11px] flex items-center justify-center hover:bg-red-500/30 border border-red-400/30 transition">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                <button type="button" onclick="openPitstopModal({{ $v->id }})"
+                                    class="w-full mb-3 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5
+                                        bg-[#ff2ba6]/10 border border-[#ff2ba6]/30 text-[#ff2ba6] hover:bg-[#ff2ba6]/20 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                                    Add Stop
+                                </button>
                                 <form action="{{ route('salesman.visits.complete', $v->id) }}" method="POST"
-                                    enctype="multipart/form-data">
+                                    enctype="multipart/form-data" id="completeForm_{{ $v->id }}">
                                     @csrf
 
                                     <textarea name="notes"
@@ -544,7 +614,10 @@
                                     <input type="file" name="images[]" multiple accept="image/*"
                                         class="w-full text-white mb-3 bg-white/10 p-2 rounded-lg text-sm" required>
 
-                                    <button
+                                    <input type="hidden" name="lat" id="complete_lat_{{ $v->id }}">
+                                    <input type="hidden" name="lng" id="complete_lng_{{ $v->id }}">
+
+                                    <button type="button" onclick="completeVisit('completeForm_{{ $v->id }}', 'complete_lat_{{ $v->id }}', 'complete_lng_{{ $v->id }}')"
                                         class="w-full py-2 rounded-xl text-white font-semibold
                        flex items-center justify-center
                        bg-gradient-to-r from-green-500 to-emerald-500
@@ -593,7 +666,117 @@
 
 @endsection
 
+<!-- ADD PITSTOP MODAL -->
+<div id="pitstopModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-[#ff2ba6]">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                Add Stop
+            </h3>
+            <button onclick="closePitstopModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-red-500/40 transition text-white text-lg">&times;</button>
+        </div>
+        <form id="pitstopForm" method="POST" enctype="multipart/form-data" class="space-y-3">
+            @csrf
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="relative">
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <i data-lucide="building-2" class="w-4 h-4 mr-1.5 text-white/50"></i>
+                    Customer *
+                </label>
+                <select name="customer_id" required
+                    class="bg-white/10 text-white border border-white/20 p-2.5 pl-10 rounded-xl w-full appearance-none text-sm focus:bg-white/20 outline-none">
+                    <option value="" class="text-black">-- Select Customer --</option>
+                    @foreach($customers as $c)
+                        <option value="{{ $c->id }}" class="text-black">{{ $c->name }}</option>
+                    @endforeach
+                </select>
+                <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-[2.35rem] text-white/60 pointer-events-none"></i>
+                <i data-lucide="building-2" class="w-5 h-5 absolute left-3 top-[2.35rem] text-white/50 pointer-events-none"></i>
+            </div>
+            <div class="relative">
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <i data-lucide="target" class="w-4 h-4 mr-1.5 text-white/50"></i>
+                    Purpose
+                </label>
+                <select name="purpose"
+                    class="bg-white/10 text-white border border-white/20 p-2.5 pl-10 rounded-xl w-full appearance-none text-sm focus:bg-white/20 outline-none">
+                    <option value="" class="text-black">-- Select Purpose --</option>
+                    <option value="Complaint Visit" class="text-black">Complaint Visit</option>
+                    <option value="Delivery" class="text-black">Delivery</option>
+                    <option value="Follow-up" class="text-black">Follow-up</option>
+                    <option value="New Lead Visit" class="text-black">New Lead Visit</option>
+                    <option value="Order Taking" class="text-black">Order Taking</option>
+                    <option value="Office Work" class="text-black">Office Work</option>
+                    <option value="Product Details" class="text-black">Product Details</option>
+                    <option value="Payment Collection" class="text-black">Payment Collection</option>
+                    <option value="Recovery" class="text-black">Recovery</option>
+                </select>
+                <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 top-[2.35rem] text-white/60 pointer-events-none"></i>
+                <i data-lucide="target" class="w-5 h-5 absolute left-3 top-[2.35rem] text-white/50 pointer-events-none"></i>
+            </div>
+            <div>
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <i data-lucide="sticky-note" class="w-4 h-4 mr-1.5 text-white/50"></i>
+                    Notes
+                </label>
+                <textarea name="notes" rows="2" placeholder="Optional notes"
+                    class="w-full bg-white/10 text-white placeholder-white/50 p-2.5 rounded-xl border border-white/20 outline-none focus:bg-white/20 text-sm"></textarea>
+            </div>
+            <div>
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <i data-lucide="map" class="w-4 h-4 mr-1.5 text-white/50"></i>
+                    Distance (KM)
+                </label>
+                <input type="number" step="0.1" min="0" name="distance_km" placeholder="Distance in KM"
+                    class="w-full bg-white/10 text-white placeholder-white/50 p-2.5 rounded-xl border border-white/20 outline-none focus:bg-white/20 text-sm">
+            </div>
+            <div>
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <i data-lucide="image" class="w-4 h-4 mr-1.5 text-white/50"></i>
+                    Images
+                </label>
+                <input type="file" name="images[]" multiple accept="image/*"
+                    class="w-full text-white bg-white/10 p-2.5 rounded-xl border border-white/20 text-sm">
+            </div>
+            <input type="hidden" name="lat" id="pitstopLat">
+            <input type="hidden" name="lng" id="pitstopLng">
+            <button type="submit"
+                class="w-full py-2.5 rounded-xl text-white font-semibold bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6] shadow hover:opacity-90 transition flex items-center justify-center">
+                <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+                Save Stop
+            </button>
+        </form>
+    </div>
+</div>
+
 <script>
+    function openPitstopModal(visitId) {
+        const modal = document.getElementById('pitstopModal');
+        const form = document.getElementById('pitstopForm');
+        form.action = '/salesman/visits/' + visitId + '/pitstop';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('pitstopLat').value = pos.coords.latitude;
+                document.getElementById('pitstopLng').value = pos.coords.longitude;
+            });
+        }
+    }
+
+    function closePitstopModal() {
+        const modal = document.getElementById('pitstopModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    document.getElementById('pitstopModal').addEventListener('click', function(e) {
+        if (e.target === this) closePitstopModal();
+    });
     function toggleNotes(id, btn) {
         const el = document.getElementById(`notes-${id}`);
         el.classList.toggle('line-clamp-3');
@@ -601,6 +784,22 @@
         btn.innerText = el.classList.contains('line-clamp-3') ?
             'Read more' :
             'Read less';
+    }
+
+    function completeVisit(formId, latId, lngId) {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                document.getElementById(latId).value = pos.coords.latitude;
+                document.getElementById(lngId).value = pos.coords.longitude;
+                document.getElementById(formId).submit();
+            },
+            err => alert('Unable to get location: ' + err.message),
+            { enableHighAccuracy: true }
+        );
     }
 </script>
 

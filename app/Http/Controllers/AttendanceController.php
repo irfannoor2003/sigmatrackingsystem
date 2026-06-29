@@ -294,17 +294,6 @@ AttendanceVerification::create([
             return back()->with('error', 'Already clocked out.');
         }
 
-        $distance = $this->distanceInMeters(
-            $request->lat,
-            $request->lng,
-            config('office.lat'),
-            config('office.lng')
-        );
-
-        if ($distance > config('office.radius')) {
-            return back()->with('error', 'Clock-out allowed only inside office.');
-        }
-
         $clockOut = now();
 
         $attendance->update([
@@ -378,9 +367,14 @@ AttendanceVerification::create([
     $totalLeaves      = $calendarCollect->where('status', 'leave')->count();
     $totalShortLeaves = $calendarCollect->filter(fn ($day) => $day['attendance'] && $day['attendance']->short_leave)->count();
 
+    $lateThreshold = Carbon::today()->setTime(10, 16);
+    $totalLates = $calendarCollect->where('status', 'present')->filter(function ($day) use ($lateThreshold) {
+        return $day['attendance'] && $day['attendance']->clock_in && Carbon::parse($day['attendance']->clock_in)->gt($lateThreshold);
+    })->count();
+
     return view($this->viewPath('history'), compact(
         'calendar', 'monthInput',
-        'totalPresents', 'totalAbsents', 'totalLeaves', 'totalShortLeaves'
+        'totalPresents', 'totalAbsents', 'totalLeaves', 'totalShortLeaves', 'totalLates'
     ));
 }
 

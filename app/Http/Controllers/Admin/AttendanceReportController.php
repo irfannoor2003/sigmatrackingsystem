@@ -186,6 +186,14 @@ class AttendanceReportController extends Controller
         $totalLeaves    = $calendar->where('status', 'leave')->count();
         $totalShortLeaves = $calendar->where('status', 'short_leave')->count();
 
+        $totalLates = $calendar->where('status', 'present')->filter(function ($day) {
+            if (!$day['attendance'] || !$day['attendance']->clock_in) {
+                return false;
+            }
+            $lateThreshold = $day['attendance']->date->copy()->setTime(10, 16);
+            return Carbon::parse($day['attendance']->clock_in)->gt($lateThreshold);
+        })->count();
+
         return view('admin.attendance.staff', compact(
             'user',
             'calendar',
@@ -193,7 +201,8 @@ class AttendanceReportController extends Controller
             'totalPresents',
             'totalAbsents',
             'totalLeaves',
-            'totalShortLeaves'
+            'totalShortLeaves',
+            'totalLates'
         ));
     }
 

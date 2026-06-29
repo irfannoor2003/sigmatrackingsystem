@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Salesman;
 use App\Http\Controllers\Controller;
 use App\Models\OldCustomer;
 use App\Imports\OldCustomersImport;
+use App\Exports\OldCustomersExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -59,5 +60,13 @@ class OldCustomerController extends Controller
                 . "Inserted: {$import->inserted}, "
                 . "Skipped: {$import->skipped}"
             );
+    }
+
+    public function exportAll()
+    {
+        return Excel::download(
+            new OldCustomersExport(Auth::id()),
+            'my_old_customers.xlsx'
+        );
     }
 }

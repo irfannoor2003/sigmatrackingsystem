@@ -54,7 +54,7 @@
                 <h3 class="text-white/70 text-sm font-medium">Working Today</h3>
                 <div class="flex items-baseline gap-2 mt-1">
                     <p class="text-3xl font-black text-white tracking-tight">{{ $todayWorkingStaff }}</p>
-                    <a href="{{ route('admin.attendance.today') }}" class="text-[10px] font-bold text-white/40 underline hover:text-green-400 uppercase tracking-tighter transition-colors">
+                    <a href="{{ route('admin.attendance.today') }}" class="text-[10px] font-bold text-white/40 underline hover:text-green-400  tracking-tighter transition-colors">
                         Details
                     </a>
                 </div>
@@ -76,7 +76,7 @@
                 <p class="text-3xl font-black text-white mt-1 tracking-tight">
                     {{ User::where('role','salesman')->count() }}
                 </p>
-                <a href="{{ route('admin.salesmen.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-blue-400 uppercase tracking-tighter transition-colors inline-block">
+                <a href="{{ route('admin.salesmen.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-blue-400  tracking-tighter transition-colors inline-block">
                     Open Section
                 </a>
             </div>
@@ -95,7 +95,7 @@
             <div>
                 <h3 class="text-white/70 text-sm font-medium">Customers</h3>
                 <p class="text-3xl font-black text-white mt-1 tracking-tight">{{ Customer::count() }}</p>
-                <a href="{{ route('admin.customers.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-emerald-400 uppercase tracking-tighter transition-colors inline-block">
+                <a href="{{ route('admin.customers.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-emerald-400  tracking-tighter transition-colors inline-block">
                     View Customers
                 </a>
             </div>
@@ -134,6 +134,9 @@
                 <p class="text-3xl font-black text-white mt-1 tracking-tight">
                     {{ Visit::whereDate('created_at', now()->toDateString())->count() }}
                 </p>
+                <a href="{{ route('admin.reports.index') }}" class="text-[10px] font-bold text-white/40 underline hover:text-orange-400 tracking-tighter transition-colors inline-block">
+                    View Reports
+                </a>
             </div>
             <div class="bg-orange-500/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
                 <i data-lucide="sun" class="w-7 h-7 text-orange-400 animate-pulse"></i>
@@ -150,7 +153,7 @@
             <div>
                 <h3 class="text-white/70 text-sm font-medium">Blocked Visits</h3>
                 <p class="text-3xl font-black text-white mt-1 tracking-tight">{{ $blockedVisits }}</p>
-                <a href="{{ route('admin.visits.blocked') }}" class="text-[10px] font-bold text-white/40 underline hover:text-red-400 uppercase tracking-tighter transition-colors inline-block">
+                <a href="{{ route('admin.visits.blocked') }}" class="text-[10px] font-bold text-white/40 underline hover:text-red-400  tracking-tighter transition-colors inline-block">
                     View Blocked Visits
                 </a>
             </div>
@@ -163,7 +166,63 @@
         </div>
     </div>
 
+    <!-- Late Staff -->
+    <a href="{{ route('admin.attendance.late-staff') }}" class="block group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-amber-500/50">
+        <div class="p-5 flex items-center justify-between">
+            <div>
+                <h3 class="text-white/70 text-sm font-medium">Late Staff</h3>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <p class="text-3xl font-black text-white tracking-tight">{{ $lateStaff->count() }}</p>
+                    <span class="text-[10px] font-bold text-white/40 underline hover:text-amber-400 tracking-tighter transition-colors">Details</span>
+                </div>
+                <span class="text-[10px] text-white/40 inline-block">Clocked in after 10:15 AM</span>
+            </div>
+            <div class="bg-amber-500/10 p-3 rounded-2xl group-hover:rotate-12 transition-transform">
+                <i data-lucide="clock" class="w-7 h-7 text-amber-400"></i>
+            </div>
+        </div>
+        <div class="h-1 w-full bg-amber-500/20 absolute bottom-0 left-0">
+            <div class="h-full bg-amber-500" style="width: {{ ($todayWorkingStaff > 0) ? ($lateStaff->count() / $todayWorkingStaff) * 100 : 0 }}%"></div>
+        </div>
+    </a>
+
 </div>
+
+<!-- Late Staff Today -->
+@if($lateStaff->count() > 0)
+<div class="mt-8 bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg border-l-8"
+     style="border-left-color:#f59e0b">
+    <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+        <i data-lucide="clock" class="w-6 h-6 text-amber-400"></i>
+        Late Staff Today
+        <a href="{{ route('admin.attendance.late-staff') }}" class="ml-auto text-[10px] font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors">
+            {{ $lateStaff->count() }} staff — View All
+        </a>
+    </h3>
+    <div class="mt-4 max-h-[300px] overflow-y-auto space-y-2">
+        @foreach($lateStaff as $late)
+            @php
+                $clockInTime = \Carbon\Carbon::parse($late->clock_in);
+                $lateThreshold = \Carbon\Carbon::today()->setTime(10, 16);
+                $minutesLate = (int) $clockInTime->diffInMinutes($lateThreshold);
+            @endphp
+            <div class="flex items-center justify-between p-2 rounded-xl hover:bg-white/5 transition">
+                <span class="flex items-center gap-2 text-sm text-white">
+                    <i data-lucide="user-check" class="w-4 h-4 text-amber-400"></i>
+                    {{ $late->salesman->name ?? 'N/A' }}
+                    <span class="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded-full">{{ ucfirst($late->salesman->role ?? '-') }}</span>
+                </span>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-white/50">{{ $clockInTime->format('h:i A') }}</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
+                        {{ $minutesLate }} min late
+                    </span>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
 
 <!-- Recent Activities -->
 <div class="mt-8 bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg border-l-8"

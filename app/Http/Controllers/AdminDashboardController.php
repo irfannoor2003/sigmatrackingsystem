@@ -37,14 +37,41 @@ class AdminDashboardController extends Controller
 
         $blockedVisits = Visit::where('status', 'blocked')->count();
 
+        // Late Staff (clocked in after 10:15 AM)
+        $lateStaff = Attendance::with('salesman')
+            ->whereDate('date', $today)
+            ->where('status', 'present')
+            ->where('clock_in', '>', Carbon::today()->setTime(10, 16))
+            ->get();
+
         return view('admin.dashboard', compact(
             'totalSalesmen',
             'workingToday',
             'attendanceActivities',
             'visitActivities',
-            'blockedVisits'
+            'blockedVisits',
+            'lateStaff'
         ));
     }
+
+public function lateStaff()
+{
+    $today = Carbon::today();
+
+    $lateStaff = Attendance::with('salesman')
+        ->whereDate('date', $today)
+        ->where('status', 'present')
+        ->where('clock_in', '>', Carbon::today()->setTime(10, 16))
+        ->get();
+
+    $allTodayAttendance = Attendance::with('salesman')
+        ->whereDate('date', $today)
+        ->whereNotNull('clock_in')
+        ->get();
+
+    return view('admin.attendance.late-staff', compact('lateStaff', 'today', 'allTodayAttendance'))
+        ->with('backRoute', route('admin.dashboard'));
+}
 
 public function todayAttendance()
 {

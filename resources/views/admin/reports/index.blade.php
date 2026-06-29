@@ -227,6 +227,12 @@
                     <th class="p-3 whitespace-nowrap">
                         <div class="flex items-center gap-2">
                             <i data-lucide="map-pin" class="w-4 h-4 text-white/50"></i>
+                            Stops
+                        </div>
+                    </th>
+                    <th class="p-3 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-white/50"></i>
                             Address
                         </div>
                     </th>
@@ -275,6 +281,16 @@
                         </td>
                         <td class="p-2 text-white/80 text-sm max-w-[120px] truncate">{{ $v->notes ?? '-' }}</td>
                         <td class="p-2 text-white/80 whitespace-nowrap">{{ $v->distance_km ?? '-' }}</td>
+                        <td class="p-2 whitespace-nowrap">
+                            @if($v->pitstops && count($v->pitstops) > 0)
+                                <div class="flex items-center gap-1.5">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#ff2ba6] text-white text-[10px] font-bold">{{ count($v->pitstops) }}</span>
+                                    <span class="text-white/80 text-xs">stop{{ count($v->pitstops) > 1 ? 's' : '' }}</span>
+                                </div>
+                            @else
+                                <span class="text-white/40 text-xs">-</span>
+                            @endif
+                        </td>
                         <td class="p-2 text-white/80 text-sm max-w-[120px] truncate">{{ $v->customer->address ?? '-' }}</td>
                         <td class="p-2 text-white/80 text-sm whitespace-nowrap">{{ $v->started_at->format('M d, Y h:i A') }}</td>
                     </tr>
@@ -344,7 +360,18 @@
                         <span class="text-white/50 text-xs block mb-0.5">Distance</span>
                         <span class="text-white/90">{{ $v->distance_km ?? '-' }} km</span>
                     </div>
-                    <div class="col-span-2">
+                    <div>
+                        <span class="text-white/50 text-xs block mb-0.5">Stops</span>
+                        @if($v->pitstops && count($v->pitstops) > 0)
+                            <div class="flex items-center gap-1.5">
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#ff2ba6] text-white text-[10px] font-bold">{{ count($v->pitstops) }}</span>
+                                <span class="text-white/80 text-xs">stop{{ count($v->pitstops) > 1 ? 's' : '' }}</span>
+                            </div>
+                        @else
+                            <span class="text-white/40 text-xs">-</span>
+                        @endif
+                    </div>
+                    <div>
                         <span class="text-white/50 text-xs block mb-0.5">Date</span>
                         <span class="text-white/90">{{ $v->started_at->format('M d, Y h:i A') }}</span>
                     </div>

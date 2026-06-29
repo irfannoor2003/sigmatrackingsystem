@@ -165,6 +165,17 @@
         </a>
     </div>
 
+    {{-- Download QR Code --}}
+    <div class="mt-3 text-center">
+        <a href="http://portal.sessigmasoft.com/uploads/image.png" download
+           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white
+                  bg-gradient-to-r from-purple-500 to-indigo-600
+                  hover:opacity-90 transition shadow-lg text-sm">
+            <i data-lucide="qr-code" class="w-4 h-4"></i>
+            Download QR Code
+        </a>
+    </div>
+
 </div>
 </div>
 
