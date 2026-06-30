@@ -55,7 +55,7 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         @foreach([
             ['Presents', $totalPresents, 'check-circle', 'border-emerald-500/30', 'from-emerald-500/20 to-emerald-600/5', 'text-emerald-400', 'bg-emerald-500/10'],
-            ['Absents', $totalAbsents, 'user-x', 'border-yellow-500/30', 'from-yellow-500/20 to-yellow-600/5', 'text-yellow-400', 'bg-yellow-500/10'],
+            ['Absents', $totalAbsents, 'user-x', 'border-red-800/30', 'from-red-800/20 to-red-900/5', 'text-red-400', 'bg-red-800/10'],
             ['Leaves', $totalLeaves, 'ban', 'border-rose-500/30', 'from-rose-500/20 to-rose-600/5', 'text-rose-400', 'bg-rose-500/10'],
             ['Short Leaves', $totalShortLeaves, 'clock', 'border-orange-500/30', 'from-orange-500/20 to-orange-600/5', 'text-orange-400', 'bg-orange-500/10'],
             ['Late', $totalLates, 'alert-triangle', 'border-amber-500/30', 'from-amber-500/20 to-amber-600/5', 'text-amber-400', 'bg-amber-500/10']
@@ -102,11 +102,13 @@ input[type="month"]::-webkit-calendar-picker-indicator {
                         @endphp
 
                         <div class="rounded-2xl p-3
-                            @if ($day['status']==='present') bg-green-500/20 text-green-300
+                            @if ($attendance && $attendance->short_leave) bg-orange-500/20 text-orange-300
+                            @elseif ($attendance && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16') bg-amber-500/20 text-amber-300
+                            @elseif ($day['status']==='present') bg-green-500/20 text-green-300
                             @elseif ($day['status']==='leave') bg-red-500/20 text-red-300
                             @elseif ($day['status']==='holiday') bg-purple-500/20 text-purple-300
                             @elseif ($day['status']==='future') bg-blue-500/10 text-blue-300 opacity-50
-                            @else bg-yellow-500/20 text-yellow-300 @endif
+                            @else bg-red-800/20 text-red-400 @endif
                             @if($date->isToday()) ring-2 ring-pink-400 @endif">
 
                             {{-- DAY --}}
@@ -128,7 +130,10 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 
                                 <div class="flex justify-center gap-1 mt-1 flex-wrap">
                                     @if($attendance->short_leave)
-                                        <span class="badge bg-yellow-500/30 text-yellow-300">Short</span>
+                                        <span class="badge bg-orange-500/30 text-orange-300">Short</span>
+                                    @endif
+                                    @if(!$attendance->short_leave && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16')
+                                        <span class="badge bg-amber-500/30 text-amber-300">Late</span>
                                     @endif
                                     @if($attendance->auto_clock_out)
                                         <span class="badge bg-blue-500/30 text-blue-300">Auto</span>
@@ -162,7 +167,9 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     {{-- LEGEND --}}
     <div class="flex flex-wrap gap-4 text-xs mt-6 text-white/70">
         <span>🟢 Present</span>
-        <span>🟡 Absent</span>
+        <span>🟠 Short Leave</span>
+        <span>🟡 Late</span>
+        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-800 mr-1"></span> Absent</span>
         <span>🔴 Leave</span>
         <span>🟣 Holiday</span>
         <span>🔵 Future</span>

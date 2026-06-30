@@ -125,7 +125,7 @@ class Attendance extends Model
     }
 
     /**
-     * Late clock-in (>= 12 PM)
+     * Late clock-in (>= 10:16 AM)
      */
     public function getIsLateAttribute(): bool
     {
@@ -133,7 +133,7 @@ class Attendance extends Model
             return false;
         }
 
-        return $this->clock_in && $this->clock_in->format('H:i') >= '12:00';
+        return $this->clock_in && $this->clock_in->format('H:i') >= '10:16';
     }
 
     /**

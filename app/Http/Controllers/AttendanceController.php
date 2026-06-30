@@ -338,10 +338,17 @@ AttendanceVerification::create([
         $nonWorkingReason = AttendanceHelper::nonWorkingReason($key);
 
         // Determine status
-        if ($attendance) {
-            $status = $attendance->status; // present / leave
-        } elseif ($isHoliday || $isSunday || $isNonWorking) {
+        // Holidays and non-working days take precedence over attendance records
+        if ($isHoliday || $isSunday || $isNonWorking) {
             $status = 'holiday';
+        } elseif ($attendance) {
+            if ($attendance->status === 'leave') {
+                $status = 'leave';
+            } elseif ($attendance->short_leave) {
+                $status = 'short_leave';
+            } else {
+                $status = $attendance->status; // present
+            }
         } elseif ($date->isFuture()) {
             $status = 'future';
         } else {
@@ -365,11 +372,14 @@ AttendanceVerification::create([
     $totalPresents    = $calendarCollect->where('status', 'present')->count();
     $totalAbsents     = $calendarCollect->where('status', 'absent')->count();
     $totalLeaves      = $calendarCollect->where('status', 'leave')->count();
-    $totalShortLeaves = $calendarCollect->filter(fn ($day) => $day['attendance'] && $day['attendance']->short_leave)->count();
+    $totalShortLeaves = $calendarCollect->where('status', 'short_leave')->count();
 
-    $lateThreshold = Carbon::today()->setTime(10, 16);
-    $totalLates = $calendarCollect->where('status', 'present')->filter(function ($day) use ($lateThreshold) {
-        return $day['attendance'] && $day['attendance']->clock_in && Carbon::parse($day['attendance']->clock_in)->gt($lateThreshold);
+    $totalLates = $calendarCollect->where('status', 'present')->filter(function ($day) {
+        if (!$day['attendance'] || !$day['attendance']->clock_in) {
+            return false;
+        }
+        $lateThreshold = $day['attendance']->date->copy()->setTime(10, 16);
+        return Carbon::parse($day['attendance']->clock_in)->gt($lateThreshold);
     })->count();
 
     return view($this->viewPath('history'), compact(

@@ -77,7 +77,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         @foreach([
             ['Presents', $totalPresents, 'check-circle', 'emerald', 'border-emerald-500/30', 'from-emerald-500/20 to-emerald-600/5', 'text-emerald-400', 'bg-emerald-500/10'],
-            ['Absents', $totalAbsents, 'user-x', 'yellow', 'border-yellow-500/30', 'from-yellow-500/20 to-yellow-600/5', 'text-yellow-400', 'bg-yellow-500/10'],
+            ['Absents', $totalAbsents, 'user-x', 'red', 'border-red-800/30', 'from-red-800/20 to-red-900/5', 'text-red-400', 'bg-red-800/10'],
             ['Leaves', $totalLeaves, 'ban', 'rose', 'border-rose-500/30', 'from-rose-500/20 to-rose-600/5', 'text-rose-400', 'bg-rose-500/10'],
             ['Short Leaves', $totalShortLeaves, 'clock', 'orange', 'border-orange-500/30', 'from-orange-500/20 to-orange-600/5', 'text-orange-400', 'bg-orange-500/10'],
             ['Late', $totalLates, 'alert-triangle', 'amber', 'border-amber-500/30', 'from-amber-500/20 to-amber-600/5', 'text-amber-400', 'bg-amber-500/10']
@@ -192,11 +192,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
                             @php $attendance = $day['attendance'] ?? null; @endphp
 
                             <div class="rounded-2xl p-4 text-center text-xs
-                                @if ($day['status']==='present') bg-green-500/20 text-green-300
+                                @if ($day['status']==='short_leave') bg-orange-500/20 text-orange-300
+                                @elseif ($day['status']==='present')
+                                    @if($attendance && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16') bg-amber-500/20 text-amber-300
+                                    @else bg-green-500/20 text-green-300 @endif
                                 @elseif ($day['status']==='leave') bg-red-500/20 text-red-300
                                 @elseif ($day['status']==='off') bg-gray-500/20 text-gray-300
                                 @elseif ($day['status']==='future') bg-blue-500/10 text-blue-300
-                                @else bg-yellow-500/20 text-yellow-300 @endif">
+                                @else bg-red-800/20 text-red-400 @endif">
 
                                 {{-- Day --}}
                                 <div class="opacity-70 text-[10px]">{{ Carbon::parse($day['date'])->format('D') }}</div>
@@ -213,7 +216,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
                                     {{-- Badges --}}
                                     <div class="flex flex-wrap justify-center gap-1 mt-1">
                                         @if($attendance->short_leave)
-                                            <span class="badge bg-yellow-500/30 text-yellow-300">Short</span>
+                                            <span class="badge bg-orange-500/30 text-orange-300">Short</span>
+                                        @endif
+                                        @if(!$attendance->short_leave && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16')
+                                            <span class="badge bg-amber-500/30 text-amber-300">Late</span>
                                         @endif
                                         @if($attendance->auto_clock_out)
                                             <span class="badge bg-blue-500/30 text-blue-300">Auto</span>

@@ -98,7 +98,7 @@ class HrDashboardController extends Controller
 
         $attendanceStats = Attendance::select(
                 'salesman_id',
-                DB::raw("SUM(status = 'present') as presents"),
+                DB::raw("SUM(status = 'present' AND short_leave = 0) as presents"),
                 DB::raw("SUM(status = 'leave') as leaves"),
                 DB::raw("SUM(short_leave = 1) as short_leaves"),
                 DB::raw("SUM(total_minutes) as minutes")

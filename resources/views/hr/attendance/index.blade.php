@@ -302,6 +302,7 @@ text-white font-bold shadow-xl
                             <th>Role</th>
                             <th class="text-center">Present</th>
                             <th class="text-center">Leaves</th>
+                            <th class="text-center">Short</th>
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
@@ -333,6 +334,12 @@ text-white font-bold shadow-xl
                                 <td class="text-center">
                                     <span class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 font-bold">
                                         {{ $user->monthLeaves }}
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 font-bold">
+                                        {{ $user->shortLeaves }}
                                     </span>
                                 </td>
 
@@ -378,7 +385,7 @@ text-white font-bold shadow-xl
             </div>
 
             {{-- Stats --}}
-            <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
 
                 <div class="bg-white/5 p-3 rounded-lg">
                     <div class="text-white/60 flex items-center">
@@ -400,7 +407,17 @@ text-white font-bold shadow-xl
                     </div>
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-lg col-span-2">
+                <div class="bg-white/5 p-3 rounded-lg">
+                    <div class="text-white/60 flex items-center">
+                        <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
+                        Short
+                    </div>
+                    <div class="text-orange-300 font-semibold text-lg">
+                        {{ $u->shortLeaves }}
+                    </div>
+                </div>
+
+                <div class="bg-white/5 p-3 rounded-lg col-span-2 sm:col-span-3">
                     <div class="text-white/60 flex items-center">
                         <i data-lucide="badge-check" class="w-4 h-4 mr-2"></i>
                         Role
