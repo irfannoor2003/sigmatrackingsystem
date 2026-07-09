@@ -72,6 +72,7 @@ class VisitsFilteredExport implements FromCollection, WithHeadings, WithMapping
             'Status',
             'Notes',
             'Distance (KM)',
+            'Total Trip KM (Pitstops)',
             'Visit Date',
         ];
     }
@@ -90,6 +91,7 @@ class VisitsFilteredExport implements FromCollection, WithHeadings, WithMapping
                 '-',
                 $row->notes,
                 $row->distance_km,
+                '-',
                 $row->visited_at ? $row->visited_at->format('Y-m-d H:i') : '',
             ];
         }
@@ -104,6 +106,7 @@ class VisitsFilteredExport implements FromCollection, WithHeadings, WithMapping
             ucfirst($row->status),
             $row->notes,
             $row->distance_km,
+            $row->pitstop_total_km ?? '-',
             $row->started_at->format('Y-m-d H:i'),
         ];
     }

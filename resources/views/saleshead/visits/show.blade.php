@@ -94,8 +94,20 @@
                 </p>
 <p class="mb-3 flex items-center">
                     <i data-lucide="map" class="w-5 h-5 mr-2 text-white/70"></i>
-                    <strong class="text-white mr-2">Km:</strong>
-                    {{ $visit->distance_km }}
+                    <strong class="text-white mr-2">
+                        @if($visit->pitstops && count($visit->pitstops) > 0)
+                            Total KM Traveled:
+                        @else
+                            Km:
+                        @endif
+                    </strong>
+                    @if($visit->pitstops && count($visit->pitstops) > 0 && $visit->pitstop_total_km)
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#ff2ba6]/20 text-[#ff2ba6] text-sm font-bold border border-[#ff2ba6]/30">
+                            {{ $visit->pitstop_total_km }} km
+                        </span>
+                    @else
+                        {{ $visit->distance_km ?? '-' }}
+                    @endif
                 </p>
             </div>
 
@@ -170,7 +182,7 @@
         var roadModalData = roadModalData || {};
         roadModalData['office-start'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-green-500/20 border border-green-400/40 flex items-center justify-center"><i data-lucide="home" class="w-3 h-3 text-green-400"></i></div><div><div class="text-white font-semibold text-sm">Office</div><div class="text-white/40 text-[10px]">Start Point</div></div></div><p class="text-white/50 text-xs">Visit started from office location</p>';
         roadModalData['main-customer'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center"><i data-lucide="user" class="w-3 h-3 text-blue-400"></i></div><div><div class="text-white font-semibold text-sm">{!! addslashes($visit->customer->name) !!}</div><div class="text-white/40 text-[10px]">Main Visit</div></div></div><div class="space-y-1.5 text-xs"><div class="flex items-center gap-1.5 text-white/60"><i data-lucide="target" class="w-2.5 h-2.5 text-blue-400 shrink-0"></i>{!! addslashes($visit->purpose) !!}</div>@if($visit->notes)<div class="flex items-start gap-1.5 text-white/50"><i data-lucide="sticky-note" class="w-2.5 h-2.5 text-white/30 shrink-0 mt-0.5"></i><span class="italic break-words">"{!! \Illuminate\Support\Str::limit($visit->notes, 80) !!}"</span></div>@endif @if($visit->distance_km)<div class="flex items-center gap-1.5 text-white/60"><i data-lucide="map-pin" class="w-2.5 h-2.5 text-blue-400 shrink-0"></i>{{ $visit->distance_km }} km</div>@endif</div>';
-        roadModalData['office-end'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[#ff2ba6]/20 border border-[#ff2ba6]/40 flex items-center justify-center"><i data-lucide="building" class="w-3 h-3 text-[#ff2ba6]"></i></div><div><div class="text-white font-semibold text-sm">Office</div><div class="text-white/40 text-[10px]">End Point</div></div></div><p class="text-white/50 text-xs">Return to office after visit</p>';
+        roadModalData['office-end'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[#ff2ba6]/20 border border-[#ff2ba6]/40 flex items-center justify-center"><i data-lucide="building" class="w-3 h-3 text-[#ff2ba6]"></i></div><div><div class="text-white font-semibold text-sm">Office</div><div class="text-white/40 text-[10px]">End Point</div></div></div><p class="text-white/50 text-xs">Return to office after visit</p>@if($visit->pitstops && count($visit->pitstops) > 0 && $visit->pitstop_total_km)<div class="mt-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#ff2ba6]/10 border border-[#ff2ba6]/30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#ff2ba6] shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2.5 2.5"/></svg><span class="text-[#ff2ba6] text-xs font-bold">Total Trip: {{ $visit->pitstop_total_km }} km</span></div>@endif';
         @foreach($visit->pitstops as $idx => $ps)
         roadModalData['stop-{{ $idx }}'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[#ff2ba6] text-white text-[10px] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</div><div><div class="text-white font-semibold text-sm">{!! addslashes($ps->customer->name ?? 'N/A') !!}</div><div class="text-white/40 text-[10px]">{{ $ps->visited_at ? $ps->visited_at->format('d M, h:i A') : '-' }}</div></div></div><div class="space-y-1.5 text-xs">@if($ps->purpose)<div class="flex items-center gap-1.5 text-white/60"><i data-lucide="target" class="w-2.5 h-2.5 text-[#ff2ba6] shrink-0"></i>{!! addslashes($ps->purpose) !!}</div>@endif @if($ps->notes)<div class="flex items-start gap-1.5 text-white/50"><i data-lucide="sticky-note" class="w-2.5 h-2.5 text-white/30 shrink-0 mt-0.5"></i><span class="italic break-words">"{!! \Illuminate\Support\Str::limit($ps->notes, 80) !!}"</span></div>@endif @if($ps->distance_km)<div class="flex items-center gap-1.5 text-white/60"><i data-lucide="map-pin" class="w-2.5 h-2.5 text-[#ff2ba6] shrink-0"></i>{{ $ps->distance_km }} km</div>@endif @if($ps->images && count($ps->images) > 0)<div class="flex gap-1.5 mt-2 flex-wrap">@foreach($ps->images as $img)<img src="{{ asset($img) }}" class="w-10 h-10 object-cover rounded-lg border border-white/10 road-pitstop-img cursor-pointer" onclick="event.stopPropagation();openRoadImage(this.src)">@endforeach</div>@endif</div>';
         @endforeach

@@ -346,43 +346,53 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                                         Add Stop
                                     </button>
-                                    <form action="{{ route('salesman.visits.complete', $v->id) }}" method="POST"
-                                        enctype="multipart/form-data" id="completeForm_{{ $v->id }}">
-                                        @csrf
-
-                                        <textarea name="notes"
-                                            class="w-full bg-white/10 text-white placeholder-white/50
-                                                p-2 rounded-lg outline-none mb-2 focus:bg-white/20"
-                                            placeholder="Add notes" required></textarea>
-                                        <input type="number" step="0.1" min="0" name="distance_km"
-                                            placeholder="Enter distance in KM"
-                                            class="w-full bg-white/10 text-white placeholder-white/50
-           p-2 rounded-lg mb-2 focus:bg-white/20"
-                                            required>
-
-                                        {{-- File upload for images only --}}
-                                        <input type="file" name="images[]" multiple accept="image/*"
-                                            {{-- Suggested addition to hint for images only --}}
-                                            class="w-full text-white mb-2 bg-white/10 p-2 rounded-lg" required>
-
-                                        <input type="hidden" name="lat" id="complete_lat_{{ $v->id }}">
-                                        <input type="hidden" name="lng" id="complete_lng_{{ $v->id }}">
-
-                                        <button type="button" onclick="completeVisit('completeForm_{{ $v->id }}', 'complete_lat_{{ $v->id }}', 'complete_lng_{{ $v->id }}')"
+                                    @if($v->pitstops && count($v->pitstops) > 0)
+                                        {{-- PITSTOP VISIT: open dedicated modal with KM field --}}
+                                        <button type="button" onclick="openPitstopCompleteModal({{ $v->id }})"
                                             class="w-full py-2 rounded-xl text-white font-semibold flex items-center justify-center
                                                 bg-gradient-to-r from-green-500 to-emerald-500
                                                 shadow hover:opacity-90 transition">
-                                            {{-- Lucide Icon: check-circle --}}
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-check-circle mr-1">
+                                                class="mr-1">
                                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                                                 <path d="m9 11 2 2 4-4" />
                                             </svg>
-                                            Complete
+                                            Complete Visit
                                         </button>
-                                    </form>
+                                    @else
+                                        {{-- SIMPLE VISIT: standard inline form (with KM field) --}}
+                                        <form action="{{ route('salesman.visits.complete', $v->id) }}" method="POST"
+                                            enctype="multipart/form-data" id="completeForm_{{ $v->id }}">
+                                            @csrf
+                                            <textarea name="notes"
+                                                class="w-full bg-white/10 text-white placeholder-white/50
+                                                    p-2 rounded-lg outline-none mb-2 focus:bg-white/20"
+                                                placeholder="Add notes" required></textarea>
+                                            <input type="number" step="0.1" min="0" name="distance_km"
+                                                placeholder="Enter distance in KM"
+                                                class="w-full bg-white/10 text-white placeholder-white/50
+                                                p-2 rounded-lg mb-2 focus:bg-white/20" required>
+                                            <input type="file" name="images[]" multiple accept="image/*"
+                                                class="w-full text-white mb-2 bg-white/10 p-2 rounded-lg" required>
+                                            <input type="hidden" name="lat" id="complete_lat_{{ $v->id }}">
+                                            <input type="hidden" name="lng" id="complete_lng_{{ $v->id }}">
+                                            <button type="button" onclick="completeVisit('completeForm_{{ $v->id }}', 'complete_lat_{{ $v->id }}', 'complete_lng_{{ $v->id }}')"
+                                                class="w-full py-2 rounded-xl text-white font-semibold flex items-center justify-center
+                                                    bg-gradient-to-r from-green-500 to-emerald-500
+                                                    shadow hover:opacity-90 transition">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="lucide lucide-check-circle mr-1">
+                                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                    <path d="m9 11 2 2 4-4" />
+                                                </svg>
+                                                Complete
+                                            </button>
+                                        </form>
+                                    @endif
                                 @else
 <div class="flex items-center gap-3 justify-center">
 
@@ -594,37 +604,48 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
                                     Add Stop
                                 </button>
-                                <form action="{{ route('salesman.visits.complete', $v->id) }}" method="POST"
-                                    enctype="multipart/form-data" id="completeForm_{{ $v->id }}">
-                                    @csrf
-
-                                    <textarea name="notes"
-                                        class="w-full bg-white/10 text-white placeholder-white/50
-                       p-2 rounded-lg outline-none mb-2 focus:bg-white/20"
-                                        placeholder="Add notes" required></textarea>
-
-                                    {{-- KM Field --}}
-                                    <input type="number" step="0.1" min="0" name="distance_km"
-                                        placeholder="Enter distance in KM"
-                                        class="w-full bg-white/10 text-white placeholder-white/50
-                       p-2 rounded-lg mb-2 focus:bg-white/20"
-                                        required>
-
-                                    {{-- Images --}}
-                                    <input type="file" name="images[]" multiple accept="image/*"
-                                        class="w-full text-white mb-3 bg-white/10 p-2 rounded-lg text-sm" required>
-
-                                    <input type="hidden" name="lat" id="complete_lat_{{ $v->id }}">
-                                    <input type="hidden" name="lng" id="complete_lng_{{ $v->id }}">
-
-                                    <button type="button" onclick="completeVisit('completeForm_{{ $v->id }}', 'complete_lat_{{ $v->id }}', 'complete_lng_{{ $v->id }}')"
-                                        class="w-full py-2 rounded-xl text-white font-semibold
-                       flex items-center justify-center
-                       bg-gradient-to-r from-green-500 to-emerald-500
-                       shadow hover:opacity-90 transition">
-                                        ✔ Complete Visit
+                                @if($v->pitstops && count($v->pitstops) > 0)
+                                    {{-- PITSTOP VISIT: open dedicated modal with KM field --}}
+                                    <button type="button" onclick="openPitstopCompleteModal({{ $v->id }})"
+                                        class="w-full py-2.5 rounded-xl text-white font-semibold
+                                            flex items-center justify-center
+                                            bg-gradient-to-r from-green-500 to-emerald-500
+                                            shadow hover:opacity-90 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="mr-1.5">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                            <path d="m9 11 2 2 4-4" />
+                                        </svg>
+                                        Complete Visit
                                     </button>
-                                </form>
+                                @else
+                                    {{-- SIMPLE VISIT: standard inline form (with KM field) --}}
+                                    <form action="{{ route('salesman.visits.complete', $v->id) }}" method="POST"
+                                        enctype="multipart/form-data" id="completeForm_{{ $v->id }}">
+                                        @csrf
+                                        <textarea name="notes"
+                                            class="w-full bg-white/10 text-white placeholder-white/50
+                                                p-2 rounded-lg outline-none mb-2 focus:bg-white/20"
+                                            placeholder="Add notes" required></textarea>
+                                        <input type="number" step="0.1" min="0" name="distance_km"
+                                            placeholder="Enter distance in KM"
+                                            class="w-full bg-white/10 text-white placeholder-white/50
+                                            p-2 rounded-lg mb-2 focus:bg-white/20" required>
+                                        <input type="file" name="images[]" multiple accept="image/*"
+                                            class="w-full text-white mb-3 bg-white/10 p-2 rounded-lg text-sm" required>
+                                        <input type="hidden" name="lat" id="complete_lat_{{ $v->id }}">
+                                        <input type="hidden" name="lng" id="complete_lng_{{ $v->id }}">
+                                        <button type="button" onclick="completeVisit('completeForm_{{ $v->id }}', 'complete_lat_{{ $v->id }}', 'complete_lng_{{ $v->id }}')"
+                                            class="w-full py-2.5 rounded-xl text-white font-semibold
+                                                flex items-center justify-center
+                                                bg-gradient-to-r from-green-500 to-emerald-500
+                                                shadow hover:opacity-90 transition">
+                                            ✔ Complete Visit
+                                        </button>
+                                    </form>
+                                @endif
 
                                 {{-- IF VISIT IS COMPLETED --}}
                             @else
@@ -665,6 +686,131 @@
     </div>
 
 @endsection
+
+{{-- ============================================================
+     PITSTOP COMPLETE MODAL
+     Only shown when closing a visit that has ≥1 pit stop.
+     Requires GPS match to office + notes + total KM + images.
+============================================================ --}}
+<div id="pitstopCompleteModal" class="fixed inset-0 z-[9998] hidden items-center justify-center bg-black/70 backdrop-blur-md p-4">
+    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
+
+        {{-- Header --}}
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold text-white flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="mr-2 text-green-400">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 2 2 4-4"/>
+                </svg>
+                Complete Pit Stop Visit
+            </h3>
+            <button onclick="closePitstopCompleteModal()"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-red-500/40 transition text-white text-lg">&times;</button>
+        </div>
+
+        {{-- GPS status banner --}}
+        <div id="pcm-gps-banner" class="mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-yellow-500/10 border border-yellow-400/30 text-yellow-300 text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="shrink-0 animate-pulse">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span id="pcm-gps-text">Acquiring GPS location…</span>
+        </div>
+
+        <form id="pitstopCompleteForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+
+            {{-- Notes --}}
+            <div>
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mr-1.5 text-white/50"><path d="M15.5 8H20v14H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8.5L20 8.5z"/></svg>
+                    Notes <span class="text-red-400 ml-1">*</span>
+                </label>
+                <textarea name="notes" rows="3" required
+                    placeholder="Add your visit notes…"
+                    class="w-full bg-white/10 text-white placeholder-white/40 p-3 rounded-xl border border-white/20
+                           outline-none focus:bg-white/20 text-sm transition resize-none"></textarea>
+            </div>
+
+            {{-- Main Visit KM --}}
+            <div>
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mr-1.5 text-white/50"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Main Visit KM <span class="text-red-400 ml-1">*</span>
+                </label>
+                <div class="relative">
+                    <input type="number" name="distance_km" step="0.1" min="0" required
+                        placeholder="Distance to main customer"
+                        class="w-full bg-white/10 text-white placeholder-white/40 p-3 pr-12 rounded-xl border border-white/20
+                               outline-none focus:bg-white/20 text-sm transition">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-xs font-bold">KM</span>
+                </div>
+            </div>
+
+            {{-- Total KM Traveled (pitstop visits only) --}}
+            <div class="bg-[#ff2ba6]/5 border border-[#ff2ba6]/30 rounded-xl p-4">
+                <label class="text-white/80 text-sm mb-2 block flex items-center font-semibold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mr-2 text-[#ff2ba6]">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 8v4l2.5 2.5"/>
+                    </svg>
+                    Total KM Traveled (All Stops) <span class="text-red-400 ml-1">*</span>
+                </label>
+                <p class="text-white/40 text-xs mb-2">Enter the total distance you covered during this entire pit stop visit including all stops.</p>
+                <div class="relative">
+                    <input type="number" name="pitstop_total_km" step="0.1" min="0" required
+                        placeholder="e.g. 24.5"
+                        class="w-full bg-white/10 text-white placeholder-white/40 p-3 pr-12 rounded-xl
+                               border border-[#ff2ba6]/40 outline-none focus:bg-white/20 focus:border-[#ff2ba6]
+                               text-sm transition font-semibold">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[#ff2ba6] text-xs font-bold">KM</span>
+                </div>
+            </div>
+
+            {{-- Images --}}
+            <div>
+                <label class="text-white/70 text-sm mb-1 block flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="mr-1.5 text-white/50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    Documents / Images <span class="text-red-400 ml-1">*</span>
+                </label>
+                <input type="file" name="images[]" multiple accept="image/*" required
+                    class="w-full text-white bg-white/10 p-2.5 rounded-xl border border-white/20
+                           text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0
+                           file:bg-[#ff2ba6]/20 file:text-[#ff2ba6] file:text-xs file:font-semibold
+                           hover:file:bg-[#ff2ba6]/30 transition">
+            </div>
+
+            {{-- Hidden GPS fields --}}
+            <input type="hidden" name="lat" id="pcm_lat">
+            <input type="hidden" name="lng" id="pcm_lng">
+
+            {{-- Submit --}}
+            <button type="button" id="pcm-submit-btn"
+                onclick="submitPitstopComplete()"
+                disabled
+                class="w-full py-3 rounded-xl text-white font-bold flex items-center justify-center gap-2
+                       bg-gradient-to-r from-green-500 to-emerald-500
+                       shadow-lg shadow-green-500/20 hover:opacity-90 transition
+                       disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 2 2 4-4"/>
+                </svg>
+                Complete Visit
+            </button>
+        </form>
+    </div>
+</div>
 
 <!-- ADD PITSTOP MODAL -->
 <div id="pitstopModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -787,6 +933,14 @@
     }
 
     function completeVisit(formId, latId, lngId) {
+        const form = document.getElementById(formId);
+        
+        // Enforce HTML5 required fields before checking GPS
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
         if (!navigator.geolocation) {
             alert('Geolocation is not supported by your browser.');
             return;
@@ -795,12 +949,82 @@
             pos => {
                 document.getElementById(latId).value = pos.coords.latitude;
                 document.getElementById(lngId).value = pos.coords.longitude;
-                document.getElementById(formId).submit();
+                form.submit();
             },
             err => alert('Unable to get location: ' + err.message),
             { enableHighAccuracy: true }
         );
     }
+
+    // ── Pitstop Complete Modal ─────────────────────────────────
+    function openPitstopCompleteModal(visitId) {
+        const modal  = document.getElementById('pitstopCompleteModal');
+        const form   = document.getElementById('pitstopCompleteForm');
+        const btn    = document.getElementById('pcm-submit-btn');
+        const banner = document.getElementById('pcm-gps-banner');
+        const gpsText = document.getElementById('pcm-gps-text');
+
+        // Reset state
+        form.action = '/salesman/visits/' + visitId + '/complete';
+        document.getElementById('pcm_lat').value = '';
+        document.getElementById('pcm_lng').value = '';
+        btn.disabled = true;
+        banner.className = 'mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-yellow-500/10 border border-yellow-400/30 text-yellow-300 text-xs';
+        gpsText.textContent = 'Acquiring GPS location…';
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        // Acquire GPS immediately on open
+        if (!navigator.geolocation) {
+            banner.className = 'mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-400/30 text-red-300 text-xs';
+            gpsText.textContent = 'GPS not supported by your browser.';
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                document.getElementById('pcm_lat').value = pos.coords.latitude;
+                document.getElementById('pcm_lng').value = pos.coords.longitude;
+                btn.disabled = false;
+                banner.className = 'mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-green-500/10 border border-green-400/30 text-green-300 text-xs';
+                gpsText.textContent = '✓ GPS location confirmed — ready to submit.';
+            },
+            err => {
+                banner.className = 'mb-4 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-400/30 text-red-300 text-xs';
+                gpsText.textContent = '✗ Could not get GPS: ' + err.message + '. Please enable location and try again.';
+            },
+            { enableHighAccuracy: true, timeout: 12000 }
+        );
+    }
+
+    function closePitstopCompleteModal() {
+        const modal = document.getElementById('pitstopCompleteModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function submitPitstopComplete() {
+        const form = document.getElementById('pitstopCompleteForm');
+        
+        // Enforce HTML5 required fields (Notes and Total KM)
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const lat = document.getElementById('pcm_lat').value;
+        const lng = document.getElementById('pcm_lng').value;
+        if (!lat || !lng) {
+            alert('GPS location is required. Please wait for GPS confirmation before submitting.');
+            return;
+        }
+        form.submit();
+    }
+
+    document.getElementById('pitstopCompleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closePitstopCompleteModal();
+    });
 </script>
 
 <style>

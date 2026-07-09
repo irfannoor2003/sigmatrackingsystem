@@ -175,9 +175,11 @@ public function index(Request $request)
     $request->validate([
         'lat' => 'required|numeric',
         'lng' => 'required|numeric',
-        'notes' => 'nullable|string|max:1000',
+        'notes' => 'required|string|max:1000',
         'distance_km' => 'nullable|numeric|min:0',
-        'images.*' => 'nullable|image|max:5120', // optional, max 5MB
+        'pitstop_total_km' => 'nullable|numeric|min:0',
+        'images' => 'required|array',
+        'images.*' => 'required|image|max:5120',
     ]);
 
     $officeLat = config('office.lat');
@@ -226,7 +228,12 @@ if ($request->hasFile('images')) {
 }
 
     $visit->notes = $request->notes;
-    $visit->distance_km = $request->distance_km; // save km entered by salesman
+    if ($request->has('distance_km')) {
+        $visit->distance_km = $request->distance_km;
+    }
+    if ($request->has('pitstop_total_km')) {
+        $visit->pitstop_total_km = $request->pitstop_total_km;
+    }
     $visit->images = array_merge($visit->images ?? [], $images);
     $visit->status = 'completed';
     $visit->completed_at = now();
