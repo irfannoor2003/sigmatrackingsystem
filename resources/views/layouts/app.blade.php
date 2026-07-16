@@ -60,7 +60,9 @@
             -webkit-backdrop-filter: blur(18px);
         }
 
-        aside { transition: background 0.3s ease, border-color 0.3s ease; }
+        aside {
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
 
         .sidebar-active {
             background: rgba(255, 0, 170, 0.2) !important;
@@ -75,7 +77,9 @@
             color: white !important;
         }
 
-        header { transition: background 0.3s ease, border-color 0.3s ease; }
+        header {
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
 
         .hf-heading {
             font-size: 26px;
@@ -85,91 +89,131 @@
 
         /* ===== PITSTOP ROAD ANIMATION ===== */
         @keyframes road-flow {
-            0% { background-position: 0 0; }
-            100% { background-position: 24px 0; }
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 24px 0;
+            }
         }
+
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,43,166,0.5); }
-            50% { box-shadow: 0 0 12px 4px rgba(255,43,166,0.35); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 43, 166, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 12px 4px rgba(255, 43, 166, 0.35);
+            }
         }
+
         @keyframes float-bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
         }
+
         .route-line-h {
-            background-image: repeating-linear-gradient(
-                to right,
-                rgba(255,255,255,0.15) 0px,
-                rgba(255,255,255,0.15) 8px,
-                transparent 8px,
-                transparent 16px
-            );
+            background-image: repeating-linear-gradient(to right,
+                    rgba(255, 255, 255, 0.15) 0px,
+                    rgba(255, 255, 255, 0.15) 8px,
+                    transparent 8px,
+                    transparent 16px);
             background-size: 24px 3px;
             animation: road-flow 1s linear infinite;
         }
+
         .route-line-v {
-            background-image: repeating-linear-gradient(
-                to bottom,
-                rgba(255,255,255,0.15) 0px,
-                rgba(255,255,255,0.15) 8px,
-                transparent 8px,
-                transparent 16px
-            );
+            background-image: repeating-linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.15) 0px,
+                    rgba(255, 255, 255, 0.15) 8px,
+                    transparent 8px,
+                    transparent 16px);
             background-size: 3px 24px;
             animation: road-flow 1s linear infinite;
         }
+
         @keyframes road-flow-v {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 24px; }
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 24px;
+            }
         }
+
         .route-line-v {
             animation: road-flow-v 1s linear infinite;
         }
+
         .route-marker {
             animation: pulse-glow 2.5s ease-in-out infinite;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .route-marker:hover {
             transform: scale(1.35);
-            box-shadow: 0 0 20px 6px rgba(255,43,166,0.5);
+            box-shadow: 0 0 20px 6px rgba(255, 43, 166, 0.5);
         }
+
         .route-car {
             animation: float-bounce 1.8s ease-in-out infinite;
         }
+
         .road-modal {
             opacity: 0;
             visibility: hidden;
             transform: translateY(8px) scale(0.95);
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .road-node:hover .road-modal,
         .road-node.active .road-modal {
             opacity: 1;
             visibility: visible;
             transform: translateY(0) scale(1);
         }
+
         .road-node:hover .road-marker {
             transform: scale(1.35);
-            box-shadow: 0 0 20px 6px rgba(255,43,166,0.5);
+            box-shadow: 0 0 20px 6px rgba(255, 43, 166, 0.5);
         }
+
         .route-label-h {
             opacity: 0;
             transform: translateX(-50%) translateY(4px);
             transition: all 0.3s ease;
         }
+
         .road-node:hover .route-label-h {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
+
         #road-modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             z-index: 9998;
             display: none;
         }
+
         #road-modal-overlay.show {
             display: block;
         }
+
         #road-modal-box {
             position: fixed;
             z-index: 9999;
@@ -182,6 +226,7 @@
             pointer-events: none;
             max-width: calc(100vw - 24px);
         }
+
         #road-modal-box.show {
             opacity: 1;
             visibility: visible;
@@ -291,6 +336,16 @@
                             </span>
                         </a>
 
+                        <a href="https://delivery.sessigmasoft.com/"
+                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
+   hover:bg-white/10 transition-all duration-300">
+                            <i data-lucide="truck" class="w-5 h-5"></i>
+                            <span>Delivery</span>
+                            <span
+                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
+                        </a>
+
                         <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                         <a href="{{ route('admin.old-customers.index') }}"
@@ -332,6 +387,16 @@
     {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
                             <i data-lucide="building-2"></i>
                             All Customers
+                        </a>
+
+                        <a href="https://delivery.sessigmasoft.com/"
+                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
+   hover:bg-white/10 transition-all duration-300">
+                            <i data-lucide="truck" class="w-5 h-5"></i>
+                            <span>Delivery</span>
+                            <span
+                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
                         </a>
                     @endif
 
@@ -458,7 +523,7 @@
                         </a>
                     @endif
 
-                    @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
+                    @if (in_array(auth()->user()->role, ['it', 'account', 'office_boy']))
                         {{-- Staff Dashboard --}}
                         <a href="{{ route('staff.dashboard') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
@@ -474,8 +539,39 @@
                             <i data-lucide="clock" class="w-5 h-5"></i>
                             Attendance
                         </a>
+
+
                     @endif
 
+
+                    @if ($role === 'store')
+                                {{-- Staff Dashboard --}}
+                                <a href="{{ route('staff.dashboard') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+       {{ request()->routeIs('staff.dashboard') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                                    Dashboard
+                                </a>
+
+                                {{-- Attendance --}}
+                                <a href="{{ route('staff.attendance.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+       {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    Attendance
+                                </a>
+
+
+
+                                <a href="https://delivery.sessigmasoft.com/"
+                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
+                                    <span>Delivery</span>
+                                    <span
+                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
+                                </a>
+                            @endif
 
 
 
@@ -625,19 +721,28 @@
                                     All Customers
                                 </a>
                                 <a href="https://expense.sessigmasoft.com/"
-   class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
    {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active-mobile' : '' }}">
 
-    <i data-lucide="wallet"
-        class="w-5 h-5 "></i>
+                                    <i data-lucide="wallet" class="w-5 h-5 "></i>
 
-    <span>All Expenses</span>
+                                    <span>All Expenses</span>
 
-    <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+                                    <span
+                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
         bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
-        NEW
-    </span>
-</a>
+                                        NEW
+                                    </span>
+                                </a>
+
+                                <a href="https://delivery.sessigmasoft.com/"
+                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
+                                    <span>Delivery</span>
+                                    <span
+                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
+                                </a>
 
                                 <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
@@ -752,6 +857,15 @@
                                     <i data-lucide="building-2"></i>
                                     All Customers
                                 </a>
+
+                                <a href="https://delivery.sessigmasoft.com/"
+                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
+                                    <span>Delivery</span>
+                                    <span
+                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
+                                </a>
                             @endif
 
                             @if (auth()->user()->role === 'hr')
@@ -783,22 +897,22 @@
                                     Leave Messages
                                 </a>
                                 <a href="https://expense.sessigmasoft.com/"
-   class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
+                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
    {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active-mobile' : '' }}">
 
-    <i data-lucide="wallet"
-        class="w-5 h-5 "></i>
+                                    <i data-lucide="wallet" class="w-5 h-5 "></i>
 
-    <span>All Expenses</span>
+                                    <span>All Expenses</span>
 
-    <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+                                    <span
+                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
         bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
-        NEW
-    </span>
-</a>
+                                        NEW
+                                    </span>
+                                </a>
                             @endif
 
-                            @if (in_array(auth()->user()->role, ['it', 'account', 'store', 'office_boy']))
+                            @if (in_array(auth()->user()->role, ['it', 'account', 'office_boy']))
                                 {{-- Staff Dashboard --}}
                                 <a href="{{ route('staff.dashboard') }}"
                                     class="flex items-center gap-3 py-2 rounded hover:bg-white/10
@@ -816,7 +930,34 @@
                                 </a>
                             @endif
 
+                            @if ($role === 'store')
+                                {{-- Staff Dashboard --}}
+                                <a href="{{ route('staff.dashboard') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+       {{ request()->routeIs('staff.dashboard') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                                    Dashboard
+                                </a>
 
+                                {{-- Attendance --}}
+                                <a href="{{ route('staff.attendance.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+       {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="clock" class="w-5 h-5"></i>
+                                    Attendance
+                                </a>
+
+
+
+                                <a href="https://delivery.sessigmasoft.com/"
+                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
+                                    <i data-lucide="truck" class="w-5 h-5"></i>
+                                    <span>Delivery</span>
+                                    <span
+                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
+        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
+                                </a>
+                            @endif
 
                             <form method="POST" action="{{ route('logout') }}"
                                 class="mt-4 pt-4 border-t border-white/10">
@@ -856,10 +997,14 @@
     @yield('scripts')
 
     <script>
-        function renderLucide() { lucide.createIcons(); }
+        function renderLucide() {
+            lucide.createIcons();
+        }
         document.addEventListener("DOMContentLoaded", renderLucide);
         document.addEventListener("alpine:init", () => {
-            Alpine.effect(() => { renderLucide(); });
+            Alpine.effect(() => {
+                renderLucide();
+            });
         });
     </script>
 

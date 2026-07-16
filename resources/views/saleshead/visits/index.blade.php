@@ -160,6 +160,12 @@
                     </th>
                     <th class="p-3 whitespace-nowrap">
                         <div class="flex items-center gap-2">
+                            <i data-lucide="map" class="w-4 h-4 text-white/50"></i>
+                            Total Km
+                        </div>
+                    </th>
+                    <th class="p-3 whitespace-nowrap">
+                        <div class="flex items-center gap-2">
                             <i data-lucide="map-pin" class="w-4 h-4 text-white/50"></i>
                             Stops
                         </div>
@@ -215,6 +221,7 @@
                         </td>
                         <td class="p-2 text-white/80 text-sm max-w-[120px] truncate" title="{{ $v->notes ?? '' }}">{{ $v->notes ?? '-' }}</td>
                         <td class="p-2 text-white/80 whitespace-nowrap">{{ $v->distance_km ?? '-' }}</td>
+                        <td class="p-2 text-white/80 whitespace-nowrap">{{ $v->pitstop_total_km ?? '-' }}</td>
                         <td class="p-2 whitespace-nowrap">
                             @if($v->pitstops && count($v->pitstops) > 0)
                                 <div class="flex items-center gap-1.5">
@@ -230,7 +237,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="p-8 text-center text-white/60">
+                        <td colspan="11" class="p-8 text-center text-white/60">
                             <i data-lucide="search-x" class="w-6 h-6 inline-block mr-2 text-white/40"></i>
                             No report found
                         </td>
@@ -293,6 +300,10 @@
                     <div>
                         <span class="text-white/50 text-xs block mb-0.5">Distance</span>
                         <span class="text-white/90">{{ $v->distance_km ?? '-' }} km</span>
+                    </div>
+                    <div>
+                        <span class="text-white/50 text-xs block mb-0.5">Total Km</span>
+                        <span class="text-white/90">{{ $v->pitstop_total_km ?? '-' }}</span>
                     </div>
                     <div>
                         <span class="text-white/50 text-xs block mb-0.5">Stops</span>
