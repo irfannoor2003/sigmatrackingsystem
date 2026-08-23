@@ -170,7 +170,9 @@ class AttendanceExport implements FromCollection, WithHeadings
 
                 } elseif ($attendance) {
 
-                    $status  = 'Present';
+                    $isLate = ! $attendance->short_leave && $attendance->is_late;
+
+                    $status  = $isLate ? 'Late' : 'Present';
                     $remarks = $attendance->note ?: '--';
 
                 } else {
@@ -207,6 +209,9 @@ class AttendanceExport implements FromCollection, WithHeadings
                     'Clock Out'     => $attendance?->clock_out?->format('h:i A') ?? '-',
                     'Work Hours'    => $workHours,
                     'Reason / Note' => $remarks,
+                    'Late Reason'   => $attendance && ! $attendance->short_leave && $attendance->is_late
+                        ? ($attendance->late_reason ?: '--')
+                        : '--',
                     'Marked By'     => $attendance?->markedBy?->name ?? '-',
                 ]);
 
@@ -229,6 +234,7 @@ class AttendanceExport implements FromCollection, WithHeadings
             'Clock Out',
             'Work Hours',
             'Reason / Note',
+            'Late Reason',
             'Marked By',
         ];
     }

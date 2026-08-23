@@ -149,6 +149,8 @@
                         <option value="" class="text-black">All Status</option>
                         <option value="started" {{ request('status')=='started'?'selected':'' }} class="text-black">Started</option>
                         <option value="completed" {{ request('status')=='completed'?'selected':'' }} class="text-black">Completed</option>
+                        <option value="cancelled" {{ request('status')=='cancelled'?'selected':'' }} class="text-black">Cancelled</option>
+                        <option value="blocked" {{ request('status')=='blocked'?'selected':'' }} class="text-black">Blocked</option>
                     </select>
                     <i data-lucide="chevron-down" class="w-4 h-4 absolute right-3 text-white/60 pointer-events-none"></i>
                 </div>
@@ -285,7 +287,14 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="p-2 text-white/80 text-sm max-w-[120px] truncate">{{ $v->notes ?? '-' }}</td>
+                        <td class="p-2 text-white/80 text-sm max-w-[120px] truncate">{{ $v->notes ?? '-' }}
+                            @if($v->status == 'cancelled' && $v->cancelled_reason)
+                                <div class="mt-1 text-xs text-red-300/90 break-words max-w-[120px]" title="{{ $v->cancelled_reason }}">
+                                    <i data-lucide="x-circle" class="w-3 h-3 inline mr-0.5"></i>
+                                    {{ \Illuminate\Support\Str::limit($v->cancelled_reason, 30) }}
+                                </div>
+                            @endif
+                        </td>
                         <td class="p-2 text-white/80 whitespace-nowrap">{{ $v->distance_km ?? '-' }}</td>
                         <td class="p-2 text-white/80 whitespace-nowrap">{{ $v->pitstop_total_km ?? '-' }}</td>
                         <td class="p-2 whitespace-nowrap">
@@ -392,6 +401,15 @@
                     <div class="bg-white/5 rounded-lg p-3 text-sm">
                         <span class="text-white/50 text-xs block mb-1">Notes</span>
                         <span class="text-white/80 text-sm">{{ $v->notes }}</span>
+                    </div>
+                @endif
+
+                @if($v->status == 'cancelled' && $v->cancelled_reason)
+                    <div class="bg-red-500/10 border border-red-400/30 rounded-lg p-3 text-sm">
+                        <span class="text-red-300 text-xs block mb-1 flex items-center">
+                            <i data-lucide="x-circle" class="w-3 h-3 mr-1"></i> Cancellation Reason
+                        </span>
+                        <span class="text-red-200 text-sm break-words">{{ $v->cancelled_reason }}</span>
                     </div>
                 @endif
 

@@ -249,6 +249,9 @@ Route::middleware(['auth', 'role:salesman'])
         Route::post('/visits/{id}/complete', [VisitController::class, 'complete'])
             ->name('visits.complete');
 
+        Route::post('/visits/{id}/cancel', [VisitController::class, 'cancel'])
+            ->name('visits.cancel');
+
         Route::post('/visits/{id}/pitstop', [VisitController::class, 'addPitstop'])
             ->name('visits.pitstop.add');
 
@@ -260,6 +263,7 @@ Route::middleware(['auth', 'role:salesman'])
             Route::post('/clock-in', [AttendanceController::class, 'clockIn'])->name('clockin');
             Route::post('/clock-out', [AttendanceController::class, 'clockOut'])->name('clockout');
             Route::get('/history', [AttendanceController::class, 'history'])->name('history');
+            Route::get('/lates', [AttendanceController::class, 'myLates'])->name('lates');
         });
 
         Route::get('/reports', [ReportController::class, 'salesmanReport'])
@@ -299,6 +303,7 @@ Route::middleware(['auth', 'role:it,account,store,office_boy'])
             Route::post('/clock-in', [AttendanceController::class, 'clockIn'])->name('clockin');
             Route::post('/clock-out', [AttendanceController::class, 'clockOut'])->name('clockout');
             Route::get('/history', [AttendanceController::class, 'history'])->name('history');
+            Route::get('/lates', [AttendanceController::class, 'myLates'])->name('lates');
         });
     });
 
@@ -313,6 +318,10 @@ Route::middleware('auth')
 Route::middleware('auth')
     ->post('/attendance/leave', [AttendanceController::class, 'requestLeave'])
     ->name('attendance.leave');
+
+Route::middleware('auth')
+    ->post('/attendance/late-reason', [AttendanceController::class, 'submitLateReason'])
+    ->name('attendance.late-reason');
 
 Route::post('/attendance/clock-in-request',
     [AttendanceController::class, 'clockInRequest']

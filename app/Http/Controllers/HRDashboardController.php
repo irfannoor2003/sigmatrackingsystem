@@ -209,14 +209,39 @@ class HrDashboardController extends Controller
     /**
      * 4. LEAVE & MANUAL ACTIONS
      */
-    public function leaveRequests()
+    public function leaveRequests(Request $request)
     {
+        $period   = $request->period;      // current_month | previous_month | custom
+        $fromDate = $request->from_date;
+        $toDate   = $request->to_date;
+        $staffId  = $request->staff;
+
         $leaves = Attendance::with('salesman')
             ->where('status', 'leave')
+            ->when($staffId, fn ($q) => $q->where('salesman_id', $staffId))
+            ->when($period === 'current_month', function ($q) {
+                $q->whereBetween('date', [
+                    now()->startOfMonth()->toDateString(),
+                    now()->endOfMonth()->toDateString(),
+                ]);
+            })
+            ->when($period === 'previous_month', function ($q) {
+                $q->whereBetween('date', [
+                    now()->subMonth()->startOfMonth()->toDateString(),
+                    now()->subMonth()->endOfMonth()->toDateString(),
+                ]);
+            })
+            ->when($period === 'custom' && $fromDate, fn ($q) => $q->whereDate('date', '>=', $fromDate))
+            ->when($period === 'custom' && $toDate, fn ($q) => $q->whereDate('date', '<=', $toDate))
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('hr.attendance.leave-requests', compact('leaves'));
+        $staff = User::whereNotIn('role', ['admin', 'hr', 'saleshead'])
+            ->orderBy('name')
+            ->get(['id', 'name', 'role']);
+
+        return view('hr.attendance.leave-requests', compact('leaves', 'staff', 'period', 'fromDate', 'toDate', 'staffId'));
     }
 
     public function markLeave(Request $request, $id)

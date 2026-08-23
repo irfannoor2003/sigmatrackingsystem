@@ -18,6 +18,9 @@ class Visit extends Model
         'started_at',
         'completed_at',
         'distance_km',
+        'cancelled_at',
+        'cancelled_reason',
+        'cancelled_by',
         'images',
         'start_lat',
         'start_lng',
@@ -32,6 +35,7 @@ class Visit extends Model
     protected $casts = [
         'started_at'       => 'datetime',
         'completed_at'     => 'datetime',
+        'cancelled_at'     => 'datetime',
         'blocked_at'       => 'datetime',
         'unblocked_at'     => 'datetime',
         'created_at'       => 'datetime',
@@ -80,6 +84,11 @@ class Visit extends Model
         return $this->status === 'blocked';
     }
 
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
+
     public function isPending(): bool
     {
         return $this->status === 'pending';
@@ -100,6 +109,11 @@ class Visit extends Model
         return $this->isBlocked();
     }
 
+    public function canBeCancelled(): bool
+    {
+        return $this->status === 'started';
+    }
+
     /* ======================
         ACCESSORS
     ====================== */
@@ -111,6 +125,7 @@ class Visit extends Model
             'started'   => 'In Progress',
             'completed' => 'Completed',
             'blocked'   => 'Blocked',
+            'cancelled' => 'Cancelled',
             default     => 'Unknown',
         };
     }
@@ -121,6 +136,7 @@ class Visit extends Model
             'started'   => 'bg-blue-100 text-blue-800',
             'completed' => 'bg-green-100 text-green-800',
             'blocked'   => 'bg-red-100 text-red-800',
+            'cancelled' => 'bg-gray-100 text-gray-800',
             default     => 'bg-gray-100 text-gray-800',
         };
     }

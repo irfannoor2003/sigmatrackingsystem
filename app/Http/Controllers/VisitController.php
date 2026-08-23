@@ -156,6 +156,32 @@ public function index(Request $request)
     }
 
     /**
+     * Cancel a started visit (reason required)
+     */
+    public function cancel(Request $request, $id)
+    {
+        $visit = Visit::where('id', $id)
+            ->where('salesman_id', Auth::id())
+            ->where('status', 'started')
+            ->firstOrFail();
+
+        $request->validate([
+            'cancelled_reason' => 'required|string|max:1000',
+        ]);
+
+        $visit->update([
+            'status'          => 'cancelled',
+            'cancelled_at'    => now(),
+            'cancelled_reason'=> $request->cancelled_reason,
+            'cancelled_by'    => Auth::id(),
+        ]);
+
+        return redirect()
+            ->route('salesman.visits.index')
+            ->with('success', 'Visit cancelled successfully.');
+    }
+
+    /**
      * Complete visit
      */
     public function complete(Request $request, $id)
@@ -331,7 +357,8 @@ public function update(Request $request, Visit $visit)
             'distance_km' => 'nullable|numeric|min:0',
             'lat'         => 'nullable|numeric',
             'lng'         => 'nullable|numeric',
-            'images.*'    => 'nullable|image|max:5120',
+            'images'      => 'required|array',
+            'images.*'    => 'required|image|max:5120',
         ]);
 
         $images = [];

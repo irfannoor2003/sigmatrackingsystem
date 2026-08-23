@@ -503,6 +503,14 @@
                             My Visits
                         </a>
 
+                        {{-- My Lates --}}
+                        <a href="{{ route('salesman.attendance.lates') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('salesman.attendance.lates') ? 'sidebar-active' : '' }}">
+                            <i data-lucide="alarm-clock" class="w-5 h-5"></i>
+                            My Lates
+                        </a>
+
                         {{-- Old Customers --}}
                         <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
@@ -535,9 +543,17 @@
                         {{-- Attendance --}}
                         <a href="{{ route('staff.attendance.index') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active' : '' }}">
+        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active' : '' }}">
                             <i data-lucide="clock" class="w-5 h-5"></i>
                             Attendance
+                        </a>
+
+                        {{-- My Lates --}}
+                        <a href="{{ route('staff.attendance.lates') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active' : '' }}">
+                            <i data-lucide="alarm-clock" class="w-5 h-5"></i>
+                            My Lates
                         </a>
 
 
@@ -559,6 +575,14 @@
        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
                                     <i data-lucide="clock" class="w-5 h-5"></i>
                                     Attendance
+                                </a>
+
+                                {{-- My Lates --}}
+                                <a href="{{ route('staff.attendance.lates') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
+                                    My Lates
                                 </a>
 
 
@@ -805,6 +829,14 @@
                                     My Visits
                                 </a>
 
+                                {{-- My Lates --}}
+                                <a href="{{ route('salesman.attendance.lates') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+        {{ request()->routeIs('salesman.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
+                                    My Lates
+                                </a>
+
                                 <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                                 {{-- Import Old Customers --}}
@@ -924,9 +956,17 @@
                                 {{-- Attendance --}}
                                 <a href="{{ route('staff.attendance.index') }}"
                                     class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
+        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
                                     <i data-lucide="clock" class="w-5 h-5"></i>
                                     Attendance
+                                </a>
+
+                                {{-- My Lates --}}
+                                <a href="{{ route('staff.attendance.lates') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
+                                    My Lates
                                 </a>
                             @endif
 
@@ -942,9 +982,17 @@
                                 {{-- Attendance --}}
                                 <a href="{{ route('staff.attendance.index') }}"
                                     class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
+        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
                                     <i data-lucide="clock" class="w-5 h-5"></i>
                                     Attendance
+                                </a>
+
+                                {{-- My Lates --}}
+                                <a href="{{ route('staff.attendance.lates') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
+                                    My Lates
                                 </a>
 
 

@@ -133,7 +133,10 @@ input[type="month"]::-webkit-calendar-picker-indicator {
                                         <span class="badge bg-orange-500/30 text-orange-300">Short</span>
                                     @endif
                                     @if(!$attendance->short_leave && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16')
-                                        <span class="badge bg-amber-500/30 text-amber-300">Late</span>
+                                        <span class="badge bg-amber-500/30 text-amber-300"
+                                              title="{{ $attendance->late_reason ? 'Late reason: ' . $attendance->late_reason : 'Late - no reason submitted yet' }}">
+                                            Late{{ empty($attendance->late_reason) ? ' ⚠' : '' }}
+                                        </span>
                                     @endif
                                     @if($attendance->auto_clock_out)
                                         <span class="badge bg-blue-500/30 text-blue-300">Auto</span>

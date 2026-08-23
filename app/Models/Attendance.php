@@ -36,6 +36,7 @@ class Attendance extends Model
 
         'reminder_sent',
         'note',
+        'late_reason',
         'marked_by',
     ];
 

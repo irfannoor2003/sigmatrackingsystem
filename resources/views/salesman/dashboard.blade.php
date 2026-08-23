@@ -4,6 +4,8 @@
 
 @section('content')
 
+@include('partials.late-reason-modal', ['lateRecord' => $pendingLateRecord ?? null])
+
 <div class="p-0">
 
     <!-- Page Title -->

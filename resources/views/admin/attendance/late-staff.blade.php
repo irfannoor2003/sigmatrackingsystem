@@ -94,6 +94,18 @@
                         </span>
                     </div>
                 </div>
+
+                {{-- Late reason --}}
+                <div class="px-2 pb-2 -mt-1 flex items-start gap-2">
+                    @if(!empty($late->late_reason))
+                        <span class="badge bg-emerald-500/20 text-emerald-300 shrink-0">Reason</span>
+                        <span class="text-xs text-white/70 break-words" title="{{ $late->late_reason }}">
+                            {{ $late->late_reason }}
+                        </span>
+                    @else
+                        <span class="badge bg-red-500/20 text-red-300">⚠ No reason submitted</span>
+                    @endif
+                </div>
             @empty
                 <div class="text-center py-12">
                     <i data-lucide="check-circle" class="w-12 h-12 text-emerald-400/30 mx-auto mb-4"></i>

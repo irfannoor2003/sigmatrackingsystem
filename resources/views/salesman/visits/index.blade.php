@@ -279,6 +279,7 @@
                                     class="px-3 py-1 rounded-lg text-xs
                                 @if ($v->status == 'started') bg-yellow-500/20 border border-yellow-400/40 text-yellow-200
                                 @elseif ($v->status == 'blocked') bg-red-500/20 border border-red-400/40 text-red-200
+                                @elseif ($v->status == 'cancelled') bg-gray-500/20 border border-gray-400/40 text-gray-200
                                 @else
                                     bg-green-500/20 border border-green-400/40 text-green-200 @endif
                             ">
@@ -290,6 +291,12 @@
                                 <div class="break-words whitespace-pre-line truncate max-w-[120px]" title="{{ $v->notes ?? '' }}">
                                     {{ \Illuminate\Support\Str::limit($v->notes ?? '-', 10) }}
                                 </div>
+                                @if($v->status == 'cancelled' && $v->cancelled_reason)
+                                    <div class="mt-1 text-xs text-red-300/90 break-words max-w-[120px]" title="{{ $v->cancelled_reason }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="inline mr-0.5"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                                        {{ \Illuminate\Support\Str::limit($v->cancelled_reason, 30) }}
+                                    </div>
+                                @endif
                             </td>
 
                             <td class="p-3 ">
@@ -393,6 +400,20 @@
                                             </button>
                                         </form>
                                     @endif
+
+                                    <button type="button" onclick="openCancelModal({{ $v->id }})"
+                                        class="w-full mt-2 py-2 rounded-xl text-white font-semibold flex items-center justify-center
+                                            bg-gradient-to-r from-gray-600 to-gray-700
+                                            shadow hover:opacity-90 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="mr-1">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="m15 9-6 6"/><path d="m9 9 6 6"/>
+                                        </svg>
+                                        Cancel Visit
+                                    </button>
                                 @else
 <div class="flex items-center gap-3 justify-center">
 
@@ -436,7 +457,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="p-6 text-center text-white/70 bg-white/5">
+                            <td colspan="10" class="p-6 text-center text-white/70 bg-white/5">
                                 No record found
                             </td>
                         </tr>
@@ -507,12 +528,20 @@
                                 class="px-3 py-1 rounded-lg text-xs
                             @if ($v->status == 'started') bg-yellow-500/20 border border-yellow-400/40 text-yellow-200
                             @elseif ($v->status == 'blocked') bg-red-500/20 border border-red-400/40 text-red-200
+                            @elseif ($v->status == 'cancelled') bg-gray-500/20 border border-gray-400/40 text-gray-200
                             @else
                                 bg-green-500/20 border border-green-400/40 text-green-200 @endif
                         ">
                                 {{ ucfirst($v->status) }}
                             </span>
                         </div>
+
+                        @if($v->status == 'cancelled' && $v->cancelled_reason)
+                            <div class="text-red-300/90 text-sm mb-2 ml-px flex items-start gap-1.5 bg-red-500/10 border border-red-400/30 rounded-lg px-3 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                                <span class="break-words"><strong>Cancelled:</strong> {{ $v->cancelled_reason }}</span>
+                            </div>
+                        @endif
 
                         <div class="text-white/60 text-sm mb-2 ml-px">
                             <div class="flex items-center mb-1">
@@ -646,6 +675,20 @@
                                         </button>
                                     </form>
                                 @endif
+
+                                <button type="button" onclick="openCancelModal({{ $v->id }})"
+                                    class="w-full mt-2 py-2.5 rounded-xl text-white font-semibold
+                                        flex items-center justify-center
+                                        bg-gradient-to-r from-gray-600 to-gray-700
+                                        shadow hover:opacity-90 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                        class="mr-1.5">
+                                        <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>
+                                    </svg>
+                                    Cancel Visit
+                                </button>
 
                                 {{-- IF VISIT IS COMPLETED --}}
                             @else
@@ -869,7 +912,7 @@
                     Notes
                 </label>
                 <textarea name="notes" rows="2" placeholder="Optional notes"
-                    class="w-full bg-white/10 text-white placeholder-white/50 p-2.5 rounded-xl border border-white/20 outline-none focus:bg-white/20 text-sm"></textarea>
+                    class="w-full bg-white/10 text-white placeholder-white/50 p-2.5 rounded-xl border border-white/20 outline-none focus:bg-white/20 text-sm" required></textarea>
             </div>
             <div>
                 <label class="text-white/70 text-sm mb-1 block flex items-center">
@@ -877,14 +920,14 @@
                     Distance (KM)
                 </label>
                 <input type="number" step="0.1" min="0" name="distance_km" placeholder="Distance in KM"
-                    class="w-full bg-white/10 text-white placeholder-white/50 p-2.5 rounded-xl border border-white/20 outline-none focus:bg-white/20 text-sm">
+                    class="w-full bg-white/10 text-white placeholder-white/50 p-2.5 rounded-xl border border-white/20 outline-none focus:bg-white/20 text-sm" required>
             </div>
             <div>
                 <label class="text-white/70 text-sm mb-1 block flex items-center">
                     <i data-lucide="image" class="w-4 h-4 mr-1.5 text-white/50"></i>
-                    Images
+                    Images *
                 </label>
-                <input type="file" name="images[]" multiple accept="image/*"
+                <input type="file" name="images[]" multiple accept="image/*" required
                     class="w-full text-white bg-white/10 p-2.5 rounded-xl border border-white/20 text-sm">
             </div>
             <input type="hidden" name="lat" id="pitstopLat">
@@ -894,6 +937,49 @@
                 <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
                 Save Stop
             </button>
+        </form>
+    </div>
+</div>
+
+<!-- CANCEL VISIT MODAL -->
+<div id="cancelVisitModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 backdrop-blur-xl p-4">
+    <div class="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="mr-2 text-red-400"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                Cancel Visit
+            </h3>
+            <button onclick="closeCancelModal()"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-red-500/40 transition text-white text-lg">&times;</button>
+        </div>
+
+        <p class="text-white/70 text-sm mb-4">Please provide a reason for cancelling this visit. This action cannot be undone.</p>
+
+        <form id="cancelVisitForm" method="POST" class="space-y-4">
+            @csrf
+            <div>
+                <label class="text-white/70 text-sm mb-1 block">
+                    Reason <span class="text-red-400">*</span>
+                </label>
+                <textarea id="cancelReason" name="cancelled_reason" rows="4" required
+                    placeholder="Explain why you are cancelling this visit…"
+                    class="w-full bg-black/40 text-white placeholder-white/40 p-3 rounded-xl border border-white/20
+                           outline-none focus:bg-white/20 text-sm transition resize-none"></textarea>
+                <p id="cancelMissingReason" class="mt-1 text-xs text-red-400 hidden">
+                    Please enter a reason to enable cancellation.
+                </p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeCancelModal()"
+                    class="px-5 py-2 rounded-xl bg-white/10 text-white">Keep Visit</button>
+                <button type="submit" id="cancelSubmitBtn" disabled
+                    class="px-5 py-2 rounded-xl bg-red-600 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
+                    Cancel Visit
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -934,7 +1020,7 @@
 
     function completeVisit(formId, latId, lngId) {
         const form = document.getElementById(formId);
-        
+
         // Enforce HTML5 required fields before checking GPS
         if (!form.checkValidity()) {
             form.reportValidity();
@@ -1006,7 +1092,7 @@
 
     function submitPitstopComplete() {
         const form = document.getElementById('pitstopCompleteForm');
-        
+
         // Enforce HTML5 required fields (Notes and Total KM)
         if (!form.checkValidity()) {
             form.reportValidity();
@@ -1024,6 +1110,34 @@
 
     document.getElementById('pitstopCompleteModal').addEventListener('click', function(e) {
         if (e.target === this) closePitstopCompleteModal();
+    });
+
+    // ── Cancel Visit Modal ───────────────────────────────────
+    function openCancelModal(visitId) {
+        document.getElementById('cancelVisitForm').action =
+            '/salesman/visits/' + visitId + '/cancel';
+        document.getElementById('cancelReason').value = '';
+        document.getElementById('cancelSubmitBtn').disabled = true;
+        document.getElementById('cancelMissingReason').classList.add('hidden');
+        document.getElementById('cancelVisitModal').classList.remove('hidden');
+        document.getElementById('cancelVisitModal').classList.add('flex');
+    }
+
+    function closeCancelModal() {
+        document.getElementById('cancelVisitModal').classList.add('hidden');
+        document.getElementById('cancelVisitModal').classList.remove('flex');
+    }
+
+    document.getElementById('cancelVisitModal').addEventListener('click', function(e) {
+        if (e.target === this) closeCancelModal();
+    });
+
+    document.getElementById('cancelReason').addEventListener('input', function() {
+        const val = this.value.trim();
+        const btn = document.getElementById('cancelSubmitBtn');
+        const warn = document.getElementById('cancelMissingReason');
+        btn.disabled = val.length === 0;
+        warn.classList.toggle('hidden', val.length > 0);
     });
 </script>
 

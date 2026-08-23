@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visit;
 use App\Models\Customer;
+use App\Models\Attendance;
 use App\Helpers\AttendanceHelper;
 use Carbon\Carbon;
 
@@ -58,6 +59,16 @@ class SalesmanDashboardController extends Controller
 $isNonWorkingDay = AttendanceHelper::isNonWorkingDay($today);
 $nonWorkingReason = AttendanceHelper::nonWorkingReason($today);
 
+        // Today's pending late reason (today only)
+        $todayAttendance = Attendance::where('salesman_id', $userId)
+            ->whereDate('date', Carbon::today())
+            ->first();
+
+        $pendingLateRecord = ($todayAttendance
+            && $todayAttendance->is_late
+            && empty($todayAttendance->late_reason))
+            ? $todayAttendance
+            : null;
 
         return view('salesman.dashboard', [
             'visitLabels'   => $visitLabels,
@@ -65,6 +76,7 @@ $nonWorkingReason = AttendanceHelper::nonWorkingReason($today);
             'customerData'  => $customerData,
             'isNonWorkingDay' => $isNonWorkingDay,
     'nonWorkingReason' => $nonWorkingReason,
+            'pendingLateRecord' => $pendingLateRecord,
         ]);
     }
 }

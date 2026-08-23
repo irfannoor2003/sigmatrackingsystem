@@ -70,6 +70,25 @@
     </div>
 </div>
 
+@if($visit->status === 'cancelled' && $visit->cancelled_reason)
+<div class="bg-red-500/10 border border-red-400/30 py-3 px-4 rounded-xl text-sm md:text-base">
+    <div class="flex items-center mb-2 text-red-300">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle mr-2">
+            <circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>
+        </svg>
+        Cancellation Reason
+    </div>
+    <div class="text-red-200 break-words whitespace-pre-line">
+        {{ $visit->cancelled_reason }}
+    </div>
+    @if($visit->cancelled_at)
+        <div class="mt-2 text-xs text-white/50">
+            Cancelled on {{ $visit->cancelled_at->format('d M Y, h:i A') }}
+        </div>
+    @endif
+</div>
+@endif
+
 <div class="flex justify-between bg-white/10 py-3 px-4 rounded-xl text-sm md:text-base">
     <span class="text-white/70 flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

@@ -3,6 +3,9 @@
 @section('title','My Attendance')
 
 @section('content')
+
+@include('partials.late-reason-modal', ['lateRecord' => $pendingLateRecord ?? null])
+
 <div class="max-w-xl mx-auto mt-10 px-0">
 <div class="glass border border-white/20 p-6 rounded-3xl shadow-2xl">
 

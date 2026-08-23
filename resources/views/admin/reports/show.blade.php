@@ -122,6 +122,22 @@
             </div>
         </div>
 
+        @if($visit->status == 'cancelled' && $visit->cancelled_reason)
+        <div class="mt-6">
+            <p class="text-white mb-2 font-semibold text-lg flex items-center">
+                <i data-lucide="x-circle" class="w-5 h-5 mr-2 text-red-400"></i> Cancellation Reason:
+            </p>
+            <div class="bg-red-500/10 p-4 rounded-xl border border-red-400/30">
+                <p class="text-red-200">{{ $visit->cancelled_reason }}</p>
+                @if($visit->cancelled_at)
+                    <p class="mt-2 text-xs text-white/50">
+                        Cancelled on {{ $visit->cancelled_at->format('Y-m-d H:i') }}
+                    </p>
+                @endif
+            </div>
+        </div>
+        @endif
+
         {{-- HORIZONTAL ROAD MAP --}}
         @if($visit->pitstops && count($visit->pitstops) > 0)
         <div class="mt-8">

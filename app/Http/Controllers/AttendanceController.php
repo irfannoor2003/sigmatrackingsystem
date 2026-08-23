@@ -81,6 +81,13 @@ $nonWorkingReason = AttendanceHelper::nonWorkingReason($today);
         $hideLeaveButton   = now()->hour >= 12;
         $hideClockInButton = now()->hour >= 15;
 
+        // Late-reason dialog flag: attendance is late and no reason submitted yet
+        $isLatePendingReason = $attendance
+            && $attendance->is_late
+            && empty($attendance->late_reason);
+
+        $pendingLateRecord = $isLatePendingReason ? $attendance : null;
+
        return view(
     $this->viewPath('index'),
     compact(
@@ -88,7 +95,9 @@ $nonWorkingReason = AttendanceHelper::nonWorkingReason($today);
         'hideLeaveButton',
         'hideClockInButton',
         'isNonWorkingDay',
-        'nonWorkingReason'
+        'nonWorkingReason',
+        'isLatePendingReason',
+        'pendingLateRecord'
     )
 );
     }
@@ -418,6 +427,54 @@ AttendanceVerification::create([
         ]);
 
         return back()->with('success', 'Leave requested successfully.');
+    }
+    /* ================= SUBMIT LATE REASON ================= */
+    public function submitLateReason(Request $request)
+    {
+        $user = $this->staffUser();
+
+        $request->validate([
+            'attendance_id' => 'required|exists:attendances,id',
+            'late_reason'   => 'required|string|max:1000',
+        ]);
+
+        $attendance = Attendance::where('id', $request->attendance_id)
+            ->where('salesman_id', $user->id)
+            ->whereNotNull('clock_in')
+            ->firstOrFail();
+
+        if (! $attendance->is_late) {
+            return back()->with('error', 'This attendance record is not marked late.');
+        }
+
+        // A reason can only be set once; it stays fixed afterwards.
+        if (empty($attendance->late_reason)) {
+            $attendance->update([
+                'late_reason' => $request->late_reason,
+            ]);
+        }
+
+        return back()->with('success', 'Late reason submitted.');
+    }
+
+    /* ================= MY LATES ================= */
+    public function myLates()
+    {
+        $user = $this->staffUser();
+
+        $lates = Attendance::where('salesman_id', $user->id)
+            ->whereNotNull('clock_in')
+            ->where('manual_visit', false)
+            ->where('status', '!=', 'leave')
+            ->whereTime('clock_in', '>=', '10:16')
+            ->whereBetween('date', [
+                now()->startOfMonth()->toDateString(),
+                now()->endOfMonth()->toDateString(),
+            ])
+            ->orderBy('date', 'desc')
+            ->paginate(10);
+
+        return view('attendance.lates', compact('lates'));
     }
     public function manualForm()
 {
