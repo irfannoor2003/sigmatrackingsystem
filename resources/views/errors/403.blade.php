@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Account Blocked')
+@php
+    $reason = '';
+    if (isset($exception) && $exception && method_exists($exception, 'getMessage')) {
+        $reason = $exception->getMessage();
+    } elseif (isset($message) && $message) {
+        $reason = $message;
+    }
+@endphp
+
+@section('title', $reason ?: 'Access Denied')
 
 @section('content')
     <div class="min-h-screen flex items-center justify-center p-6">
@@ -13,16 +22,13 @@
                 </div>
             </div>
 
-            <h1 class="text-2xl font-extrabold mb-2">Account Blocked</h1>
+            <h1 class="text-2xl font-extrabold mb-2">{{ $reason ?: 'Access Denied' }}</h1>
 
             <p class="text-white/80 mb-6">
-                {{-- Prefer exception message when available --}}
-                @if(isset($exception) && $exception && method_exists($exception, 'getMessage') && $exception->getMessage())
-                    {{ $exception->getMessage() }}
-                @elseif(isset($message) && $message)
-                    {{ $message }}
+                @if($reason)
+                    {{ $reason }}
                 @else
-                    Your account has been blocked. Contact admin to restore access.
+                    You do not have permission to access this page.
                 @endif
             </p>
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\OutOfCityVisit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,7 @@ class ManualVisitController extends Controller
             $clockIn  = $start->copy()->setTime(10, 0);
             $clockOut = $start->copy()->setTime(17, 0);
 
-            Attendance::updateOrCreate(
+            $attendance = Attendance::updateOrCreate(
                 [
                     'salesman_id' => $userId,
                     'date'        => $start->toDateString(),
@@ -45,6 +46,12 @@ class ManualVisitController extends Controller
                     'note'            => $request->note,
                 ]
             );
+
+            OutOfCityVisit::create([
+                'attendance_id' => $attendance->id,
+                'salesman_id'   => $userId,
+                'status'        => 'pending',
+            ]);
 
             $start->addDay();
         }

@@ -11,7 +11,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="{{ asset('js/lucide.min.js') }}"></script>
 
 
 
@@ -305,6 +305,13 @@
                             Visits Reports
                         </a>
 
+                        <a href="{{ route('admin.out-of-city-visits.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+                        {{ request()->routeIs('admin.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
+                            <i data-lucide="plane" class="w-5 h-5"></i>
+                            Out of City Visits
+                        </a>
+
 
                         <a href="{{ url('/admin/customers') }}"
                             class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
@@ -371,6 +378,14 @@
     {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
                             <i data-lucide="clipboard-list"></i>
                             Salesman Visits
+                        </a>
+
+                        {{-- Out of City Visits --}}
+                        <a href="{{ route('salehead.out-of-city-visits.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+    {{ request()->routeIs('salehead.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
+                            <i data-lucide="plane"></i>
+                            Out of City Visits
                         </a>
 
                         {{-- Salesmen --}}
@@ -509,6 +524,22 @@
         {{ request()->routeIs('salesman.attendance.lates') ? 'sidebar-active' : '' }}">
                             <i data-lucide="alarm-clock" class="w-5 h-5"></i>
                             My Lates
+                        </a>
+
+                        {{-- Out of City Visits --}}
+                        @php
+                            $pendingOcCount = \App\Models\OutOfCityVisit::where('salesman_id', auth()->id())->where('status', 'pending')->count();
+                        @endphp
+                        <a href="{{ route('salesman.out-of-city-visits.index') }}"
+                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+        {{ request()->routeIs('salesman.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
+                            <i data-lucide="plane" class="w-5 h-5"></i>
+                            Out of City Visits
+                            @if ($pendingOcCount > 0)
+                                <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full bg-red-500 text-white shadow-[0_0_8px_#ef4444]">
+                                    {{ $pendingOcCount }}
+                                </span>
+                            @endif
                         </a>
 
                         {{-- Old Customers --}}
@@ -732,9 +763,17 @@
                                 {{-- Visit Reports --}}
                                 <a href="{{ route('admin.reports.index') }}"
                                     class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('admin.reports.*') ? 'sidebar-active-mobile' : '' }}">
+        {{ request()->routeIs('admin.reports.*') ? 'sidebar-active-mobile' : '' }}">
                                     <i data-lucide="clipboard-list" class="w-5 h-5"></i>
                                     Visit Reports
+                                </a>
+
+                                {{-- Out of City Visits --}}
+                                <a href="{{ route('admin.out-of-city-visits.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+        {{ request()->routeIs('admin.out-of-city-visits.*') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="plane" class="w-5 h-5"></i>
+                                    Out of City Visits
                                 </a>
 
                                 {{-- All Customers (URL based) --}}
@@ -837,6 +876,17 @@
                                     My Lates
                                 </a>
 
+                                {{-- Out of City Visits --}}
+                                <a href="{{ route('salesman.out-of-city-visits.index') }}"
+                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
+        {{ request()->routeIs('salesman.out-of-city-visits.*') ? 'sidebar-active-mobile' : '' }}">
+                                    <i data-lucide="plane" class="w-5 h-5"></i>
+                                    Out of City Visits
+                                    @if (($pendingOcCount ?? 0) > 0)
+                                        <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full bg-red-500 text-white">{{ $pendingOcCount }}</span>
+                                    @endif
+                                </a>
+
                                 <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
 
                                 {{-- Import Old Customers --}}
@@ -872,6 +922,14 @@
     {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
                                     <i data-lucide="clipboard-list"></i>
                                     Salesman Visits
+                                </a>
+
+                                {{-- Out of City Visits --}}
+                                <a href="{{ route('salehead.out-of-city-visits.index') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
+    {{ request()->routeIs('salehead.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
+                                    <i data-lucide="plane"></i>
+                                    Out of City Visits
                                 </a>
 
                                 {{-- Salesmen --}}
@@ -1046,7 +1104,9 @@
 
     <script>
         function renderLucide() {
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
         document.addEventListener("DOMContentLoaded", renderLucide);
         document.addEventListener("alpine:init", () => {
@@ -1054,6 +1114,7 @@
                 renderLucide();
             });
         });
+        window.addEventListener("load", renderLucide);
     </script>
 
 </body>

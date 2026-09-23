@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Attendance;
 use App\Models\Holiday;
+use App\Models\OutOfCityVisit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -269,7 +270,7 @@ class HrDashboardController extends Controller
             $clockIn  = $start->copy()->setTime(10, 0);
             $clockOut = $start->copy()->setTime(17, 0);
 
-            Attendance::updateOrCreate(
+            $attendance = Attendance::updateOrCreate(
                 ['salesman_id' => $userId, 'date' => $start->toDateString()],
                 [
                     'status' => 'present', 'clock_in' => $clockIn, 'clock_out' => $clockOut,
@@ -277,6 +278,13 @@ class HrDashboardController extends Controller
                     'office_verified' => false, 'manual_visit' => true, 'note' => $request->note
                 ]
             );
+
+            \App\Models\OutOfCityVisit::create([
+                'attendance_id' => $attendance->id,
+                'salesman_id'   => $userId,
+                'status'        => 'pending',
+            ]);
+
             $start->addDay();
         }
         return back()->with('success', 'Manual visit marked.');

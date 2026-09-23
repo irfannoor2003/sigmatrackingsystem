@@ -32,6 +32,8 @@ use App\Http\Controllers\SalesHeadDashboardController;
 use App\Http\Controllers\HR\StaffController as HRStaffController;
 use App\Http\Controllers\VisitExportController;
 use App\Http\Controllers\Admin\AdminVisitController;
+use App\Http\Controllers\Admin\OutOfCityVisitController as AdminOutOfCityVisitController;
+use App\Http\Controllers\SalesHeadOutOfCityVisitController;
 
 
 
@@ -40,6 +42,7 @@ use App\Http\Controllers\Admin\AdminVisitController;
 // Salesman
 use App\Http\Controllers\Salesman\CustomerController as SalesmanCustomerController;
 use App\Http\Controllers\Salesman\OldCustomerController as SalesmanOldCustomerController;
+use App\Http\Controllers\Salesman\OutOfCityVisitController as SalesmanOutOfCityVisitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -222,6 +225,12 @@ Route::middleware(['auth', 'role:admin'])
 
         Route::post('/visits/{id}/unblock', [AdminVisitController::class, 'unblock'])
             ->name('visits.unblock');
+
+        // Out of City Visits
+        Route::get('/out-of-city-visits', [AdminOutOfCityVisitController::class, 'index'])
+            ->name('out-of-city-visits.index');
+        Route::get('/out-of-city-visits/{id}', [AdminOutOfCityVisitController::class, 'show'])
+            ->name('out-of-city-visits.show');
     });
 
 /*
@@ -283,6 +292,16 @@ Route::middleware(['auth', 'role:salesman'])
 
         Route::get('/old-customers/export/all', [SalesmanOldCustomerController::class, 'exportAll'])
             ->name('old-customers.export.all');
+
+        // Out of City Visits
+        Route::get('/out-of-city-visits', [SalesmanOutOfCityVisitController::class, 'index'])
+            ->name('out-of-city-visits.index');
+        Route::get('/out-of-city-visits/{id}', [SalesmanOutOfCityVisitController::class, 'show'])
+            ->name('out-of-city-visits.show');
+        Route::get('/out-of-city-visits/{id}/create', [SalesmanOutOfCityVisitController::class, 'create'])
+            ->name('out-of-city-visits.create');
+        Route::post('/out-of-city-visits', [SalesmanOutOfCityVisitController::class, 'store'])
+            ->name('out-of-city-visits.store');
     });
 
 /*
@@ -355,6 +374,12 @@ Route::prefix('salehead')->middleware(['auth','role:saleshead'])->name('salehead
     // ---------------- Salesmen ----------------
     Route::get('/salesmen', [SalesHeadDashboardController::class, 'salesmen'])
         ->name('salesmen.index');
+
+    // Out of City Visits
+    Route::get('/out-of-city-visits', [SalesHeadOutOfCityVisitController::class, 'index'])
+        ->name('out-of-city-visits.index');
+    Route::get('/out-of-city-visits/{id}', [SalesHeadOutOfCityVisitController::class, 'show'])
+        ->name('out-of-city-visits.show');
 
 
 });
