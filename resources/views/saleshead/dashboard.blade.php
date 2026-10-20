@@ -4,126 +4,176 @@
 
 @section('content')
 
-<div class="space-y-6">
+<div class="page-head">
+    <h1 class="page-title">
+        <span class="page-ico"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></span>
+        Sales Head Dashboard
+    </h1>
+    <span class="badge badge-magenta !py-1.5 !px-4 !text-xs">
+        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+        {{ now()->format('l, d M Y') }}
+    </span>
+</div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+@php
+    $monthVisitCount = $visitsThisMonth->count();
+    $todayVisitCount = $todayVisits->count();
+    $completedToday = $todayVisits->where('status', 'completed')->count();
+    $engagementIndex = $totalSalesmen > 0 ? round((min($todayVisitCount, $totalSalesmen * 5) / ($totalSalesmen * 5)) * 100) : 0;
+@endphp
 
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-green-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-green-400 mb-1">Portfolio</p>
-                    <h3 class="text-white/70 text-sm font-medium">Total Customers</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $totalCustomers }}</p>
-                </div>
-                <div class="bg-green-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="users" class="w-8 h-8 text-green-400"></i>
-                </div>
+{{-- Stat Grid --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+    <div class="stat-card tint-cyan">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Total Customers</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $totalCustomers }}</p>
+                <a href="{{ route('salehead.customers.index') }}"
+                    class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">View Customers</a>
             </div>
-            <div class="h-1 w-full bg-green-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-green-500 w-1/3"></div> </div>
+            <span class="stat-ico"><i data-lucide="contact" class="w-6 h-6"></i></span>
         </div>
-
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-[#ff2ba7]/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-[#ff2ba7] mb-1">Team</p>
-                    <h3 class="text-white/70 text-sm font-medium">Total Salesmen</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $totalSalesmen }}</p>
-                </div>
-                <div class="bg-[#ff2ba7]/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform">
-                    <i data-lucide="user-check" class="w-8 h-8 text-[#ff2ba7]"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-[#ff2ba7]/20 absolute bottom-0 left-0"></div>
-        </div>
-
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-yellow-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-1">Monthly</p>
-                    <h3 class="text-white/70 text-sm font-medium">Visits Recorded</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $visitsThisMonth->count() }}</p>
-                </div>
-                <div class="bg-yellow-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="calendar-check" class="w-8 h-8 text-yellow-400"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-yellow-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-yellow-500 w-2/3"></div>
-            </div>
-        </div>
-
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-orange-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-orange-400 mb-1">Real-Time</p>
-                    <h3 class="text-white/70 text-sm font-medium">Today's Visits</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $todayVisits->count() }}</p>
-                </div>
-                <div class="bg-orange-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="radar" class="w-8 h-8 text-orange-400 animate-pulse"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-orange-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-orange-500 w-full"></div>
-            </div>
-        </div>
-
+        <div class="stat-bar"><div style="width: 100%"></div></div>
     </div>
 
-    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-        <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-[#ff2ba7]/20 rounded-lg">
-                    <i data-lucide="history" class="w-5 h-5 text-[#ff2ba7]"></i>
-                </div>
-                <h3 class="text-lg font-bold text-white tracking-wide">Live Visit Activity Feed</h3>
+    <div class="stat-card tint-magenta">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Total Salesmen</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $totalSalesmen }}</p>
+                <a href="{{ route('salehead.salesmen.index') }}"
+                    class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">Open Section</a>
             </div>
-            <span class="text-[10px] font-bold py-1 px-3 rounded-full bg-white/10 text-white/60 uppercase tracking-tighter">
-                Live Updates
-            </span>
+            <span class="stat-ico"><i data-lucide="users" class="w-6 h-6"></i></span>
         </div>
+        <div class="stat-bar"><div style="width: 100%"></div></div>
+    </div>
 
-        <div class="p-6">
-            <div class="relative space-y-6">
-
-
-                @forelse($visitActivities as $v)
-                    <div class="relative flex items-center gap-6 group">
-                        <div class="z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl bg-[#ff2ba7]/10 border border-[#ff2ba7] text-[#ff2ba7] shadow-xl transition-colors">
-                            <i data-lucide="map-pin" class="w-5 h-5"></i>
-                        </div>
-
-                        <div class="flex-1 flex flex-col md:flex-row md:items-center justify-between bg-white/5 border border-white/10 p-4 rounded-2xl hover:bg-white/10 transition-all">
-                            <div class="mb-2 md:mb-0">
-                                <p class="text-sm text-white leading-relaxed">
-                                    <span class="font-bold text-indigo-300">{{ $v->salesman->name }}</span>
-                                    <span class="text-white/40 mx-1">reached</span>
-                                    <span class="font-bold text-white">{{ $v->customer->name }}</span>
-                                </p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <i data-lucide="clock" class="w-3 h-3 text-white/30"></i>
-                                    <span class="text-[11px] text-white/50 font-medium tracking-wide">
-                                        {{ $v->started_at->format('h:i A') }} • {{ $v->started_at->diffForHumans() }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center">
-                                <span class="text-[10px] font-bold px-3 py-1 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 uppercase">
-                                    {{ $v->status }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="py-12 text-center">
-                        <i data-lucide="inbox" class="w-12 h-12 text-white/10 mx-auto mb-4"></i>
-                        <p class="text-white/40 text-sm">No activity logs recorded for this period.</p>
-                    </div>
-                @endforelse
+    <div class="stat-card tint-amber">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Visits This Month</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $monthVisitCount }}</p>
+                <a href="{{ route('salehead.reports.index') }}"
+                    class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">View Reports</a>
             </div>
+            <span class="stat-ico"><i data-lucide="calendar" class="w-6 h-6"></i></span>
         </div>
+        <div class="stat-bar"><div style="width: 100%"></div></div>
+    </div>
+
+    <a href="{{ route('salehead.reports.index') }}" class="stat-card tint-orange block">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Today's Visits</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $todayVisitCount }}</p>
+                <span class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">View Reports</span>
+            </div>
+            <span class="stat-ico"><i data-lucide="sun" class="w-6 h-6 animate-pulse"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: 100%"></div></div>
+    </a>
+
+    <a href="{{ route('salehead.reports.index', ['status' => 'blocked']) }}" class="stat-card tint-red block">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Completed Today</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $completedToday }}</p>
+                <span class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">View Completed</span>
+            </div>
+            <span class="stat-ico"><i data-lucide="alert-circle" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar">
+            <div style="width: {{ $todayVisitCount > 0 ? ($completedToday / $todayVisitCount) * 100 : 0 }}%"></div>
+        </div>
+    </a>
+
+    <a href="{{ route('salehead.out-of-city-visits.index') }}" class="stat-card tint-violet block">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Out of City Visits</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">
+                    {{ $engagementIndex }}<span class="text-base muted font-medium">%</span>
+                </p>
+                <span class="text-[.68rem] muted inline-block mt-1">Team field coverage index</span>
+            </div>
+            <span class="stat-ico"><i data-lucide="plane" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: {{ $engagementIndex }}%"></div></div>
+    </a>
+</div>
+
+{{-- Recent Activities --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-7">
+
+    <div class="card p-6">
+        <div class="mb-5 flex items-center justify-between gap-3">
+            <h3 class="font-display font-semibold text-[var(--text)] flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-5 h-5 text-[var(--accent)]"></i>
+                Recent Visits Activities
+            </h3>
+            <span class="live-pill"><span></span> Live</span>
+        </div>
+        <ul class="space-y-4">
+            @forelse($visitActivities as $v)
+                <li class="flex items-start gap-3">
+                    <div class="activity-live w-9 h-9 flex items-center justify-center rounded-xl shrink-0 bg-[var(--accent-soft)] text-[var(--accent)]">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm text-[var(--text)]">
+                            <strong>{{ $v->salesman->name }}</strong> started visit at
+                            <strong>{{ $v->customer->name }}</strong>
+                        </p>
+                        <span class="text-xs muted">{{ $v->created_at->diffForHumans() }}</span>
+                    </div>
+                </li>
+            @empty
+                <li class="text-sm muted">No visit activity found.</li>
+            @endforelse
+        </ul>
+    </div>
+
+    <div class="card p-6">
+        <div class="mb-5 flex items-center justify-between gap-3">
+            <h3 class="font-display font-semibold text-[var(--text)] flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-[var(--accent)]"></i>
+                Today's Team Activity
+            </h3>
+            <span class="live-pill"><span></span> Live</span>
+        </div>
+        <ul class="space-y-4">
+            @forelse($todayVisits as $v)
+                <li class="flex items-start gap-3">
+                    <div class="w-9 h-9 flex items-center justify-center rounded-xl shrink-0
+                        @if($v->status === 'completed') bg-emerald-500/10 text-emerald-500
+                        @elseif($v->status === 'blocked') bg-red-500/10 text-red-500
+                        @else bg-sky-500/10 text-sky-500 @endif">
+                        <i data-lucide="{{ $v->status === 'completed' ? 'check-circle' : ($v->status === 'blocked' ? 'ban' : 'play-circle') }}" class="w-4 h-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm text-[var(--text)]">
+                            <strong>{{ $v->salesman->name }}</strong>
+                            @if($v->status === 'completed')
+                                <span class="text-emerald-500 font-semibold">completed</span>
+                                at {{ \Carbon\Carbon::parse($v->started_at)->format('h:i A') }}
+                            @elseif($v->status === 'blocked')
+                                <span class="text-red-500 font-semibold">was blocked</span>
+                                at {{ \Carbon\Carbon::parse($v->started_at)->format('h:i A') }}
+                            @else
+                                <span class="text-sky-500 font-semibold">is in progress</span>
+                                at {{ \Carbon\Carbon::parse($v->started_at)->format('h:i A') }}
+                            @endif
+                        </p>
+                        <span class="text-xs muted">{{ $v->updated_at->diffForHumans() }}</span>
+                    </div>
+                </li>
+            @empty
+                <li class="text-sm muted">No team activity found.</li>
+            @endforelse
+        </ul>
     </div>
 </div>
 

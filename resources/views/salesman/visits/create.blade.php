@@ -7,77 +7,73 @@
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 
 <style>
-    /* Styling to match your existing glassmorphism theme */
     .ts-wrapper .ts-control {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        border-radius: 0.5rem !important;
-        padding: 12px !important;
-        transition: all 0.3s ease;
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text) !important;
+        border-radius: .75rem !important;
+        padding: .75rem 1rem !important;
+        transition: all .2s ease;
     }
+
     .ts-wrapper.focus .ts-control {
-        background: rgba(255, 255, 255, 0.2) !important;
-        box-shadow: none !important;
+        background: var(--surface) !important;
+        box-shadow: 0 0 0 3px var(--accent-soft) !important;
     }
+
     .ts-dropdown {
-        background: #1e1e1e !important; /* Dark background for dropdown */
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 0.5rem !important;
+        background: var(--surface) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: .75rem !important;
         margin-top: 5px !important;
+        box-shadow: var(--shadow-lg) !important;
     }
+
     .ts-dropdown .option {
-        padding: 10px 12px !important;
+        padding: .6rem .75rem !important;
+        color: var(--text-soft) !important;
     }
+
     .ts-dropdown .active {
-        background: #ff2ba6 !important; /* Your signature pink color */
-        color: white !important;
+        background: var(--accent-soft) !important;
+        color: var(--text) !important;
     }
+
+    .ts-dropdown .active .item {
+        background: var(--accent) !important;
+        color: #fff !important;
+    }
+
     .ts-control input {
-        color: white !important;
+        color: var(--text) !important;
     }
+
     .ts-wrapper.single .ts-control::after {
-        border-color: white transparent transparent transparent !important;
+        border-color: var(--text-muted) transparent transparent transparent !important;
     }
 </style>
 
-<div class="max-w-xl mx-auto p-0">
+<div class="max-w-xl mx-auto">
 
-    <h1 class="text-3xl font-bold text-white mb-6 tracking-wide flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send-horizontal mr-3 text-[#ff2ba6]">
-            <path d="m3 3 3 9-3 9 19-9Z"/>
-            <path d="M6 12h16"/>
-        </svg>
-        Start a Visit
-    </h1>
+    <div class="page-head">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="send-horizontal" class="w-6 h-6"></i></span>
+            Start a Visit
+        </h1>
+    </div>
 
-    {{-- Error Message --}}
-    @if(session('error'))
-        <div class="mb-4 p-4 bg-red-500/20 border border-red-400/40 text-red-100 rounded-xl backdrop-blur-lg flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-circle mr-2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="m15 9-6 6"/>
-                <path d="m9 9 6 6"/>
-            </svg>
-            {{ session('error') }}
-        </div>
-    @endif
 
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-xl">
+    <div class="card !rounded-2xl p-6 md:p-8">
 
         <form id="startVisitForm" method="POST" action="{{ route('salesman.visits.store') }}">
             @csrf
 
-            {{-- Customer Selection with Search --}}
-            <label for="customer_id" class="block text-sm text-white/80 mb-1 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building mr-2">
-                    <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
-                    <path d="M9 22v-4h6v4"/>
-                </svg>
+            <label for="customer_id" class="label flex items-center gap-2">
+                <i data-lucide="building-2" class="w-4 h-4 text-[var(--accent)]"></i>
                 Select Customer
             </label>
-            <div class="mb-4">
+            <div class="mb-5">
                 <select name="customer_id" id="customer_search" required>
                     <option value="">Search or choose a customer...</option>
                     @foreach($customers as $customer)
@@ -86,39 +82,34 @@
                 </select>
             </div>
 
-            {{-- Purpose --}}
-            <label for="purpose" class="block text-sm text-white/80 mb-1 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target mr-2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="6"/>
-                    <circle cx="12" cy="12" r="2"/>
-                </svg>
+            <label for="purpose" class="label flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-[var(--accent)]"></i>
                 Purpose of Visit
             </label>
-            <select name="purpose" id="purpose"
-                    class="w-full px-4 py-3 mb-6 rounded-lg bg-white/10 text-white
-                           placeholder-white/50 focus:bg-white/20 outline-none appearance-none"
-                    required>
-                <option value="" class="text-black">-- Select Purpose --</option>
-                <option value="Complaint Visit" class="text-black">Complaint Visit</option>
-                <option value="Delivery" class="text-black">Delivery </option>
-                <option value="Follow-up" class="text-black">Follow-up</option>
-                <option value="New Lead Visit" class="text-black">New Lead Visit</option>
-                <option value="Order Taking" class="text-black">Order Taking</option>
-                <option value="Office Work" class="text-black">Office Work</option>
-                <option value="Product Details" class="text-black">Product Details</option>
-                <option value="Payment Collection" class="text-black">Payment Collection</option>
-                <option value="Recovery" class="text-black">Recovery</option>
-
+            <select name="purpose" id="purpose" class="select w-full mb-6" required>
+                <option value="">-- Select Purpose --</option>
+                <option value="Complaint Visit">Complaint Visit</option>
+                <option value="Delivery">Delivery </option>
+                <option value="Follow-up">Follow-up</option>
+                <option value="New Lead Visit">New Lead Visit</option>
+                <option value="Order Taking">Order Taking</option>
+                <option value="Office Work">Office Work</option>
+                <option value="Product Details">Product Details</option>
+                <option value="Payment Collection">Payment Collection</option>
+                <option value="Recovery">Recovery</option>
             </select>
 
             <input type="hidden" name="lat" id="lat">
             <input type="hidden" name="lng" id="lng">
 
-            <button type="submit" class="w-full py-3 rounded-xl text-white font-semibold tracking-wide flex items-center justify-center bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6] shadow-lg hover:opacity-90 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-navigation mr-2">
-                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                </svg>
+            <div id="gpsNotice"
+                class="mb-4 hidden items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-amber-700 dark:text-amber-300 text-xs">
+                <i data-lucide="map-pin-off" class="w-3.5 h-3.5 shrink-0"></i>
+                <span id="gpsNoticeText">Waiting for GPS…</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">
+                <i data-lucide="navigation" class="w-4 h-4"></i>
                 Start Visit
             </button>
         </form>
@@ -132,39 +123,105 @@ new TomSelect("#customer_search",{
     sortField: { field: "text", direction: "asc"}
 });
 
+/* ------------------------------------------------------------------
+   GPS helper
+   Geolocation is unreliable (and blocked outright) on plain-HTTP hosts
+   such as http://salesmantrackingsystem.test, so we:
+     1. try a cached / low-accuracy fix first (fast),
+     2. then escalate to a high-accuracy fix with a generous timeout,
+     3. and only surface an error if both fail.
+------------------------------------------------------------------ */
+window.SigmaGps = (function () {
+    var lastFix = null;
+
+    function remember(lat, lng) {
+        lastFix = { lat: lat, lng: lng };
+    }
+
+    function isStale() {
+        return !lastFix;
+    }
+
+    function request(options) {
+        return new Promise(function (resolve, reject) {
+            if (!navigator.geolocation) {
+                reject({ code: 0, message: 'Geolocation is not supported by this browser.' });
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                function (pos) {
+                    remember(pos.coords.latitude, pos.coords.longitude);
+                    resolve(pos.coords);
+                },
+                function (err) { reject(err); },
+                options
+            );
+        });
+    }
+
+    return {
+        isStale: isStale,
+        get: function () {
+            // 1) cheap cached / network-assisted fix
+            return request({ enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 })
+                .catch(function () {
+                    // 2) high accuracy retry
+                    return request({ enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+                })
+                .catch(function (err) {
+                    // 3) last known fix from earlier in this session
+                    if (lastFix) return { latitude: lastFix.lat, longitude: lastFix.lng, stale: true };
+                    throw err;
+                });
+        },
+        message: function (err) {
+            if (!window.isSecureContext) {
+                return 'GPS needs a secure connection (HTTPS or localhost). '
+                    + (err && err.message ? err.message : '');
+            }
+            switch (err && err.code) {
+                case 1: return 'GPS permission denied. Allow location access and try again.';
+                case 2: return 'GPS signal not available. Move near a window and retry.';
+                case 3: return 'GPS request timed out. Check your location settings and retry.';
+                default: return (err && err.message) ? err.message : 'Unable to get your location.';
+            }
+        }
+    };
+})();
+
 // GPS and Form Submission Logic
 document.getElementById('startVisitForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const notice = document.getElementById('gpsNotice');
+    const noticeText = document.getElementById('gpsNoticeText');
 
     submitButton.innerHTML = 'Finding location...';
     submitButton.disabled = true;
 
-    if (!navigator.geolocation) {
-        alert("Your browser does not support geolocation.");
-        submitButton.innerHTML = originalText;
-        submitButton.disabled = false;
-        return;
-    }
+    notice.classList.remove('hidden');
+    notice.classList.add('flex');
+    noticeText.textContent = 'Finding your location…';
 
-    navigator.geolocation.getCurrentPosition(function(position) {
-        document.getElementById('lat').value = position.coords.latitude;
-        document.getElementById('lng').value = position.coords.longitude;
+    window.SigmaGps.get().then(function (coords) {
+        document.getElementById('lat').value = coords.latitude;
+        document.getElementById('lng').value = coords.longitude;
+        noticeText.textContent = coords.stale
+            ? 'Using your last known location — move outdoors for a live fix.'
+            : 'GPS locked. Starting visit…';
         submitButton.innerHTML = 'Starting Visit...';
-        e.target.submit();
-    }, function(error) {
-        submitButton.innerHTML = originalText;
+        form.submit();
+    }).catch(function (error) {
+        submitButton.innerHTML = '<i data-lucide="navigation" class="w-4 h-4"></i> Start Visit';
         submitButton.disabled = false;
-        let errorMessage = "Unable to get your location.";
-        switch(error.code) {
-            case error.PERMISSION_DENIED: errorMessage = "GPS permission denied."; break;
-            case error.POSITION_UNAVAILABLE: errorMessage = "GPS signal not available."; break;
-            case error.TIMEOUT: errorMessage = "GPS request timed out."; break;
-        }
-        alert(errorMessage);
-    }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
+        if (window.SigmaIcons) window.SigmaIcons.refresh();
+
+        noticeText.textContent = window.SigmaGps.message(error);
+        notice.classList.remove('hidden');
+        notice.classList.add('flex');
+    });
 });
 </script>
 @endsection

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserWelcome;
 
 class StaffController extends Controller
 {
@@ -27,6 +29,14 @@ class StaffController extends Controller
     {
         $query = User::query();
 
+        // Filter by Status (active / left / all)
+        $status = $request->input('status', 'active');
+        if ($status === 'active') {
+            $query->whereNull('left_at');
+        } elseif ($status === 'left') {
+            $query->whereNotNull('left_at');
+        }
+
         if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
@@ -41,7 +51,7 @@ class StaffController extends Controller
 
         $staff = $query->orderBy('name')->paginate(10);
 
-        return view('hr.staff.index', compact('staff'));
+        return view('hr.staff.index', compact('staff', 'status'));
     }
 
     public function create()
@@ -52,22 +62,28 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'role'     => 'required|in:' . implode(',', $this->roles),
-            'phone'    => 'nullable|string|max:255',
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email',
+            'password'  => 'required|min:6',
+            'role'      => 'required|in:' . implode(',', $this->roles),
+            'phone'     => 'nullable|string|max:255',
         ]);
 
-        User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => $request->role,
-            'phone'    => $request->phone,
+        $staff = User::create([
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'password'  => Hash::make($request->password),
+            'role'      => $request->role,
+            'phone'     => $request->phone,
         ]);
 
-        return redirect()->route('hr.staff.index')->with('success', 'Staff created successfully.');
+        try {
+            Mail::to($staff->email)->send(new UserWelcome($staff, $request->password));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed sending welcome email: ' . $e->getMessage());
+        }
+
+        return redirect()->route('hr.staff.index')->with('success', 'Staff created successfully and welcome email sent.');
     }
 
     public function edit(User $staff)
@@ -105,5 +121,36 @@ class StaffController extends Controller
     {
         $staff->delete();
         return redirect()->route('hr.staff.index')->with('success', 'Staff deleted successfully.');
+    }
+
+    public function markAsLeft(Request $request, User $staff)
+    {
+        if (auth()->id() === $staff->id) {
+            return back()->with('error', 'You cannot mark your own account as left.');
+        }
+
+        if ($staff->role === 'admin') {
+            return back()->with('error', 'Admin accounts cannot be marked as left.');
+        }
+
+        $request->validate([
+            'left_reason' => 'nullable|string|max:255',
+            'left_at'     => 'nullable|date',
+        ]);
+
+        $staff->markAsLeft($request->input('left_reason'), $request->input('left_at'));
+
+        return redirect()
+            ->route('hr.staff.index')
+            ->with('success', 'Staff marked as left and notified.');
+    }
+
+    public function rejoin(User $staff)
+    {
+        $staff->rejoin();
+
+        return redirect()
+            ->route('hr.staff.index')
+            ->with('success', 'Staff re-added as an active member.');
     }
 }

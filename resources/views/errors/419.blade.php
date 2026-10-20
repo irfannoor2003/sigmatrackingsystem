@@ -1,123 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="{ theme: window.ThemeManager?.current() || 'dark' }" class="dark">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>419 | Page Expired</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-    :root {
-        /* Matching your variable colors */
-        --hf-magenta: #d6007b;
-        --hf-magenta-light: #f51a97;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-        width: 100%;
-        height: 100vh;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        /* Deep dark background matching the login flow */
-        background-color: #0f0f10;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        color: #fff;
-    }
-
-    /* The 'Glass' Card matching your login container */
-    .glass-card {
-        width: 100%;
-        max-width: 450px;
-        padding: 3rem 2rem;
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        text-align: center;
-        margin: 20px;
-    }
-
-    /* Magenta 419 Code */
-    .code {
-        font-size: 100px;
-        font-weight: 800;
-        line-height: 1;
-        margin-bottom: 0.5rem;
-        color: var(--hf-magenta);
-        letter-spacing: -0.05em;
-        /* Glow effect */
-        text-shadow: 0 0 30px rgba(214, 0, 123, 0.3);
-    }
-
-    .title {
-        font-size: 1.875rem; /* text-3xl */
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        letter-spacing: 0.025em;
-    }
-
-    .description {
-        color: #d1d5db; /* text-gray-300 */
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-bottom: 2rem;
-    }
-
-    /* Button matching your Sign In button */
-    .btn-action {
-        display: block;
-        width: 100%;
-        padding: 0.75rem 0;
-        background-color: var(--hf-magenta);
-        color: white;
-        font-weight: 700;
-        text-decoration: none;
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 15px -3px rgba(214, 0, 123, 0.4);
-        text-transform: none;
-        letter-spacing: 0.025em;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-action:hover {
-        background-color: var(--hf-magenta-light);
-        transform: translateY(-2px);
-    }
-
-    .footer-text {
-        margin-top: 1.5rem;
-        font-size: 0.875rem;
-        color: #d1d5db;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>419 | Page Expired</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=3">
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('sigma-theme');
+                if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.classList.toggle('dark', t === 'dark');
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
 
-    <div class="glass-card">
-        <div class="code">419</div>
-        <h2 class="title">Session Expired</h2>
+<body class="antialiased min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans flex items-center justify-center overflow-hidden px-4">
 
-        <p class="description">
-            Your security token has expired due to inactivity. <br>
-            Please login again to refresh your session.
+    <div class="pointer-events-none fixed -top-40 -right-40 w-[28rem] h-[28rem] rounded-full opacity-25 blur-3xl animate-spin-slow"
+        style="background: conic-gradient(#ff2ba6,#9333ea,#2563eb,#06b6d4,#22c55e,#facc15,#f97316,#ef4444,#ff2ba6)"></div>
+
+    <div class="relative z-10 w-full max-w-md card card-hover !rounded-[2rem] shadow-card-lg p-9 text-center animate-fade-up">
+        <p class="font-display font-black text-7xl gradient-text leading-none mb-2">419</p>
+        <h2 class="font-display font-bold text-xl mt-3">Session Expired</h2>
+        <p class="text-sm muted mt-2 leading-relaxed">
+            Your session timed out because the page was left idle. Log in again &mdash; you will be taken
+            straight to your dashboard and your previous device session is replaced automatically.
         </p>
 
-        <a href="{{ route('login') }}" class="btn-action">
+        <a href="{{ route('login') }}" class="btn btn-primary w-full !py-3 mt-7">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
             Go to Login
         </a>
 
-        <p class="footer-text">
-            Need help? Contact your administrator.
+        <p class="text-xs muted mt-5">
+            Need help? <a class="underline" href="mailto:{{ config('support.email') }}">{{ config('support.email') }}</a>
         </p>
     </div>
-
 </body>
+
 </html>

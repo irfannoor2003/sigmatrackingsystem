@@ -9,149 +9,121 @@
     $total = $presentStaff->count() + $leaveStaff->count() + $absentStaff->count();
 @endphp
 
-<style>
-    /* Glassmorphism Core */
-    .glass {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .status-pulse {
-        width: 10px;
-        height: 10px;
-        background: #ff2ba6;
-        border-radius: 50%;
-        box-shadow: 0 0 0 rgba(255, 43, 166, 0.5);
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(255, 43, 166, 0.6); }
-        70% { box-shadow: 0 0 0 10px rgba(255, 43, 166, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(255, 43, 166, 0); }
-    }
-
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 10px;
-    }
-</style>
-
-<div class="max-w-7xl mx-auto p-0">
+<div>
 
     {{-- HEADER --}}
-    <div class="relative glass p-8 rounded-2xl border border-white/20 shadow-2xl mb-8 overflow-hidden">
-        <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400/20 blur-3xl rounded-full hidden lg:block"></div>
-
-        <div class="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-center gap-4">
-                <div class="bg-white/10 p-3 rounded-2xl">
-                    <i data-lucide="activity" class="w-8 h-8 text-[#ff2ba6]"></i>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-extrabold text-white">
-                        {{ $todayDate->format('D, M d') }}
-                    </h1>
-                    <p class="text-sm text-white/40 uppercase tracking-widest">Live Attendance Feed</p>
-                </div>
-            </div>
-
-            <a href="{{ route('admin.dashboard') }}"
-               class="w-full sm:w-auto sm:ml-auto
-flex items-center justify-center gap-2
-px-6 py-3 rounded-2xl
-bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-hover:scale-105 transition
-text-white font-bold shadow-xl">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                Dashboard
-            </a>
-        </div>
+    <div class="page-head">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="activity" class="w-6 h-6"></i></span>
+            Live Attendance Feed
+        </h1>
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-outline btn-sm">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Dashboard
+        </a>
     </div>
+
+    <p class="text-sm muted -mt-3 mb-6 uppercase tracking-widest text-[.7rem]">{{ $todayDate->format('D, M d') }}</p>
 
     {{-- STATS GRID --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        @foreach([
-            ['Total Staff', $total, 'users', 'border-white/20'],
-            ['Present', $presentStaff->count(), 'check-circle', 'border-emerald-500/30'],
-            ['On Leave', $leaveStaff->count(), 'coffee', 'border-sky-500/30'],
-            ['Absent', $absentStaff->count(), 'user-x', 'border-rose-500/30']
-        ] as [$label, $value, $icon, $borderColor])
-        <div class="glass p-6 rounded-2xl border {{ $borderColor }} hover:scale-[1.02] transition">
-            <p class="text-white/40 text-xs font-semibold uppercase tracking-wider mb-1">{{ $label }}</p>
-            <div class="flex items-center justify-between">
-                <h3 class="text-3xl font-extrabold text-white">{{ $value }}</h3>
-                <div class="p-2 rounded-lg bg-white/5">
-                    <i data-lucide="{{ $icon }}" class="w-6 h-6 text-[#ff2ba6]"></i>
-                </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="stat-card tint-magenta">
+            <div>
+                <p class="text-sm muted font-medium">Total Staff</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $total }}</p>
             </div>
+            <span class="stat-ico"><i data-lucide="users" class="w-6 h-6"></i></span>
+            <div class="stat-bar"><div style="width: 100%"></div></div>
         </div>
-        @endforeach
+
+        <div class="stat-card tint-emerald">
+            <div>
+                <p class="text-sm muted font-medium">Present</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $presentStaff->count() }}</p>
+            </div>
+            <span class="stat-ico"><i data-lucide="check-circle" class="w-6 h-6"></i></span>
+            <div class="stat-bar"><div style="width: {{ $total > 0 ? ($presentStaff->count() / $total) * 100 : 0 }}%"></div></div>
+        </div>
+
+        <div class="stat-card tint-cyan">
+            <div>
+                <p class="text-sm muted font-medium">On Leave</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $leaveStaff->count() }}</p>
+            </div>
+            <span class="stat-ico"><i data-lucide="coffee" class="w-6 h-6"></i></span>
+            <div class="stat-bar"><div style="width: {{ $total > 0 ? ($leaveStaff->count() / $total) * 100 : 0 }}%"></div></div>
+        </div>
+
+        <div class="stat-card tint-red">
+            <div>
+                <p class="text-sm muted font-medium">Absent</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $absentStaff->count() }}</p>
+            </div>
+            <span class="stat-ico"><i data-lucide="user-x" class="w-6 h-6"></i></span>
+            <div class="stat-bar"><div style="width: {{ $total > 0 ? ($absentStaff->count() / $total) * 100 : 0 }}%"></div></div>
+        </div>
     </div>
 
-    <div class="grid lg:grid-cols-12 gap-8">
+    <div class="grid lg:grid-cols-12 gap-6">
 
         {{-- PRESENT STAFF SECTION --}}
-        <div class="lg:col-span-8 space-y-6">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                    <i data-lucide="users" class="text-[#ff2ba6]"></i>
-                    Present Today
-                </h2>
-            </div>
+        <div class="lg:col-span-8 space-y-5">
+            <h2 class="font-display font-semibold text-lg text-[var(--text)] flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5 text-[var(--accent)]"></i>
+                Present Today
+            </h2>
 
             <div class="grid sm:grid-cols-2 gap-4">
                 @forelse($presentStaff as $staff)
-                <div class="glass p-5 rounded-3xl border border-white/10 hover:border-pink-500/30 transition">
+                <div class="card card-hover !rounded-2xl p-5">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/20 to-fuchsia-500/20 flex items-center justify-center border border-white/10">
-                                <span class="text-[#ff2ba6] font-extrabold text-lg">
-                                    {{ strtoupper(substr($staff->name,0,1)) }}
-                                </span>
+                            <div class="avatar avatar-md bg-[var(--accent-soft)] !text-[var(--accent)]">
+                                {{ strtoupper(substr($staff->name,0,1)) }}
                             </div>
                             <div>
-                                <h4 class="text-white font-bold text-base">{{ $staff->name }}</h4>
-                                <p class="text-white/40 text-[11px] font-semibold uppercase tracking-wide">
-                                    {{ $staff->role }}
+                                <h4 class="font-semibold text-[var(--text)] text-base">{{ $staff->name }}</h4>
+                                <p class="muted text-[11px] font-semibold uppercase tracking-wide">
+                                    {{ str_replace('_', ' ', $staff->role) }}
                                 </p>
                             </div>
                         </div>
                         @if(!$staff->today_record->clock_out)
-                            <div class="status-pulse" title="Currently Active"></div>
+                            <span class="relative flex h-2.5 w-2.5 mt-2">
+                                <span class="absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75 animate-ping"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--accent)]"></span>
+                            </span>
                         @endif
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 bg-black/40 p-3 rounded-2xl border border-white/5">
+                    <div class="grid grid-cols-2 gap-3 soft-panel p-3 rounded-2xl">
                         <div>
-                            <p class="text-[10px] text-white/30 font-semibold uppercase">Clock In</p>
-                            <p class="text-[#ff2ba6] font-bold text-sm">
+                            <p class="text-[10px] muted font-semibold uppercase">Clock In</p>
+                            <p class="text-[var(--accent)] font-bold text-sm">
                                 {{ $staff->today_record->clock_in ? \Carbon\Carbon::parse($staff->today_record->clock_in)->format('h:i A') : '--:--' }}
                             </p>
                         </div>
                         <div>
-                            <p class="text-[10px] text-white/30 font-semibold uppercase">Clock Out</p>
-                            <p class="font-bold text-sm {{ $staff->today_record->clock_out ? 'text-white' : 'text-emerald-400' }}">
+                            <p class="text-[10px] muted font-semibold uppercase">Clock Out</p>
+                            <p class="font-bold text-sm {{ $staff->today_record->clock_out ? 'text-[var(--text)]' : 'text-emerald-500' }}">
                                 {{ $staff->today_record->clock_out ? \Carbon\Carbon::parse($staff->today_record->clock_out)->format('h:i A') : 'Active' }}
                             </p>
                         </div>
                     </div>
 
-                    <div class="mt-3 flex items-center gap-2 text-[11px] text-white/40 font-semibold uppercase">
-                        <i data-lucide="clock" class="w-3 h-3 text-[#ff2ba6]"></i>
+                    <div class="mt-3 flex items-center gap-2 text-[11px] muted font-semibold uppercase">
+                        <i data-lucide="clock" class="w-3 h-3 text-[var(--accent)]"></i>
+                        Worked:
                         @php
                             $clockIn = \Carbon\Carbon::parse($staff->today_record->clock_in);
                             $clockOut = $staff->today_record->clock_out ? \Carbon\Carbon::parse($staff->today_record->clock_out) : now();
                             $diff = $clockIn->diff($clockOut);
                         @endphp
-                        Worked: <span class="text-white">{{ $diff->h }}h {{ $diff->i }}m</span>
+                        <span class="text-[var(--text)]">{{ $diff->h }}h {{ $diff->i }}m</span>
                     </div>
                 </div>
                 @empty
-                <div class="col-span-full glass p-10 rounded-3xl text-center text-white/30">
+                <div class="col-span-full card !rounded-2xl p-10 text-center muted">
                     No staff members present yet.
                 </div>
                 @endforelse
@@ -159,50 +131,50 @@ text-white font-bold shadow-xl">
         </div>
 
         {{-- SIDEBAR: LEAVE + ABSENT --}}
-        <div class="lg:col-span-4 space-y-8">
+        <div class="lg:col-span-4 space-y-6">
 
             {{-- LEAVE --}}
-            <div class="glass p-6 rounded-3xl border border-sky-400/20">
-                <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                    <i data-lucide="coffee" class="text-sky-400"></i> On Leave
+            <div class="card !rounded-2xl p-6 !border-sky-500/25">
+                <h2 class="font-display font-semibold text-lg text-[var(--text)] flex items-center gap-2 mb-4">
+                    <i data-lucide="coffee" class="w-5 h-5 text-sky-500"></i> On Leave
                 </h2>
-                <div class="max-h-[300px] overflow-y-auto custom-scrollbar space-y-3">
+                <div class="max-h-[300px] overflow-y-auto space-y-3">
                     @forelse($leaveStaff as $staff)
-                        <div class="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5">
-                            <div class="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center font-bold text-sky-400">
+                        <div class="flex items-center gap-3 p-3 rounded-2xl soft-panel">
+                            <div class="avatar avatar-sm !rounded-xl bg-sky-500/15 !text-sky-500">
                                 {{ substr($staff->name,0,1) }}
                             </div>
                             <div>
-                                <p class="text-white font-semibold text-sm">{{ $staff->name }}</p>
-                                <p class="text-sky-400/60 text-[10px] font-bold uppercase tracking-tighter">Approved Leave</p>
+                                <p class="text-[var(--text)] font-semibold text-sm">{{ $staff->name }}</p>
+                                <p class="text-sky-500/70 text-[10px] font-bold uppercase tracking-tighter">Approved Leave</p>
                             </div>
                         </div>
                     @empty
-                        <p class="text-white/20 text-sm text-center py-4">No leaves today</p>
+                        <p class="muted text-sm text-center py-4">No leaves today</p>
                     @endforelse
                 </div>
             </div>
 
             {{-- ABSENT --}}
-            <div class="glass p-6 rounded-3xl border border-rose-500/20">
-                <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                    <i data-lucide="user-x" class="text-rose-500"></i> Absent
+            <div class="card !rounded-2xl p-6 !border-red-500/25">
+                <h2 class="font-display font-semibold text-lg text-[var(--text)] flex items-center gap-2 mb-4">
+                    <i data-lucide="user-x" class="w-5 h-5 text-red-500"></i> Absent
                 </h2>
-                <div class="max-h-[300px] overflow-y-auto custom-scrollbar space-y-3">
+                <div class="max-h-[300px] overflow-y-auto space-y-3">
                     @forelse($absentStaff as $staff)
-                        <div class="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5">
-                            <div class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
+                        <div class="flex items-center gap-3 p-3 rounded-2xl soft-panel">
+                            <div class="avatar avatar-sm !rounded-xl bg-red-500/10 !text-red-500">
                                 <i data-lucide="user-minus" class="w-4 h-4"></i>
                             </div>
                             <div>
-                                <p class="text-white font-semibold text-sm">{{ $staff->name }}</p>
-                                <p class="text-white/30 text-[10px] font-semibold uppercase">{{ $staff->role }}</p>
+                                <p class="text-[var(--text)] font-semibold text-sm">{{ $staff->name }}</p>
+                                <p class="muted text-[10px] font-semibold uppercase">{{ $staff->role }}</p>
                             </div>
                         </div>
                     @empty
                         <div class="text-center py-4">
                             <div class="text-2xl mb-1">🎉</div>
-                            <p class="text-white/20 text-sm font-medium">Perfect attendance!</p>
+                            <p class="muted text-sm font-medium">Perfect attendance!</p>
                         </div>
                     @endforelse
                 </div>
@@ -211,9 +183,4 @@ text-white font-bold shadow-xl">
         </div>
     </div>
 </div>
-
-<script>
-    // Initialize Lucide Icons
-    lucide.createIcons();
-</script>
 @endsection

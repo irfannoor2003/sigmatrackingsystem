@@ -1,1122 +1,601 @@
 <!doctype html>
-<html lang="en" x-data>
+<html lang="en" x-data="appShell()" class="{{ auth()->user()?->glass_mode ? 'glass-ui' : '' }}">
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Sigma Tracking System')</title>
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
+    <title>@yield('title', 'Dashboard') · Sigma Operations</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=3">
 
+    {{-- FOUC-safe theme bootstrap --}}
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('sigma-theme');
+                if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.classList.toggle('dark', t === 'dark');
+            } catch (e) {}
+        })();
+    </script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="{{ asset('js/lucide.min.js') }}"></script>
+    {{-- Fonts --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
 
+    {{-- Glass UI: preference is stored per-user. ?glass=1 / ?glass=0 previews it. --}}
+    <script>
+        (function() {
+            try {
+                var g = new URLSearchParams(location.search).get('glass');
+                if (g === '1') document.documentElement.classList.add('glass-ui');
+                if (g === '0') document.documentElement.classList.remove('glass-ui');
 
+                // Seed the guest-page preference from the account default, once per browser.
+                if (localStorage.getItem('sigma-glass') === null) {
+                    localStorage.setItem('sigma-glass',
+                        document.documentElement.classList.contains('glass-ui') ? '1' : '0');
+                }
+            } catch (e) {}
+        })();
+    </script>
 
-    <style>
-        :root {
-            --hf-magenta: #d6007b;
-            --hf-magenta-light: #ff2ba6;
-            --hf-purple: #6A00FF;
-            --bg-body: linear-gradient(135deg, #000000, #333333, #000000, #666666);
-            --text-primary: #ffffff;
-            --text-secondary: #e0e0e0;
-            --text-muted: #999999;
-            --text-on-accent: #ffffff;
-            --bg-glass: rgba(255, 255, 255, 0.08);
-            --border-glass: rgba(255, 255, 255, 0.14);
-            --bg-hover: rgba(255, 255, 255, 0.1);
-            --bg-hover-strong: rgba(255, 255, 255, 0.18);
-            --bg-input: rgba(0, 0, 0, 0.4);
-            --bg-card: rgba(255, 255, 255, 0.04);
-            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --border-color-strong: rgba(255, 255, 255, 0.2);
-            --mobile-menu-bg: #000000;
-            --accent-glow: rgba(255, 0, 170, 0.4);
-            --sidebar-active-bg: rgba(255, 0, 170, 0.2);
-            --sidebar-active-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
-            --btn-primary-bg: linear-gradient(135deg, #ff2ba6, #d41a8a);
-            --icon-color: #b0b0c8;
-            --table-header-bg: rgba(255, 255, 255, 0.04);
-            --table-border: rgba(255, 255, 255, 0.08);
-            --table-row-hover: rgba(255, 255, 255, 0.04);
-            --badge-text: rgba(255, 255, 255, 0.9);
-        }
-
-        body {
-            background: var(--bg-body);
-            background-size: 300% 300%;
-            color: var(--text-primary) !important;
-        }
-
-        .glass {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-
-        aside {
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-
-        .sidebar-active {
-            background: rgba(255, 0, 170, 0.2) !important;
-            border-left: 4px solid var(--hf-magenta-light);
-            box-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
-            color: white !important;
-        }
-
-        .sidebar-active-mobile {
-            background: rgba(255, 0, 170, 0.2) !important;
-            box-shadow: 0 0 12px rgba(255, 0, 170, 0.4);
-            color: white !important;
-        }
-
-        header {
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-
-        .hf-heading {
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-
-        /* ===== PITSTOP ROAD ANIMATION ===== */
-        @keyframes road-flow {
-            0% {
-                background-position: 0 0;
-            }
-
-            100% {
-                background-position: 24px 0;
-            }
-        }
-
-        @keyframes pulse-glow {
-
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 43, 166, 0.5);
-            }
-
-            50% {
-                box-shadow: 0 0 12px 4px rgba(255, 43, 166, 0.35);
-            }
-        }
-
-        @keyframes float-bounce {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-3px);
-            }
-        }
-
-        .route-line-h {
-            background-image: repeating-linear-gradient(to right,
-                    rgba(255, 255, 255, 0.15) 0px,
-                    rgba(255, 255, 255, 0.15) 8px,
-                    transparent 8px,
-                    transparent 16px);
-            background-size: 24px 3px;
-            animation: road-flow 1s linear infinite;
-        }
-
-        .route-line-v {
-            background-image: repeating-linear-gradient(to bottom,
-                    rgba(255, 255, 255, 0.15) 0px,
-                    rgba(255, 255, 255, 0.15) 8px,
-                    transparent 8px,
-                    transparent 16px);
-            background-size: 3px 24px;
-            animation: road-flow 1s linear infinite;
-        }
-
-        @keyframes road-flow-v {
-            0% {
-                background-position: 0 0;
-            }
-
-            100% {
-                background-position: 0 24px;
-            }
-        }
-
-        .route-line-v {
-            animation: road-flow-v 1s linear infinite;
-        }
-
-        .route-marker {
-            animation: pulse-glow 2.5s ease-in-out infinite;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .route-marker:hover {
-            transform: scale(1.35);
-            box-shadow: 0 0 20px 6px rgba(255, 43, 166, 0.5);
-        }
-
-        .route-car {
-            animation: float-bounce 1.8s ease-in-out infinite;
-        }
-
-        .road-modal {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(8px) scale(0.95);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .road-node:hover .road-modal,
-        .road-node.active .road-modal {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-        }
-
-        .road-node:hover .road-marker {
-            transform: scale(1.35);
-            box-shadow: 0 0 20px 6px rgba(255, 43, 166, 0.5);
-        }
-
-        .route-label-h {
-            opacity: 0;
-            transform: translateX(-50%) translateY(4px);
-            transition: all 0.3s ease;
-        }
-
-        .road-node:hover .route-label-h {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        #road-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 9998;
-            display: none;
-        }
-
-        #road-modal-overlay.show {
-            display: block;
-        }
-
-        #road-modal-box {
-            position: fixed;
-            z-index: 9999;
-            left: 50%;
-            bottom: 24px;
-            transform: translateX(-50%) translateY(8px) scale(0.95);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            max-width: calc(100vw - 24px);
-        }
-
-        #road-modal-box.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0) scale(1);
-            pointer-events: auto;
-        }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('head')
 </head>
 
-<body class="antialiased">
+@php
+    $role = auth()->user()?->role;
 
-    <div class="min-h-screen flex">
+    $isA = function (array $patterns) {
+        foreach ($patterns as $p) {
+            if (str_starts_with($p, 'url:')) {
+                if (request()->is(substr($p, 4) . '*')) return true;
+                continue;
+            }
+            if (request()->routeIs($p)) return true;
+        }
+        return false;
+    };
 
-        <aside class="w-72 hidden md:flex flex-col glass shadow-2xl border-r border-white/10">
+    $link = fn ($label, $icon, $url, $active, $badge = null) => [
+        'label' => $label, 'icon' => $icon, 'url' => $url,
+        'active' => $active, 'badge' => $badge,
+    ];
 
-            <div class="p-6 border-b border-white/10">
-                <a href="{{ Route::has('dashboard') ? route('dashboard') : url('/') }}" class="hf-heading text-white">
+    $navGroups = [];
 
-                    SES<span class="text-[var(--hf-magenta-light)]">.</span>
+    if ($role === 'admin') {
+        $navGroups[] = [
+            'label' => 'Overview',
+            'items' => [
+                $link('Dashboard', 'layout-dashboard', route('admin.dashboard'), $isA(['admin.dashboard'])),
+                $link('All Staff', 'users-round', route('admin.staff.index'), $isA(['admin.staff.*'])),
+                $link('Salesmen', 'users', route('admin.salesmen.index'), $isA(['admin.salesmen.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Tracking',
+            'items' => [
+                $link('Attendance Reports', 'calendar-clock', route('admin.attendance.index'), $isA(['admin.attendance.index', 'admin.attendance.today', 'admin.attendance.late-staff', 'admin.attendance.staff'])),
+                $link('Leave Messages', 'mail', route('admin.attendance.leave-requests'), $isA(['admin.attendance.leave-requests'])),
+                $link('Visits Reports', 'clipboard-list', route('admin.reports.index'), $isA(['admin.reports.*'])),
+                $link('Blocked Visits', 'shield-alert', route('admin.visits.blocked'), $isA(['admin.visits.blocked'])),
+                $link('Out of City Visits', 'plane', route('admin.out-of-city-visits.index'), $isA(['admin.out-of-city-visits.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Business Data',
+            'items' => [
+                $link('All Customers', 'building-2', route('admin.customers.index'), $isA(['url:admin/customers'])),
+                $link('Old Customers', 'database', route('admin.old-customers.index'), $isA(['admin.old-customers.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Apps',
+            'items' => [
+                $link('All Expenses', 'wallet', 'https://expense.sessigmasoft.com/', false, 'NEW'),
+                $link('Delivery', 'truck', 'https://delivery.sessigmasoft.com/', false, 'NEW'),
+            ],
+        ];
+    } elseif ($role === 'hr') {
+        $navGroups[] = [
+            'label' => 'Overview',
+            'items' => [
+                $link('Dashboard', 'layout-dashboard', route('hr.dashboard'), $isA(['hr.dashboard'])),
+                $link('All Staff', 'users-round', route('hr.staff.index'), $isA(['hr.staff.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Tracking',
+            'items' => [
+                $link('Attendance Reports', 'calendar-clock', route('hr.attendance.index'), $isA(['hr.attendance.index', 'hr.attendance.staff', 'hr.attendance.today', 'hr.attendance.late-staff', 'hr.attendance.export.*', 'hr.holiday.*'])),
+                $link('Leave Messages', 'mail', route('hr.attendance.leave-requests'), $isA(['hr.attendance.leave-requests'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Apps',
+            'items' => [
+                $link('All Expenses', 'wallet', 'https://expense.sessigmasoft.com/', false, 'NEW'),
+            ],
+        ];
+    } elseif ($role === 'saleshead') {
+        $navGroups[] = [
+            'label' => 'Overview',
+            'items' => [
+                $link('Dashboard', 'layout-dashboard', route('salehead.dashboard'), $isA(['salehead.dashboard'])),
+                $link('Salesman Visits', 'clipboard-list', route('salehead.reports.index'), $isA(['salehead.reports.*', 'salehead.visits.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Tracking',
+            'items' => [
+                $link('Out of City Visits', 'plane', route('salehead.out-of-city-visits.index'), $isA(['salehead.out-of-city-visits.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Business Data',
+            'items' => [
+                $link('Salesmen', 'users', route('salehead.salesmen.index'), $isA(['salehead.salesmen.*'])),
+                $link('All Customers', 'building-2', route('salehead.customers.index'), $isA(['salehead.customers.*'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Apps',
+            'items' => [
+                $link('Delivery', 'truck', 'https://delivery.sessigmasoft.com/', false, 'NEW'),
+            ],
+        ];
+    } elseif ($role === 'salesman') {
+        $pendingOcCount = \App\Models\OutOfCityVisit::where('salesman_id', auth()->id())->where('status', 'pending')->count();
+        $navGroups[] = [
+            'label' => 'Overview',
+            'items' => [
+                $link('Dashboard', 'layout-dashboard', route('salesman.dashboard'), $isA(['salesman.dashboard'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Tracking',
+            'items' => [
+                $link('Attendance', 'clock', route('salesman.attendance.index'), $isA(['salesman.attendance.index', 'salesman.attendance.history', 'salesman.attendance.clockin', 'salesman.attendance.clockout'])),
+                $link('My Lates', 'alarm-clock', route('salesman.attendance.lates'), $isA(['salesman.attendance.lates'])),
+                $link('Start Visit', 'map-pin', route('salesman.visits.create'), $isA(['salesman.visits.create'])),
+                $link('My Visits', 'calendar-check', route('salesman.visits.index'), $isA(['salesman.visits.index'])),
+                $link('Out of City Visits', 'plane', route('salesman.out-of-city-visits.index'), $isA(['salesman.out-of-city-visits.*']), $pendingOcCount > 0 ? (string) $pendingOcCount : null),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Customers',
+            'items' => [
+                $link('My Customers', 'briefcase', route('salesman.customers.index'), $isA(['salesman.customers.index', 'salesman.customers.show', 'salesman.customers.edit'])),
+                $link('Add Customer', 'user-plus', route('salesman.customers.create'), $isA(['salesman.customers.create'])),
+            ],
+        ];
+        $navGroups[] = [
+            'label' => 'Old Data',
+            'items' => [
+                $link('Import Old Customers', 'upload', route('salesman.old-customers.import'), $isA(['url:salesman/old-customers/import'])),
+                $link('View Old Customers', 'database', route('salesman.old-customers.index'), $isA(['salesman.old-customers.index'])),
+            ],
+        ];
+    } elseif (in_array($role, ['it', 'account', 'store', 'office_boy'])) {
+        $navGroups[] = [
+            'label' => 'Overview',
+            'items' => [
+                $link('Dashboard', 'layout-dashboard', route('staff.dashboard'), $isA(['staff.dashboard'])),
+                $link('Attendance', 'clock', route('staff.attendance.index'), $isA(['staff.attendance.index', 'staff.attendance.history', 'staff.attendance.clockin', 'staff.attendance.clockout'])),
+                $link('My Lates', 'alarm-clock', route('staff.attendance.lates'), $isA(['staff.attendance.lates'])),
+            ],
+        ];
+        if ($role === 'store') {
+            $navGroups[] = [
+                'label' => 'Apps',
+                'items' => [
+                    $link('Delivery', 'truck', 'https://delivery.sessigmasoft.com/', false, 'NEW'),
+                ],
+            ];
+        }
+    }
+
+    $searchScopes = match ($role) {
+        'admin' => [
+            ['value' => 'all', 'label' => 'All'],
+            ['value' => 'customers', 'label' => 'Customers'],
+            ['value' => 'staff', 'label' => 'Staff'],
+        ],
+        'hr' => [
+            ['value' => 'staff', 'label' => 'Staff'],
+        ],
+        'saleshead' => [
+            ['value' => 'customers', 'label' => 'Customers'],
+        ],
+        'salesman' => [
+            ['value' => 'customers', 'label' => 'Customers'],
+            ['value' => 'visits', 'label' => 'Visits'],
+        ],
+        default => [],
+    };
+@endphp
+
+<body class="antialiased min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans">
+
+    <script>
+        window.SIGMA_NAV = @json(array_values(array_filter(array_map(fn($g) => ['label' => $g['label'], 'items' => $g['items']], $navGroups))));
+        window.SIGMA_SEARCH_URL = @json(route('global-search'));
+        window.SIGMA_SEARCH_SCOPES = @json($searchScopes);
+    </script>
+
+    <div class="workspace-canvas relative min-h-screen">
+        {{-- EXPERIMENTAL: blurred gradient mesh, only visible under .glass-ui --}}
+        <div class="glass-bg" aria-hidden="true">
+            <div class="auth-mesh"></div>
+            <div class="auth-blob auth-blob--magenta auth-blob--1"></div>
+            <div class="auth-blob auth-blob--violet auth-blob--2"></div>
+            <div class="auth-blob auth-blob--cyan auth-blob--3"></div>
+            <div class="auth-blob auth-blob--amber auth-blob--4"></div>
+            <div class="auth-blob auth-blob--magenta auth-blob--5"></div>
+            <div class="auth-vignette"></div>
+            <div class="auth-grain"></div>
+        </div>
+
+        <div class="ambient-canvas" aria-hidden="true">
+            <div class="ambient-orb ambient-orb--pink ambient-orb--one"></div>
+            <div class="ambient-orb ambient-orb--blue ambient-orb--two"></div>
+            <div class="ambient-orb ambient-orb--amber ambient-orb--three"></div>
+            <div class="ambient-ring top-[22%] right-[12%]"></div>
+        </div>
+        {{-- ============================ SIDEBAR (desktop) ============================ --}}
+        <aside
+            class="fixed inset-y-0 left-0 z-40 hidden lg:flex w-[17rem] flex-col border-r border-[var(--border)] transition-[width] duration-200 ease-out"
+            :class="sidebarCollapsed ? 'lg:w-[5.5rem] app-sidebar-collapsed' : 'lg:w-[17rem]'"
+            style="background: var(--sidebar-bg)">
+
+            <div class="flex items-center gap-3 px-5 h-[4.75rem] border-b border-[var(--border)]"
+                :class="sidebarCollapsed ? 'justify-center !px-0' : ''">
+                <a href="{{ route('dashboard') }}" class="flex items-center min-w-0 flex-1"
+                    title="Sigma Engineering Services" x-show="!sidebarCollapsed">
+                    <img src="{{ asset('images/logo.webp') }}" alt="Sigma Engineering Services"
+                        class="h-9 w-auto max-w-[11.5rem] object-contain object-left shrink-0">
                 </a>
-                <p class="text-xs text-gray-300 mt-1">Salesman Tracking System</p>
+                <button class="icon-btn !w-8 !h-8 shrink-0" @click="toggleSidebar()"
+                    :title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+                    <span x-show="!sidebarCollapsed">
+                        <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+                    </span>
+                    <span x-show="sidebarCollapsed">
+                        <i data-lucide="panel-left-open" class="w-4 h-4"></i>
+                    </span>
+                </button>
             </div>
 
-            <nav class="p-4 flex-1 text-gray-200">
-
-                @auth
-                    @php
-                        $role = auth()->user()->role;
-                    @endphp
-                    <div class="mb-6 p-4 rounded-xl glass border border-white/10">
-                        <div class="text-sm text-gray-300">Logged in as:</div>
-                        <div class="font-semibold text-white">{{ auth()->user()->name }}</div>
-                        <div class="text-xs text-gray-400">{{ auth()->user()->email }}</div>
-                    </div>
-
-                    @if (auth()->user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-                        {{ request()->routeIs('admin.dashboard') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                            Dashboard
-                        </a>
-                        <a href="{{ route('admin.staff.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('admin.staff.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="users-round" class="w-5 h-5"></i>
-                            All Staff
-                        </a>
-                        <a href="{{ route('admin.attendance.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('admin.attendance.index') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-                            Attendance Reports
-                        </a>
-                        <a href="{{ route('admin.attendance.leave-requests') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('admin.attendance.leave-requests') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="mail" class="w-5 h-5"></i>
-                            Leave Messages
-                        </a>
-
-
-                        <a href="{{ route('admin.salesmen.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('admin.salesmen.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="users" class="w-5 h-5"></i>
-                            Salesmen
-                        </a>
-
-                        <a href="{{ route('admin.reports.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-                        {{ request()->routeIs('admin.reports.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                            Visits Reports
-                        </a>
-
-                        <a href="{{ route('admin.out-of-city-visits.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-                        {{ request()->routeIs('admin.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="plane" class="w-5 h-5"></i>
-                            Out of City Visits
-                        </a>
-
-
-                        <a href="{{ url('/admin/customers') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->is('admin/customers*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="building-2" class="w-5 h-5"></i>
-                            All Customers
-                        </a>
-                        <a href="https://expense.sessigmasoft.com/"
-                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
-   hover:bg-white/10 transition-all duration-300
-   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active' : '' }}">
-
-                            <i data-lucide="wallet" class="w-5 h-5 "></i>
-
-                            <span>All Expenses</span>
-
-                            <span
-                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
-                                NEW
+            {{-- Nav --}}
+            <nav class="flex-1 overflow-y-auto px-3 py-4">
+                <template x-if="true" x-data="{}"></template>
+                @foreach ($navGroups as $group)
+                    <div class="side-label" x-show="!sidebarCollapsed">{{ $group['label'] }}</div>
+                    @foreach ($group['items'] as $item)
+                        <a href="{{ $item['url'] }}" title="{{ $item['label'] }}"
+                            class="side-link {{ $item['active'] ? 'active' : '' }}">
+                            <span class="side-ico">
+                                <i data-lucide="{{ $item['icon'] }}" class="w-4 h-4"></i>
                             </span>
-
-                            <span class="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
+                            <span class="truncate" x-show="!sidebarCollapsed">{{ $item['label'] }}</span>
+                            @if ($item['badge'])
                                 <span
-                                    class="absolute -left-full top-0 h-full w-1/2
-            bg-gradient-to-r from-transparent via-white/20 to-transparent
-            skew-x-[-20deg]
-            group-hover:animate-[shine_0.8s_ease]"></span>
-                            </span>
-                        </a>
-
-                        <a href="https://delivery.sessigmasoft.com/"
-                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
-   hover:bg-white/10 transition-all duration-300">
-                            <i data-lucide="truck" class="w-5 h-5"></i>
-                            <span>Delivery</span>
-                            <span
-                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
-                        </a>
-
-                        <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
-
-                        <a href="{{ route('admin.old-customers.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->routeIs('admin.old-customers.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="database" class="w-5 h-5"></i>
-                            Search / View Old
-                        </a>
-                    @endif
-
-                    @if ($role === 'saleshead')
-                        {{-- Dashboard --}}
-                        <a href="{{ route('salehead.dashboard') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="layout-dashboard"></i>
-                            Dashboard
-                        </a>
-
-                        {{-- Salesman Visits --}}
-                        <a href="{{ route('salehead.reports.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="clipboard-list"></i>
-                            Salesman Visits
-                        </a>
-
-                        {{-- Out of City Visits --}}
-                        <a href="{{ route('salehead.out-of-city-visits.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="plane"></i>
-                            Out of City Visits
-                        </a>
-
-                        {{-- Salesmen --}}
-                        <a href="{{ route('salehead.salesmen.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.salesmen.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="users"></i>
-                            Salesmen
-                        </a>
-
-                        {{-- All Customers --}}
-                        <a href="{{ route('salehead.customers.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="building-2"></i>
-                            All Customers
-                        </a>
-
-                        <a href="https://delivery.sessigmasoft.com/"
-                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
-   hover:bg-white/10 transition-all duration-300">
-                            <i data-lucide="truck" class="w-5 h-5"></i>
-                            <span>Delivery</span>
-                            <span
-                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
-                        </a>
-                    @endif
-
-                    @if (auth()->user()->role === 'hr')
-                        <a href="{{ route('hr.dashboard') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.dashboard') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                            Dashboard
-                        </a>
-
-                        <a href="{{ route('hr.staff.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.staff.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="users-round" class="w-5 h-5"></i>
-                            All Staff
-                        </a>
-
-                        <a href="{{ route('hr.attendance.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.attendance.index') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-                            Attendance Reports
-                        </a>
-
-                        <a href="{{ route('hr.attendance.leave-requests') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.attendance.leave-requests') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="mail" class="w-5 h-5"></i>
-                            Leave Messages
-                        </a>
-                        <a href="https://expense.sessigmasoft.com/"
-                            class="group relative flex items-center gap-3 px-4 py-2 rounded-lg mt-1
-   hover:bg-white/10 transition-all duration-300
-   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active' : '' }}">
-
-                            <i data-lucide="wallet" class="w-5 h-5 "></i>
-
-                            <span>All Expenses</span>
-
-                            <span
-                                class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
-                                NEW
-                            </span>
-
-                            <span class="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
-                                <span
-                                    class="absolute -left-full top-0 h-full w-1/2
-            bg-gradient-to-r from-transparent via-white/20 to-transparent
-            skew-x-[-20deg]
-            group-hover:animate-[shine_0.8s_ease]"></span>
-                            </span>
-                        </a>
-                    @endif
-
-
-                    @if (auth()->user()->role === 'salesman')
-                        {{-- Dashboard --}}
-                        <a href="{{ route('salesman.dashboard') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.dashboard') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                            Dashboard
-                        </a>
-
-                        {{-- Attendance --}}
-                        <a href="{{ route('salesman.attendance.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.attendance.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="clock" class="w-5 h-5"></i>
-                            Attendance
-                        </a>
-
-                        {{-- My Customers --}}
-                        <a href="{{ route('salesman.customers.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.customers.index') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="briefcase" class="w-5 h-5"></i>
-                            My Customers
-                        </a>
-
-                        {{-- Add Customer --}}
-                        <a href="{{ route('salesman.customers.create') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.customers.create') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="user-plus" class="w-5 h-5"></i>
-                            Add Customer
-                        </a>
-
-                        {{-- Start Visit --}}
-                        <a href="{{ route('salesman.visits.create') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.visits.create') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="map-pin" class="w-5 h-5"></i>
-                            Start Visit
-                        </a>
-
-                        {{-- My Visits --}}
-                        <a href="{{ route('salesman.visits.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.visits.index') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="calendar-check" class="w-5 h-5"></i>
-                            My Visits
-                        </a>
-
-                        {{-- My Lates --}}
-                        <a href="{{ route('salesman.attendance.lates') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('salesman.attendance.lates') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="alarm-clock" class="w-5 h-5"></i>
-                            My Lates
-                        </a>
-
-                        {{-- Out of City Visits --}}
-                        @php
-                            $pendingOcCount = \App\Models\OutOfCityVisit::where('salesman_id', auth()->id())->where('status', 'pending')->count();
-                        @endphp
-                        <a href="{{ route('salesman.out-of-city-visits.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('salesman.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="plane" class="w-5 h-5"></i>
-                            Out of City Visits
-                            @if ($pendingOcCount > 0)
-                                <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full bg-red-500 text-white shadow-[0_0_8px_#ef4444]">
-                                    {{ $pendingOcCount }}
+                                    class="ml-auto text-[.58rem] font-bold px-2 py-[2px] rounded-full badge {{ !is_numeric($item['badge']) ? 'badge-magenta' : 'badge-red' }}"
+                                    x-show="!sidebarCollapsed">
+                                    {{ $item['badge'] }}
                                 </span>
                             @endif
                         </a>
-
-                        {{-- Old Customers --}}
-                        <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
-
-                        {{-- Import Old Customers (URL-based active) --}}
-                        <a href="{{ route('salesman.old-customers.import') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->is('salesman/old-customers/import*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="upload" class="w-5 h-5"></i>
-                            Import Old Customers
-                        </a>
-
-                        {{-- View Old Customers --}}
-                        <a href="{{ route('salesman.old-customers.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.old-customers.index') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="database" class="w-5 h-5"></i>
-                            View Old Customers
-                        </a>
-                    @endif
-
-                    @if (in_array(auth()->user()->role, ['it', 'account', 'office_boy']))
-                        {{-- Staff Dashboard --}}
-                        <a href="{{ route('staff.dashboard') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('staff.dashboard') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                            Dashboard
-                        </a>
-
-                        {{-- Attendance --}}
-                        <a href="{{ route('staff.attendance.index') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="clock" class="w-5 h-5"></i>
-                            Attendance
-                        </a>
-
-                        {{-- My Lates --}}
-                        <a href="{{ route('staff.attendance.lates') }}"
-                            class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active' : '' }}">
-                            <i data-lucide="alarm-clock" class="w-5 h-5"></i>
-                            My Lates
-                        </a>
-
-
-                    @endif
-
-
-                    @if ($role === 'store')
-                                {{-- Staff Dashboard --}}
-                                <a href="{{ route('staff.dashboard') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('staff.dashboard') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                    Dashboard
-                                </a>
-
-                                {{-- Attendance --}}
-                                <a href="{{ route('staff.attendance.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="clock" class="w-5 h-5"></i>
-                                    Attendance
-                                </a>
-
-                                {{-- My Lates --}}
-                                <a href="{{ route('staff.attendance.lates') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
-                                    My Lates
-                                </a>
-
-
-
-                                <a href="https://delivery.sessigmasoft.com/"
-                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
-                                    <i data-lucide="truck" class="w-5 h-5"></i>
-                                    <span>Delivery</span>
-                                    <span
-                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
-                                </a>
-                            @endif
-
-
-
-                    <div class="border-t border-white/10 mt-6 pt-4">
-                        @if (auth()->user()->role === 'admin')
-                            <a href="{{ route('profile.edit') }}"
-                                class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                                <i data-lucide="settings" class="w-5 h-5"></i>
-                                Profile
-                            </a>
-                        @endif
-
-
-                        <form method="POST" action="{{ route('logout') }}" class="px-4 mt-3">
-                            @csrf
-                            <button type="submit"
-                                class="flex items-center gap-3 text-sm text-red-400 hover:text-red-300">
-                                <i data-lucide="log-out" class="w-5 h-5"></i>
-                                Logout
-                            </button>
-                        </form>
-                    </div>
-
-                @endauth
+                    @endforeach
+                @endforeach
             </nav>
+
+            {{-- User mini card --}}
+            <div class="p-3 border-t border-[var(--border)]">
+                <div class="flex items-center gap-3" :class="sidebarCollapsed ? 'justify-center' : ''">
+                    <div class="avatar avatar-md">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
+                    <div class="min-w-0 flex-1" x-show="!sidebarCollapsed">
+                        <p class="text-sm font-semibold truncate text-[var(--text)]">{{ auth()->user()->name }}</p>
+                        <p class="text-[.68rem] uppercase tracking-wider muted truncate">
+                            {{ str_replace('_', ' ', auth()->user()->role) }}</p>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}" x-show="!sidebarCollapsed">
+                        @csrf
+                        <button class="icon-btn !w-9 !h-9 text-red-500 border-red-300/40" title="Logout">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </aside>
 
-        <div x-data="{ open: false }" class="flex-1">
+        {{-- ============================ MOBILE DRAWER ============================ --}}
+        <div x-show="sidebarOpen" x-cloak x-transition.opacity
+            class="fixed inset-0 z-50 bg-black/50 lg:hidden" @click="sidebarOpen = false"></div>
 
-            <header class="glass border-b border-white/10 shadow-xl relative z-50">
-                <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-
-                    <div class="flex items-center gap-3">
-                        <button @click="open = !open" class="md:hidden p-2 rounded hover:bg-white/10">
-                            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        </button>
-
-                        <a href="{{ route('dashboard') }}"
-                            class="text-xl md:text-2xl font-extrabold tracking-wide text-white">
-                            Sigma Engineering Services<span class="text-[var(--hf-magenta-light)]">.</span>
+        <div x-show="sidebarOpen" x-cloak x-transition
+            class="fixed inset-y-0 left-0 z-50 w-[17rem] lg:hidden flex flex-col border-r border-[var(--border)]"
+            style="background: var(--sidebar-bg)">
+            <div class="flex items-center justify-between px-5 h-[4.75rem] border-b border-[var(--border)]">
+                <a href="{{ route('dashboard') }}" class="flex items-center">
+                    <img src="{{ asset('images/logo.webp') }}" alt="Sigma Engineering Services" class="h-9 w-auto max-w-[12rem] object-contain object-left">
+                </a>
+                <button class="icon-btn" @click="sidebarOpen = false">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <nav class="flex-1 overflow-y-auto px-3 py-4">
+                @foreach ($navGroups as $group)
+                    <div class="side-label">{{ $group['label'] }}</div>
+                    @foreach ($group['items'] as $item)
+                        <a href="{{ $item['url'] }}" @click="sidebarOpen = false"
+                            class="side-link {{ $item['active'] ? 'active' : '' }}">
+                            <span class="side-ico"><i data-lucide="{{ $item['icon'] }}" class="w-4 h-4"></i></span>
+                            <span class="truncate">{{ $item['label'] }}</span>
+                            @if ($item['badge'])
+                                <span
+                                    class="ml-auto text-[.58rem] font-bold px-2 py-[2px] rounded-full badge {{ !is_numeric($item['badge']) ? 'badge-magenta animate-pulse' : 'badge-red' }}">
+                                    {{ $item['badge'] }}
+                                </span>
+                            @endif
                         </a>
+                    @endforeach
+                @endforeach
+                <form method="POST" action="{{ route('logout') }}" class="mt-6 px-1">
+                    @csrf
+                    <button class="side-link text-red-500 w-full">
+                        <span class="side-ico"><i data-lucide="log-out" class="w-4 h-4"></i></span>
+                        Logout
+                    </button>
+                </form>
+            </nav>
+        </div>
+
+        {{-- ============================ MAIN ============================ --}}
+        <div class="relative z-10 min-w-0 transition-[padding] duration-200 ease-out"
+            :class="sidebarCollapsed ? 'lg:pl-[5.5rem]' : 'lg:pl-[17rem]'">
+
+            {{-- Topbar --}}
+            <header class="sticky top-0 z-30 glass-topbar border-b border-[var(--border)]">
+                <div class="flex items-center gap-3 px-4 sm:px-6 h-[4.5rem]">
+
+                    <button class="icon-btn lg:hidden" @click="sidebarOpen = true" title="Open navigation">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+
+                    {{-- Page title / breadcrumb --}}
+                    <div class="min-w-0">
+                        <p class="text-[.65rem] uppercase tracking-[.16em] muted hidden sm:block">Operations Workspace</p>
+                        <h1 class="font-display font-semibold text-[1.05rem] leading-tight truncate text-[var(--text)]">
+                            @yield('title', 'Dashboard')
+                        </h1>
                     </div>
 
-                    @auth
-                        <div class="flex items-center gap-3">
+                    {{-- Global search (desktop / tablet only) --}}
+                    <div class="hidden md:flex ml-auto flex-1 justify-end">
+                        <div class="relative w-full max-w-[15rem] md:max-w-[17rem] xl:max-w-[18rem]" x-data="globalSearch()"
+                            @click.outside="close()" @keydown.escape="close()">
 
-                            <div
-                                class="hidden md:flex items-center gap-3
-                bg-white/10 backdrop-blur-md border border-white/20
-                px-4 py-2 rounded-xl shadow-lg">
+                            <div class="topbar-search">
+                                <i data-lucide="search"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] z-10 pointer-events-none"></i>
+                                <input type="text" x-model="q" @focus="q.length && run()"
+                                    :placeholder="placeholder()" aria-label="Global search"
+                                    class="topbar-search__field !pl-9">
+                                <select x-model="scope" @change="run()" x-show="scopes.length > 1"
+                                    aria-label="Search scope" class="topbar-search__scope">
+                                    <template x-for="option in scopes" :key="option.value">
+                                        <option :value="option.value" x-text="option.label"></option>
+                                    </template>
+                                </select>
+                                <button x-show="q" x-cloak @click="q=''" x-transition
+                                    class="topbar-search__clear"
+                                    :class="scopes.length > 1 ? 'right-[7.1rem]' : 'right-2'"
+                                    aria-label="Clear search">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </div>
 
-                                <!-- Avatar Icon -->
-                                <div
-                                    class="w-9 h-9 flex items-center justify-center
-                    rounded-full bg-[#ff2ba6]/20 text-[#fff]">
-                                    <i data-lucide="user" class="w-5 h-5"></i>
-                                </div>
+                            {{-- Search overlay --}}
+                            <div x-show="open" x-cloak x-transition.opacity
+                                class="menu-panel absolute right-0 mt-2 w-full md:w-[26rem]">
+                                <div class="p-2.5 max-h-[24rem] overflow-y-auto">
+                                    <template x-if="loading">
+                                        <div class="flex items-center gap-2 px-3 py-4 text-sm muted">
+                                            <span
+                                                class="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></span>
+                                            Searching…
+                                        </div>
+                                    </template>
 
-                                <!-- Text -->
-                                <div class="leading-tight">
-                                    <div class="text-sm font-semibold text-[#fff]">
-                                        {{ auth()->user()->name }}
-                                    </div>
+                                    <template x-if="!loading && total() === 0">
+                                        <div class="px-3 py-6 text-center text-sm muted">
+                                            <i data-lucide="search-x" class="w-6 h-6 mx-auto mb-2 text-[var(--text-muted)]"></i>
+                                            No matches for “<span x-text="q"></span>”
+                                        </div>
+                                    </template>
 
-                                    <div class="text-xs text-white/60 flex items-center gap-1">
-                                        <i data-lucide="shield" class="w-3 h-3 text-[#ff2ba6]"></i>
-                                        <span class="capitalize">{{ auth()->user()->role }}</span>
-                                    </div>
+                                    <template x-if="navResults.length > 0">
+                                        <div>
+                                            <p class="px-3 py-1.5 text-[.62rem] font-bold uppercase tracking-widest muted">
+                                                Pages</p>
+                                            <template x-for="l in navResults" :key="'n'+l.url+l.label">
+                                                <a :href="l.url" class="search-result-link">
+                                                    <span class="side-ico"><span
+                                                            class="w-6 h-6 rounded-md bg-[var(--accent-soft)] flex items-center justify-center"><i
+                                                                :data-lucide="l.icon" class="w-3.5 h-3.5 text-[var(--accent)]"></i></span></span>
+                                                    <span class="min-w-0">
+                                                        <span class="block text-sm font-semibold text-[var(--text)] truncate"
+                                                            x-text="l.label"></span>
+                                                    </span>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <template x-if="results.length > 0">
+                                        <div>
+                                            <p class="px-3 py-1.5 text-[.62rem] font-bold uppercase tracking-widest muted"
+                                                x-show="navResults.length > 0">Records</p>
+                                            <template x-for="r in results" :key="'r'+r.url+r.title">
+                                                <a :href="r.url" class="search-result-link">
+                                                    <span class="side-ico"><span
+                                                            class="w-6 h-6 rounded-md bg-[var(--accent-soft)] flex items-center justify-center"><i
+                                                                :data-lucide="r.icon" class="w-3.5 h-3.5 text-[var(--accent)]"></i></span></span>
+                                                    <span class="min-w-0">
+                                                        <span class="block text-sm font-semibold text-[var(--text)] truncate"
+                                                            x-text="r.title"></span>
+                                                        <span class="block text-xs muted truncate" x-text="r.sub"></span>
+                                                    </span>
+                                                    <span class="ml-auto text-[.6rem] uppercase font-bold badge badge-gray"
+                                                        x-text="r.type"></span>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                    @endauth
-                </div>
+                    {{-- Live clock --}}
+                    <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface)]"
+                        x-data="liveClock()">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75 animate-ping"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent)]"></span>
+                        </span>
+                        <div class="leading-none text-right">
+                            <span class="block font-mono font-bold text-sm text-[var(--text)] tabular-nums"
+                                x-text="time"></span>
+                            <span class="block text-[.58rem] uppercase tracking-wider muted" x-text="date + ' ' + day"></span>
+                        </div>
+                    </div>
 
-                <div x-show="open" x-cloak x-transition
-                    class="md:hidden border-t border-white/10 absolute top-16 left-0 w-full z-30 bg-black">
-                    <div class="p-4">
+                    {{-- Appearance: (1) light/dark  (2) glassmorphism on/off --}}
+                    <div class="ml-auto flex items-center gap-1.5 md:ml-0">
 
-                        @auth
-                            <a href="{{ route('profile.edit') }}"
-                                class="block p-3 mb-4 rounded-xl glass border border-white/10">
-                                <div class="text-sm text-gray-300">Logged in as:</div>
-                                <div class="font-semibold text-white">{{ auth()->user()->name }}</div>
-                                <div class="text-xs text-gray-400">{{ auth()->user()->email }}</div>
-                            </a>
+                        {{-- 1. Simple light / dark mode --}}
+                        <button class="icon-btn !h-9 !w-9 !rounded-xl" @click="toggleTheme()"
+                            :title="theme === 'dark' ? 'Light mode' : 'Dark mode'"
+                            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+                            <span x-show="theme === 'dark'">
+                                <i data-lucide="sun" class="w-[1.05rem] h-[1.05rem]"></i>
+                            </span>
+                            <span x-show="theme !== 'dark'">
+                                <i data-lucide="moon" class="w-[1.05rem] h-[1.05rem]"></i>
+                            </span>
+                        </button>
 
-                            @if (auth()->user()->role === 'admin')
-                                {{-- Dashboard --}}
-                                <a href="{{ route('admin.dashboard') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('admin.dashboard') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                    Dashboard
-                                </a>
+                        {{-- 2. Glassmorphism on / off (saved to your account) --}}
+                        <form method="POST" action="{{ route('profile.glass-mode') }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                class="glass-toggle-btn relative flex !h-9 !w-9 items-center justify-center rounded-xl border"
+                                title="{{ auth()->user()?->glass_mode ? 'Glassmorphism is on — turn off' : 'Glassmorphism is off — turn on' }}"
+                                aria-label="Toggle glassmorphism"
+                                aria-pressed="{{ auth()->user()?->glass_mode ? 'true' : 'false' }}"
+                                onclick="localStorage.setItem('sigma-glass', {{ auth()->user()?->glass_mode ? "'0'" : "'1'" }})">
+                                <i data-lucide="layers" class="w-[1.05rem] h-[1.05rem]"></i>
+                                @if (auth()->user()?->glass_mode)
+                                    <span class="glass-dot"></span>
+                                @endif
+                            </button>
+                        </form>
 
+                    </div>
 
-                                {{-- All Staff --}}
-                                <a href="{{ route('admin.staff.index') }}"
-                                    class="flex items-center gap-3  py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('admin.staff.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="users-round" class="w-5 h-5"></i>
-                                    All Staff
-                                </a>
+                    {{-- User menu --}}
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <button @click="open = !open"
+                            class="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] transition">
+                            <div class="avatar avatar-md !w-8 !h-8 !text-[.7rem]">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
+                            <span class="hidden sm:flex flex-col items-start leading-tight">
+                                <span class="text-xs font-semibold text-[var(--text)] max-w-[7rem] truncate">{{ auth()->user()->name }}</span>
+                                <span class="text-[.6rem] uppercase tracking-wider muted">{{ str_replace('_', ' ', $role) }}</span>
+                            </span>
+                            <i data-lucide="chevron-down"
+                                class="w-3.5 h-3.5 text-[var(--text-muted)] transition-transform"
+                                :class="open ? 'rotate-180' : ''"></i>
+                        </button>
 
-                                {{-- Attendance Reports --}}
-                                <a href="{{ route('admin.attendance.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('admin.attendance.index') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-                                    Attendance Reports
-                                </a>
-
-                                {{-- Leave Requests (FIXED – no conflict now) --}}
-                                <a href="{{ route('admin.attendance.leave-requests') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('admin.attendance.leave-requests') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="mail" class="w-5 h-5"></i>
-                                    Leave Messages
-                                </a>
-
-                                {{-- Salesmen --}}
-                                <a href="{{ route('admin.salesmen.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('admin.salesmen.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="users" class="w-5 h-5"></i>
-                                    Salesmen
-                                </a>
-
-                                {{-- Visit Reports --}}
-                                <a href="{{ route('admin.reports.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('admin.reports.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                                    Visit Reports
-                                </a>
-
-                                {{-- Out of City Visits --}}
-                                <a href="{{ route('admin.out-of-city-visits.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('admin.out-of-city-visits.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="plane" class="w-5 h-5"></i>
-                                    Out of City Visits
-                                </a>
-
-                                {{-- All Customers (URL based) --}}
-                                <a href="{{ url('/admin/customers') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->is('admin/customers*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="building-2" class="w-5 h-5"></i>
-                                    All Customers
-                                </a>
-                                <a href="https://expense.sessigmasoft.com/"
-                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
-   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active-mobile' : '' }}">
-
-                                    <i data-lucide="wallet" class="w-5 h-5 "></i>
-
-                                    <span>All Expenses</span>
-
-                                    <span
-                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
-                                        NEW
-                                    </span>
-                                </a>
-
-                                <a href="https://delivery.sessigmasoft.com/"
-                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
-                                    <i data-lucide="truck" class="w-5 h-5"></i>
-                                    <span>Delivery</span>
-                                    <span
-                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
-                                </a>
-
-                                <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
-
-                                {{-- Old Customers --}}
-                                <a href="{{ route('admin.old-customers.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('admin.old-customers.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="database" class="w-5 h-5"></i>
-                                    Search / View Old
-                                </a>
-                            @endif
-
-
-                            @if (auth()->user()->role === 'salesman')
-                                {{-- Dashboard --}}
-                                <a href="{{ route('salesman.dashboard') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('salesman.dashboard') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                    Dashboard
-                                </a>
-
-                                {{-- Attendance --}}
-                                <a href="{{ route('salesman.attendance.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('salesman.attendance.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="clock" class="w-5 h-5"></i>
-                                    Attendance
-                                </a>
-
-                                {{-- My Customers --}}
-                                <a href="{{ route('salesman.customers.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('salesman.customers.index') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="briefcase" class="w-5 h-5"></i>
-                                    My Customers
-                                </a>
-
-                                {{-- Add Customer --}}
-                                <a href="{{ route('salesman.customers.create') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('salesman.customers.create') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="user-plus" class="w-5 h-5"></i>
-                                    Add Customer
-                                </a>
-
-                                {{-- Start Visit --}}
-                                <a href="{{ route('salesman.visits.create') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('salesman.visits.create') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="map-pin" class="w-5 h-5"></i>
-                                    Start Visit
-                                </a>
-
-                                {{-- My Visits --}}
-                                <a href="{{ route('salesman.visits.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('salesman.visits.index') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
-                                    My Visits
-                                </a>
-
-                                {{-- My Lates --}}
-                                <a href="{{ route('salesman.attendance.lates') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('salesman.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
-                                    My Lates
-                                </a>
-
-                                {{-- Out of City Visits --}}
-                                <a href="{{ route('salesman.out-of-city-visits.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('salesman.out-of-city-visits.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="plane" class="w-5 h-5"></i>
-                                    Out of City Visits
-                                    @if (($pendingOcCount ?? 0) > 0)
-                                        <span class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full bg-red-500 text-white">{{ $pendingOcCount }}</span>
-                                    @endif
-                                </a>
-
-                                <div class="mt-4 text-xs uppercase px-4 text-gray-400">Old Customers</div>
-
-                                {{-- Import Old Customers --}}
-                                <a href="{{ route('salesman.old-customers.import') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-   {{ request()->is('salesman/old-customers/import*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="upload" class="w-5 h-5"></i>
-                                    Import Old Customers
-                                </a>
-
-
-                                {{-- View Old Customers --}}
-                                <a href="{{ route('salesman.old-customers.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-       {{ request()->routeIs('salesman.old-customers.index') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="database" class="w-5 h-5"></i>
-                                    View Old Customers
-                                </a>
-                            @endif
-                            @if ($role === 'saleshead')
-                                {{-- Dashboard --}}
-                                <a href="{{ route('salehead.dashboard') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.dashboard') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="layout-dashboard"></i>
-                                    Dashboard
-                                </a>
-
-
-                                {{-- Salesman Visits --}}
-                                <a href="{{ route('salehead.reports.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.reports.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="clipboard-list"></i>
-                                    Salesman Visits
-                                </a>
-
-                                {{-- Out of City Visits --}}
-                                <a href="{{ route('salehead.out-of-city-visits.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.out-of-city-visits.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="plane"></i>
-                                    Out of City Visits
-                                </a>
-
-                                {{-- Salesmen --}}
-                                <a href="{{ route('salehead.salesmen.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.salesmen.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="users"></i>
-                                    Salesmen
-                                </a>
-
-                                {{-- All Customers --}}
-                                <a href="{{ route('salehead.customers.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-    {{ request()->routeIs('salehead.customers.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="building-2"></i>
-                                    All Customers
-                                </a>
-
-                                <a href="https://delivery.sessigmasoft.com/"
-                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
-                                    <i data-lucide="truck" class="w-5 h-5"></i>
-                                    <span>Delivery</span>
-                                    <span
-                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
-                                </a>
-                            @endif
-
-                            @if (auth()->user()->role === 'hr')
-                                <a href="{{ route('hr.dashboard') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.dashboard') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                    Dashboard
-                                </a>
-
-                                <a href="{{ route('hr.staff.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.staff.*') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="users-round" class="w-5 h-5"></i>
-                                    All Staff
-                                </a>
-
-                                <a href="{{ route('hr.attendance.index') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.attendance.index') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-                                    Attendance Reports
-                                </a>
-
-                                <a href="{{ route('hr.attendance.leave-requests') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10 mt-1
-        {{ request()->routeIs('hr.attendance.leave-requests') ? 'sidebar-active' : '' }}">
-                                    <i data-lucide="mail" class="w-5 h-5"></i>
-                                    Leave Messages
-                                </a>
-                                <a href="https://expense.sessigmasoft.com/"
-                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10
-   {{ request()->fullUrlIs('https://expense.sessigmasoft.com/*') ? 'sidebar-active-mobile' : '' }}">
-
-                                    <i data-lucide="wallet" class="w-5 h-5 "></i>
-
-                                    <span>All Expenses</span>
-
-                                    <span
-                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">
-                                        NEW
-                                    </span>
-                                </a>
-                            @endif
-
-                            @if (in_array(auth()->user()->role, ['it', 'account', 'office_boy']))
-                                {{-- Staff Dashboard --}}
-                                <a href="{{ route('staff.dashboard') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('staff.dashboard') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                    Dashboard
-                                </a>
-
-                                {{-- Attendance --}}
-                                <a href="{{ route('staff.attendance.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="clock" class="w-5 h-5"></i>
-                                    Attendance
-                                </a>
-
-                                {{-- My Lates --}}
-                                <a href="{{ route('staff.attendance.lates') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
-                                    My Lates
-                                </a>
-                            @endif
-
-                            @if ($role === 'store')
-                                {{-- Staff Dashboard --}}
-                                <a href="{{ route('staff.dashboard') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-       {{ request()->routeIs('staff.dashboard') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                                    Dashboard
-                                </a>
-
-                                {{-- Attendance --}}
-                                <a href="{{ route('staff.attendance.index') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('staff.attendance.*') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="clock" class="w-5 h-5"></i>
-                                    Attendance
-                                </a>
-
-                                {{-- My Lates --}}
-                                <a href="{{ route('staff.attendance.lates') }}"
-                                    class="flex items-center gap-3 py-2 rounded hover:bg-white/10
-        {{ request()->routeIs('staff.attendance.lates') ? 'sidebar-active-mobile' : '' }}">
-                                    <i data-lucide="alarm-clock" class="w-5 h-5"></i>
-                                    My Lates
-                                </a>
-
-
-
-                                <a href="https://delivery.sessigmasoft.com/"
-                                    class="group relative flex items-center gap-3 py-2 rounded hover:bg-white/10">
-                                    <i data-lucide="truck" class="w-5 h-5"></i>
-                                    <span>Delivery</span>
-                                    <span
-                                        class="ml-auto text-[10px] font-bold px-2 py-[2px] rounded-full
-        bg-[#ff2ba6] text-black shadow-[0_0_10px_#ff2ba6] animate-pulse">NEW</span>
-                                </a>
-                            @endif
-
-                            <form method="POST" action="{{ route('logout') }}"
-                                class="mt-4 pt-4 border-t border-white/10">
-                                @csrf
-                                <button class="flex items-center gap-3 text-red-400 hover:text-red-300">
-                                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                                    Logout
-                                </button>
-                            </form>
-                        @endauth
+                        <div x-show="open" x-cloak x-transition.scale.origin.top.right
+                            class="menu-panel absolute right-0 mt-2 w-52">
+                            <div class="px-4 py-3 border-b border-[var(--border)]">
+                                <p class="text-sm font-semibold text-[var(--text)] truncate">{{ auth()->user()->name }}</p>
+                                <p class="text-xs muted truncate">{{ auth()->user()->email }}</p>
+                            </div>
+                            <div class="p-1.5 space-y-0.5">
+                                @if (auth()->user()?->role === 'admin')
+                                    <a href="{{ route('profile.edit') }}"
+                                        class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[var(--text-soft)] hover:bg-[var(--accent-softer)] hover:text-[var(--accent)] transition">
+                                        <i data-lucide="settings" class="w-4 h-4"></i> Profile &amp; Settings
+                                    </a>
+                                @endif
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button
+                                        class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-500/10 transition">
+                                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <main class="p-2 max-w-7xl mx-auto">
-
-                @if (session('success'))
-                    <div class="mb-4 p-3 glass border border-green-400/40 rounded" style="color: #16a34a">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="mb-4 p-3 glass border border-red-400/40 rounded" style="color: #dc2626">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
+            {{-- Content --}}
+            <main class="w-full max-w-none px-4 sm:px-6 xl:px-8 py-6 animate-fade-up">
                 @yield('content')
-
             </main>
-        </div>
 
+            <footer class="px-6 pb-8 text-center text-xs muted">
+                © {{ date('Y') }} Sigma Engineering Services · Operations Platform
+            </footer>
+        </div>
+    </div>
+
+    <div id="modal-host"></div>
+
+    {{-- Flash messages render as toasts (auto-dismiss after 30s) --}}
+    <div id="toast-host" class="toast-host" aria-live="polite" aria-atomic="false">
+        @foreach (['success', 'error', 'warning', 'info'] as $flashKey)
+            @if (session($flashKey))
+                @php
+                    $flashIcons = [
+                        'success' => 'check',
+                        'error'   => 'x',
+                        'warning' => 'triangle-alert',
+                        'info'    => 'info',
+                    ];
+                @endphp
+                <div class="toast toast--{{ $flashKey }}" role="status"
+                    data-toast-autohide="30000">
+                    <span class="toast__icon">
+                        <i data-lucide="{{ $flashIcons[$flashKey] }}" class="w-3.5 h-3.5"></i>
+                    </span>
+                    <span class="toast__body">{{ session($flashKey) }}</span>
+                    <button type="button" class="toast__close" data-toast-close
+                        aria-label="Dismiss">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            @endif
+        @endforeach
     </div>
 
     @stack('scripts')
     @yield('scripts')
-
-    <script>
-        function renderLucide() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        }
-        document.addEventListener("DOMContentLoaded", renderLucide);
-        document.addEventListener("alpine:init", () => {
-            Alpine.effect(() => {
-                renderLucide();
-            });
-        });
-        window.addEventListener("load", renderLucide);
-    </script>
-
 </body>
 
 </html>

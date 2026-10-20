@@ -3,99 +3,96 @@
 @section('title', 'Customer Details: ' . $customer->name)
 
 @section('content')
-    <div class="max-w-4xl mx-auto mt-10 px-0">
+    <div class="mt-10 px-0">
 
-        <div class="glass p-6 md:p-8 rounded-3xl border border-white/20 shadow-2xl">
+        <div class="card !rounded-3xl p-6 md:p-8 shadow-card-lg">
 
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 tracking-wide flex items-center gap-3">
-                <i data-lucide="briefcase" class="w-7 h-7 text-[var(--hf-magenta-light)]"></i>
-                Customer Details
-            </h2>
+            <div class="page-head !mb-6">
+                <h2 class="page-title">
+                    <span class="page-ico"><i data-lucide="briefcase" class="w-6 h-6"></i></span>
+                    Customer Details
+                </h2>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
                 <div>
-                    <h3 class="text-xl md:text-2xl font-semibold text-white flex items-center gap-2 mb-2">
-                        <i data-lucide="building-2" class="w-6 h-6 text-white/80"></i>
+                    <h3 class="text-xl md:text-2xl font-semibold text-[var(--text)] flex items-center gap-2 mb-2">
+                        <i data-lucide="building-2" class="w-6 h-6 text-[var(--text-soft)]"></i>
                         {{ $customer->name }}
                     </h3>
 
-                    <p class="text-indigo-200 font-medium mb-4 capitalize flex items-center gap-2">
-                        <i data-lucide="tag" class="w-4 h-4 text-indigo-200"></i>
+                    <p class="text-indigo-500 font-medium mb-4 capitalize flex items-center gap-2">
+                        <i data-lucide="tag" class="w-4 h-4 text-indigo-500"></i>
                         {{ $customer->category->name ?? 'No Category' }}
                     </p>
 
                     <div class="space-y-3">
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i>
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i>
                                 Contact Person</span>
-                            <span class="text-white">{{ $customer->contact_person ?? 'N/A' }}</span>
+                            <span class="text-[var(--text)]">{{ $customer->contact_person ?? 'N/A' }}</span>
                         </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>
                                 Phone 1</span>
-                            <span class="text-white">{{ $customer->phone1 }}</span>
+                            <span class="text-[var(--text)]">{{ $customer->phone1 }}</span>
                         </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>
                                 Phone 2</span>
-                            <span class="text-white">{{ $customer->phone2 ?? 'N/A' }}</span>
+                            <span class="text-[var(--text)]">{{ $customer->phone2 ?? 'N/A' }}</span>
                         </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>
                                 Email</span>
-                            <span class="text-white">{{ $customer->email ?? 'N/A' }}</span>
+                            <span class="text-[var(--text)]">{{ $customer->email ?? 'N/A' }}</span>
                         </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="map-pin"
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="map-pin"
                                     class="w-4 h-4"></i> City</span>
-                            <span class="text-white capitalize">{{ $customer->city?->name ?? 'N/A' }}</span>
+                            <span class="text-[var(--text)] capitalize">{{ $customer->city?->name ?? 'N/A' }}</span>
                         </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="factory"
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="factory"
                                     class="w-4 h-4"></i> Industry</span>
-                            <span class="text-white">{{ $customer->industry?->name ?? 'N/A' }}</span>
+                            <span class="text-[var(--text)]">{{ $customer->industry?->name ?? 'N/A' }}</span>
                         </div>
 
-                        <div class="flex justify-between items-start bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2 whitespace-nowrap">
+                        <div class="flex justify-between items-start soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2 whitespace-nowrap">
                                 <i data-lucide="home" class="w-4 h-4"></i> Address
                             </span>
 
                             <div class="max-w-[60%] text-right">
                                 <p id="address-{{ $customer->id }}"
-                                    class="text-white text-sm leading-relaxed line-clamp-2 break-words">
+                                    class="text-[var(--text)] text-sm leading-relaxed line-clamp-2 break-words">
                                     {{ $customer->address ?? 'N/A' }}
                                 </p>
-
-
                             </div>
                         </div>
 
-
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="calendar"
+                        <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                            <span class="text-[var(--text-soft)] flex items-center gap-2"><i data-lucide="calendar"
                                     class="w-4 h-4"></i> Added On</span>
-                            <span class="text-white">{{ $customer->created_at->format('d M, Y') }}</span>
+                            <span class="text-[var(--text)]">{{ $customer->created_at->format('d M, Y') }}</span>
                         </div>
 
                     </div>
 
                     <div class="mt-6 flex gap-4">
-                        <button id="showImageBtn"
-                            class="flex items-center gap-2 px-5 py-3 bg-[#ff2ba6]/80 hover:bg-[#ff2ba6] text-white font-semibold rounded-xl shadow-lg transition">
+                        <button id="showImageBtn" class="btn btn-primary">
                             <i data-lucide="file-text" class="w-5 h-5"></i>
                             Preview Document
                         </button>
 
-                        <button id="closeImageBtn"
-                            class="flex items-center gap-2 px-5 py-3 bg-red-600/70 hover:bg-red-600 text-white font-semibold rounded-xl shadow-lg transition hidden">
+                        <button id="closeImageBtn" class="btn btn-danger hidden">
                             <i data-lucide="x" class="w-5 h-5"></i>
                             Close Preview
                         </button>
@@ -107,29 +104,25 @@
 
             <div id="imageDisplaySection" class="mt-8 hidden">
 
-                <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <i data-lucide="receipt" class="w-6 h-6 text-white/70"></i>
+                <h3 class="text-xl font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-6 h-6 text-[var(--text-soft)]"></i>
                     Customer Document
                 </h3>
 
-                       @if ($customer->image)
-    <div class="rounded-xl overflow-hidden bg-white/10 border border-white/10 shadow-lg cursor-pointer"
-         id="imageBox"
-         data-image="{{ asset($customer->image) }}">
-
-        <img src="{{ asset($customer->image) }}"
-             class="w-full h-64 object-cover">
-    </div>
-@else
-    <p class="text-white/60 text-lg">No document uploaded</p>
-@endif
-
+                @if ($customer->image)
+                    <div class="rounded-xl overflow-hidden bg-[var(--accent-softer)] border border-[var(--border)] shadow-lg cursor-pointer"
+                         id="imageBox"
+                         data-image="{{ asset($customer->image) }}">
+                        <img src="{{ asset($customer->image) }}" class="w-full h-64 object-cover">
+                    </div>
+                @else
+                    <p class="muted text-lg">No document uploaded</p>
+                @endif
 
             </div>
 
             <div class="mt-8 text-center md:text-right">
-                <a href="{{ route('salehead.customers.index') }}"
-                    class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600/80 hover:bg-purple-600 text-white font-semibold rounded-xl shadow-lg transition">
+                <a href="{{ route('salehead.customers.index') }}" class="btn btn-outline">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     Back to Customers
                 </a>
@@ -145,8 +138,8 @@
         class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/70 backdrop-blur-xl p-6 transition">
 
         <div
-            class="relative w-full max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-2xl
-                rounded-3xl shadow-2xl p-4 md:p-6 animate-fadeIn">
+            class="relative w-full max-w-4xl mx-auto bg-[var(--surface)] border border-[var(--border)]
+                rounded-3xl shadow-card-lg p-4 md:p-6 animate-fadeIn">
 
             <!-- Close Button -->
             <button id="closePreview"

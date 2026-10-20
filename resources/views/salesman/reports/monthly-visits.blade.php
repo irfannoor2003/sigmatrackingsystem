@@ -8,82 +8,86 @@
     $displayMonth = \Carbon\Carbon::createFromFormat('Y-m', $monthInput)->format('F Y');
 @endphp
 
-<div class="max-w-6xl mx-auto mt-10 p-0">
+<div class="mt-10 p-0">
 
     {{-- Header --}}
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h1 class="text-2xl font-extrabold text-white">
+    <div class="page-head !mb-0">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="calendar-range" class="w-6 h-6"></i></span>
             Monthly Visit Report – {{ $displayMonth }}
         </h1>
+    </div>
 
-        <form method="GET" class="flex gap-3">
-            <input type="month"
-                   name="month"
-                   value="{{ $monthInput }}"
-                   class="px-4 py-2 rounded-xl bg-black/40 text-white border border-white/20">
+    <x-filter-bar class="mt-4">
+        <x-filter-field icon="calendar">
+            <input type="month" name="month" value="{{ $monthInput }}" class="input">
+        </x-filter-field>
 
-            <button class="px-4 py-2 rounded-xl bg-pink-600 text-white">
-                Filter
-            </button>
-
-            <button onclick="window.print()"
-                    type="button"
-                    class="px-4 py-2 rounded-xl bg-gray-700 text-white">
+        <x-filter-actions>
+            <button onclick="window.print()" type="button" class="btn btn-outline w-full sm:w-auto">
+                <i data-lucide="printer" class="w-4 h-4"></i>
                 Print
             </button>
-
-        </form>
-    </div>
+        </x-filter-actions>
+    </x-filter-bar>
 
     {{-- Summary --}}
     <div class="grid grid-cols-2 gap-4 mb-6">
-        <div class="glass p-4 rounded-xl text-center">
-            <p class="text-sm text-gray-300">Total Visits</p>
-            <p class="text-3xl font-bold text-white">{{ $totalVisits }}</p>
+        <div class="stat-card tinted tint-magenta text-center">
+            <div class="stat-ico"><i data-lucide="map" class="w-5 h-5"></i></div>
+            <div>
+                <p class="stat-label">Total Visits</p>
+                <p class="stat-value">{{ $totalVisits }}</p>
+            </div>
         </div>
 
-        <div class="glass p-4 rounded-xl text-center">
-            <p class="text-sm text-gray-300">Total KM</p>
-            <p class="text-3xl font-bold text-white">{{ $totalKm }} km</p>
+        <div class="stat-card tinted tint-blue text-center">
+            <div class="stat-ico"><i data-lucide="route" class="w-5 h-5"></i></div>
+            <div>
+                <p class="stat-label">Total KM</p>
+                <p class="stat-value">{{ $totalKm }} km</p>
+            </div>
         </div>
     </div>
 
     {{-- Table --}}
-    <div class="overflow-x-auto glass rounded-xl">
-        <table class="w-full text-sm text-white">
-            <thead class="bg-white/10">
+    <div class="card !rounded-xl overflow-x-auto">
+        <div class="tbl-wrap !border-0 !shadow-none">
+        <table class="tbl w-full text-sm">
+            <thead>
                 <tr>
-                    <th class="p-3 text-left">Date</th>
-                    <th class="p-3 text-left">Customer</th>
-                    <th class="p-3 text-center">KM</th>
-                    <th class="p-3 text-left">Notes</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th class="text-center">KM</th>
+                    <th>Notes</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($visits as $visit)
-                    <tr class="border-b border-white/10">
-                        <td class="p-3">
+                    <tr>
+                        <td class="text-[var(--text-soft)]">
                             {{ $visit->started_at->format('d M Y') }}
                         </td>
-                        <td class="p-3">
+                        <td class="text-[var(--text)]">
                             {{ $visit->customer->name ?? '—' }}
                         </td>
-                        <td class="p-3 text-center">
+                        <td class="text-center text-[var(--text-soft)]">
                             {{ $visit->km ?? 0 }}
                         </td>
-                        <td class="p-3">
+                        <td class="text-[var(--text-muted)]">
                             {{ $visit->notes ?? '—' }}
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="p-6 text-center text-gray-400">
+                        <td colspan="4" class="p-6 text-center muted">
                             No visits found for this month
                         </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 
@@ -94,12 +98,13 @@
         background: white !important;
         color: black !important;
     }
-    button, form {
+    button, form, .page-head {
         display: none !important;
     }
-    .glass {
+    .card {
         background: white !important;
-        border: 1px solid #ccc;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
     }
 }
 </style>

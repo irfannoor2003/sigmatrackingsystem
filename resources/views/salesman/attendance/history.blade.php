@@ -12,41 +12,32 @@ $weeks = collect($calendar)->chunk(7);
 
 <style>
 input[type="month"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    cursor: pointer;
     opacity: .9;
-}
-.glass {
-    background: rgba(255,255,255,.06);
-    backdrop-filter: blur(18px);
-}
-
-.badge {
-    font-size: 9px;
-    padding: 2px 5px;
-    border-radius: 4px;
 }
 </style>
 
-<div class="max-w-6xl mx-auto p-0 pb-24 text-white">
+<div class="p-0 pb-24">
 
     {{-- HEADER --}}
-    <div class="glass p-5 sm:p-6 rounded-3xl border border-white/20 shadow-xl mb-5">
-        <h2 class="text-xl sm:text-2xl font-extrabold flex items-center gap-2">
-            <i data-lucide="calendar-days" class="w-6 h-6 text-pink-400"></i>
-            My Attendance
-        </h2>
+    <div class="card !rounded-3xl border border-[var(--border)] p-5 sm:p-6 shadow-card-lg">
+        <div class="page-head !mb-2">
+            <h2 class="page-title">
+                <span class="page-ico"><i data-lucide="calendar-days" class="w-6 h-6"></i></span>
+                My Attendance
+            </h2>
+        </div>
 
-        <p class="text-sm text-white/50 mt-1">{{ $displayMonth }}</p>
-
-        <form method="GET" class="mt-4 flex flex-col sm:flex-row gap-3">
-            <input type="month" name="month" value="{{ $monthInput }}"
-                   class="px-4 py-2 rounded-xl bg-black/40 border border-white/10 text-white w-full sm:w-auto">
-            <button
-                class="px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-fuchsia-600 font-bold">
-                Apply
-            </button>
-        </form>
+        <p class="text-sm muted mt-1">{{ $displayMonth }}</p>
     </div>
+
+    <x-filter-bar>
+        <x-filter-field icon="calendar">
+            <input type="month" name="month" value="{{ $monthInput }}" class="input">
+        </x-filter-field>
+
+        <x-filter-actions submit="Apply" />
+    </x-filter-bar>
 
     {{-- STATS GRID --}}
     @php
@@ -54,27 +45,20 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     @endphp
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         @foreach([
-            ['Presents', $totalPresents, 'check-circle', 'border-emerald-500/30', 'from-emerald-500/20 to-emerald-600/5', 'text-emerald-400', 'bg-emerald-500/10'],
-            ['Absents', $totalAbsents, 'user-x', 'border-red-800/30', 'from-red-800/20 to-red-900/5', 'text-red-400', 'bg-red-800/10'],
-            ['Leaves', $totalLeaves, 'ban', 'border-rose-500/30', 'from-rose-500/20 to-rose-600/5', 'text-rose-400', 'bg-rose-500/10'],
-            ['Short Leaves', $totalShortLeaves, 'clock', 'border-orange-500/30', 'from-orange-500/20 to-orange-600/5', 'text-orange-400', 'bg-orange-500/10'],
-            ['Late', $totalLates, 'alert-triangle', 'border-amber-500/30', 'from-amber-500/20 to-amber-600/5', 'text-amber-400', 'bg-amber-500/10']
-        ] as [$label, $value, $icon, $borderColor, $gradient, $textColor, $iconBg])
-        <div class="relative glass p-4 rounded-2xl border {{ $borderColor }} hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
-            <div class="absolute inset-0 bg-gradient-to-br {{ $gradient }} opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <div class="relative">
-                <div class="flex items-center justify-between mb-2">
-                    <p class="{{ $textColor }} text-xs font-bold uppercase tracking-wider">{{ $label }}</p>
-                    <div class="{{ $iconBg }} p-1.5 rounded-xl">
-                        <i data-lucide="{{ $icon }}" class="w-4 h-4 {{ $textColor }}"></i>
-                    </div>
-                </div>
-                <h3 class="text-2xl font-extrabold text-white mb-1">{{ $value }}</h3>
+            ['Presents', $totalPresents, 'check-circle', 'tint-emerald'],
+            ['Absents', $totalAbsents, 'user-x', 'tint-red'],
+            ['Leaves', $totalLeaves, 'ban', 'tint-rose'],
+            ['Short Leaves', $totalShortLeaves, 'clock', 'tint-orange'],
+            ['Late', $totalLates, 'alert-triangle', 'tint-amber']
+        ] as [$label, $value, $icon, $tint])
+        <div class="stat-card tinted {{ $tint }}">
+            <div class="stat-ico"><i data-lucide="{{ $icon }}" class="w-5 h-5"></i></div>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold uppercase tracking-wider muted">{{ $label }}</p>
+                <p class="text-2xl font-display font-bold text-[var(--text)] mt-1">{{ $value }}</p>
                 @if($totalDays > 0)
-                    <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full bg-gradient-to-r {{ $gradient }} {{ $textColor }}" style="width: {{ round(($value / $totalDays) * 100) }}%"></div>
-                    </div>
-                    <p class="text-[10px] text-white/30 mt-1 font-medium">{{ round(($value / $totalDays) * 100) }}% of month</p>
+                    <div class="stat-bar"><div style="width: {{ round(($value / $totalDays) * 100) }}%"></div></div>
+                    <p class="text-[10px] muted mt-1 font-medium">{{ round(($value / $totalDays) * 100) }}% of month</p>
                 @endif
             </div>
         </div>
@@ -85,7 +69,7 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     <div class="space-y-6">
 
         @foreach ($weeks as $week)
-            <div class="glass p-4 sm:p-5 rounded-3xl border border-white/20 shadow">
+            <div class="card !rounded-3xl border border-[var(--border)] p-4 sm:p-5 shadow">
                 <div class="grid
             grid-cols-2
             sm:grid-cols-3
@@ -101,15 +85,16 @@ input[type="month"]::-webkit-calendar-picker-indicator {
                             $attendance = $day['attendance'] ?? null;
                         @endphp
 
-                        <div class="rounded-2xl p-3
-                            @if ($attendance && $attendance->short_leave) bg-orange-500/20 text-orange-300
-                            @elseif ($attendance && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16') bg-amber-500/20 text-amber-300
-                            @elseif ($day['status']==='present') bg-green-500/20 text-green-300
-                            @elseif ($day['status']==='leave') bg-red-500/20 text-red-300
-                            @elseif ($day['status']==='holiday') bg-purple-500/20 text-purple-300
-                            @elseif ($day['status']==='future') bg-blue-500/10 text-blue-300 opacity-50
-                            @else bg-red-800/20 text-red-400 @endif
-                            @if($date->isToday()) ring-2 ring-pink-400 @endif">
+                        <div class="cal-day rounded-2xl p-3 border
+                            @if ($day['status']==='holiday') bg-violet-500/15 border-violet-500/30 text-violet-600 dark:text-violet-300
+                            @elseif ($attendance && $attendance->short_leave) bg-orange-500/15 border-orange-500/30 text-orange-600 dark:text-orange-300
+                            @elseif ($attendance && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16') bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-300
+                            @elseif ($day['status']==='present') bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-300
+                            @elseif ($day['status']==='leave') bg-red-500/15 border-red-500/30 text-red-600 dark:text-red-300
+                            @elseif ($day['status']==='holiday') bg-violet-500/15 border-violet-500/30 text-violet-600 dark:text-violet-300
+                            @elseif ($day['status']==='future') bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-300 opacity-50
+                            @else bg-red-800/15 border-red-800/30 text-red-600 dark:text-red-400 @endif
+                            @if($date->isToday()) ring-2 ring-[var(--accent)] @endif">
 
                             {{-- DAY --}}
                             <div class="opacity-70 text-[10px]">{{ $date->format('D') }}</div>
@@ -119,6 +104,12 @@ input[type="month"]::-webkit-calendar-picker-indicator {
                             <div class="uppercase text-[10px] tracking-wide">
                                 {{ $day['status']==='future' ? '--' : substr($day['status'],0,3) }}
                             </div>
+
+                            @if($day['status']==='holiday' && ($day['holiday'] ?? null) && $day['holiday'] !== 'Sunday')
+                                <div class="mt-1 flex justify-center">
+                                    <span class="badge badge-violet">Holiday</span>
+                                </div>
+                            @endif
 
                             {{-- ATTENDANCE --}}
                             @if($attendance)
@@ -130,30 +121,30 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 
                                 <div class="flex justify-center gap-1 mt-1 flex-wrap">
                                     @if($attendance->short_leave)
-                                        <span class="badge bg-orange-500/30 text-orange-300">Short</span>
+                                        <span class="badge badge-orange">Short</span>
                                     @endif
                                     @if(!$attendance->short_leave && $attendance->clock_in && $attendance->clock_in->format('H:i') >= '10:16')
-                                        <span class="badge bg-amber-500/30 text-amber-300"
+                                        <span class="badge badge-amber"
                                               title="{{ $attendance->late_reason ? 'Late reason: ' . $attendance->late_reason : 'Late - no reason submitted yet' }}">
-                                            Late{{ empty($attendance->late_reason) ? ' ⚠' : '' }}
+                                            Late @if(empty($attendance->late_reason))<i data-lucide="alert-triangle" class="w-2.5 h-2.5 shrink-0"></i>@endif
                                         </span>
                                     @endif
                                     @if($attendance->auto_clock_out)
-                                        <span class="badge bg-blue-500/30 text-blue-300">Auto</span>
+                                        <span class="badge badge-sky">Auto</span>
                                     @endif
                                 </div>
 
                                 @if($attendance->note)
-                                    <div class="mt-1 text-[9px] text-white/60 truncate"
+                                    <div class="cal-day__note mt-1 text-[9px] text-[var(--text-muted)]"
                                          title="{{ $attendance->note }}">
-                                        {{ $attendance->note }}
+                                        {{ \Illuminate\Support\Str::limit($attendance->note, 40) }}
                                     </div>
                                 @endif
                             @endif
 
                             {{-- HOLIDAY / LEAVE REASON --}}
                             @if(in_array($day['status'], ['holiday','leave']) && $day['holiday'] ?? false)
-                                <div class="mt-1 text-[9px] text-white/70 truncate"
+                                <div class="mt-1 text-[9px] text-[var(--text-soft)] truncate"
                                      title="{{ $day['holiday'] }}">
                                     {{ $day['holiday'] }}
                                 </div>
@@ -168,17 +159,16 @@ input[type="month"]::-webkit-calendar-picker-indicator {
     </div>
 
     {{-- LEGEND --}}
-    <div class="flex flex-wrap gap-4 text-xs mt-6 text-white/70">
-        <span>🟢 Present</span>
-        <span>🟠 Short Leave</span>
-        <span>🟡 Late</span>
-        <span><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-800 mr-1"></span> Absent</span>
-        <span>🔴 Leave</span>
-        <span>🟣 Holiday</span>
-        <span>🔵 Future</span>
+    <div class="flex flex-wrap gap-4 text-xs mt-6 text-[var(--text-soft)]">
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500/40 border border-emerald-500/50"></span> Present</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500/40 border border-orange-500/50"></span> Short Leave</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500/40 border border-amber-500/50"></span> Late</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-800 border border-red-800/50"></span> Absent</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500/40 border border-red-500/50"></span> Leave</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-violet-500/40 border border-violet-500/50"></span> Holiday</span>
+        <span class="flex items-center gap-1"><span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500/40 border border-blue-500/50"></span> Future</span>
     </div>
 
 </div>
 
-<script>lucide.createIcons();</script>
 @endsection

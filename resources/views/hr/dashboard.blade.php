@@ -4,205 +4,230 @@
 
 @section('content')
 
-<div class="space-y-6">
+<div class="page-head">
+    <h1 class="page-title">
+        <span class="page-ico"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></span>
+        HR Dashboard
+    </h1>
+    <span class="badge badge-magenta !py-1.5 !px-4 !text-xs">
+        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+        {{ now()->format('l, d M Y') }}
+    </span>
+</div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+{{-- Stat Grid --}}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-[#ff2ba7]/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-[#ff2ba7] mb-1">Workforce</p>
-                    <h3 class="text-white/70 text-sm font-medium">Total Staff</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $totalStaff }}</p>
-                </div>
-                <div class="bg-[#ff2ba7]/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform">
-                    <i data-lucide="users" class="w-8 h-8 text-[#ff2ba7]"></i>
-                </div>
+    <div class="stat-card tint-magenta">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Total Staff</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $totalStaff }}</p>
+                <a href="{{ route('hr.staff.index') }}"
+                    class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">Open Section</a>
             </div>
-            <div class="h-1 w-full bg-[#ff2ba7]/20 absolute bottom-0 left-0"></div>
+            <span class="stat-ico"><i data-lucide="users-round" class="w-6 h-6"></i></span>
         </div>
-
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-green-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-green-400 mb-1">Attendance</p>
-                    <h3 class="text-white/70 text-sm font-medium">Present Today</h3>
-                    <div class="flex items-baseline gap-2 mt-2">
-                        <p class="text-4xl font-black text-white tracking-tight">{{ $presentCount }}</p>
-                        <a href="{{ route('hr.attendance.today') }}" class="text-[10px] font-bold text-white/40 underline hover:text-green-400 uppercase tracking-tighter transition-colors">
-                            Details
-                        </a>
-                    </div>
-                </div>
-                <div class="bg-green-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="check-circle" class="w-8 h-8 text-green-400"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-green-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-green-500" style="width: {{ ($totalStaff > 0) ? ($presentCount / $totalStaff) * 100 : 0 }}%"></div>
-            </div>
-        </div>
-
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-red-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-red-400 mb-1">Absent</p>
-                    <h3 class="text-white/70 text-sm font-medium">Absent Today</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $absentCount }}</p>
-                </div>
-                <div class="bg-red-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="x-circle" class="w-8 h-8 text-red-400"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-red-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-red-500" style="width: {{ ($totalStaff > 0) ? ($absentCount / $totalStaff) * 100 : 0 }}%"></div>
-            </div>
-        </div>
-
-        <div class="group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-yellow-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-yellow-400 mb-1">On Leave</p>
-                    <h3 class="text-white/70 text-sm font-medium">Leave Today</h3>
-                    <p class="text-4xl font-black text-white mt-2 tracking-tight">{{ $leaveCount }}</p>
-                </div>
-                <div class="bg-yellow-500/10 p-4 rounded-2xl group-hover:scale-110 transition-transform">
-                    <i data-lucide="calendar-off" class="w-8 h-8 text-yellow-400"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-yellow-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-yellow-500" style="width: {{ ($totalStaff > 0) ? ($leaveCount / $totalStaff) * 100 : 0 }}%"></div>
-            </div>
-        </div>
-
-        <a href="{{ route('hr.attendance.late-staff') }}" class="block group relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-1 transition-all hover:border-amber-500/50">
-            <div class="p-6 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-amber-400 mb-1">Late</p>
-                    <h3 class="text-white/70 text-sm font-medium">Late Today</h3>
-                    <div class="flex items-baseline gap-2 mt-2">
-                        <p class="text-4xl font-black text-white tracking-tight">{{ $lateStaff->count() }}</p>
-                        <span class="text-[10px] font-bold text-white/40 underline uppercase tracking-tighter">Details</span>
-                    </div>
-                </div>
-                <div class="bg-amber-500/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform">
-                    <i data-lucide="clock" class="w-8 h-8 text-amber-400"></i>
-                </div>
-            </div>
-            <div class="h-1 w-full bg-amber-500/20 absolute bottom-0 left-0">
-                <div class="h-full bg-amber-500" style="width: {{ ($presentCount > 0) ? ($lateStaff->count() / $presentCount) * 100 : 0 }}%"></div>
-            </div>
-        </a>
-
+        <div class="stat-bar"><div style="width: 100%"></div></div>
     </div>
 
-    @if($lateStaff->count() > 0)
-    <div class="bg-white/5 backdrop-blur-xl border border-amber-400/20 rounded-3xl p-6 shadow-xl">
-        <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2 mb-4">
-            <i data-lucide="clock" class="w-5 h-5"></i>
-            Late Staff Today
-            <a href="{{ route('hr.attendance.late-staff') }}" class="ml-auto text-[10px] font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors">
-                {{ $lateStaff->count() }} staff — View All
-            </a>
-        </h3>
-        <div class="max-h-[300px] overflow-y-auto space-y-2">
-            @foreach($lateStaff as $late)
-                @php
-                    $clockInTime = \Carbon\Carbon::parse($late->clock_in);
-                    $lateThreshold = \Carbon\Carbon::today()->setTime(10, 16);
-                    $minutesLate = (int) $clockInTime->diffInMinutes($lateThreshold);
-                @endphp
-                <div class="flex items-center justify-between p-2 rounded-xl hover:bg-amber-500/10 transition">
-                    <span class="flex items-center gap-2 text-sm text-white">
-                        <i data-lucide="user-check" class="w-4 h-4 text-amber-300"></i>
+    <div class="stat-card tint-emerald">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Present Today</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <p class="text-3xl font-display font-bold text-[var(--text)] tracking-tight">{{ $presentCount }}</p>
+                    <a href="{{ route('hr.attendance.today') }}"
+                        class="text-xs font-bold text-[var(--accent)] hover:underline tracking-tight">Details</a>
+                </div>
+            </div>
+            <span class="stat-ico"><i data-lucide="check-circle" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: {{ $totalStaff > 0 ? ($presentCount / $totalStaff) * 100 : 0 }}%"></div></div>
+    </div>
+
+    <div class="stat-card tint-red">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Absent Today</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">{{ $absentCount }}</p>
+                <a href="{{ route('hr.attendance.index') }}"
+                    class="text-xs font-bold text-[var(--accent)] hover:underline inline-block mt-1">View Report</a>
+            </div>
+            <span class="stat-ico"><i data-lucide="x-circle" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: {{ $totalStaff > 0 ? ($absentCount / $totalStaff) * 100 : 0 }}%"></div></div>
+    </div>
+
+    <div class="stat-card tint-amber">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">On Leave</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <p class="text-3xl font-display font-bold text-[var(--text)] tracking-tight">{{ $leaveCount }}</p>
+                    <a href="{{ route('hr.attendance.leave-requests') }}"
+                        class="text-xs font-bold text-[var(--accent)] hover:underline tracking-tight">Details</a>
+                </div>
+            </div>
+            <span class="stat-ico"><i data-lucide="calendar-off" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: {{ $totalStaff > 0 ? ($leaveCount / $totalStaff) * 100 : 0 }}%"></div></div>
+    </div>
+
+    <a href="{{ route('hr.attendance.late-staff') }}" class="stat-card tint-orange block">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Late Today</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <p class="text-3xl font-display font-bold text-[var(--text)] tracking-tight">{{ $lateStaff->count() }}</p>
+                    <span class="text-xs font-bold text-[var(--accent)] tracking-tight">Details</span>
+                </div>
+                <span class="text-[.68rem] muted inline-block mt-1">Clocked in after 10:15 AM</span>
+            </div>
+            <span class="stat-ico"><i data-lucide="clock" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: {{ $presentCount > 0 ? ($lateStaff->count() / $presentCount) * 100 : 0 }}%"></div></div>
+    </a>
+
+    <a href="{{ route('hr.attendance.leave-requests') }}" class="stat-card tint-violet block">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-sm muted font-medium">Attendance Rate</p>
+                <p class="text-3xl font-display font-bold text-[var(--text)] mt-1 tracking-tight">
+                    {{ $totalStaff > 0 ? round(($presentCount / $totalStaff) * 100) : 0 }}<span class="text-base muted font-medium">%</span>
+                </p>
+                <span class="text-[.68rem] muted inline-block mt-1">Present vs total workforce</span>
+            </div>
+            <span class="stat-ico"><i data-lucide="gauge" class="w-6 h-6"></i></span>
+        </div>
+        <div class="stat-bar"><div style="width: {{ $totalStaff > 0 ? ($presentCount / $totalStaff) * 100 : 0 }}%"></div></div>
+    </a>
+</div>
+
+{{-- Late Staff Today --}}
+@if($lateStaff->count() > 0)
+<div class="card mt-7 p-6 !rounded-2xl overflow-hidden">
+    <div class="flex items-center gap-2 mb-4">
+        <i data-lucide="clock" class="w-5 h-5 text-amber-500"></i>
+        <h3 class="font-display font-semibold text-[var(--text)]">Late Staff Today</h3>
+        <a href="{{ route('hr.attendance.late-staff') }}" class="ml-auto badge badge-amber hover:opacity-80 transition">
+            {{ $lateStaff->count() }} staff — View All
+        </a>
+    </div>
+    <div class="max-h-[300px] overflow-y-auto space-y-2">
+        @foreach($lateStaff as $late)
+            @php
+                $clockInTime = \Carbon\Carbon::parse($late->clock_in);
+                $lateThreshold = \Carbon\Carbon::today()->setTime(10, 16);
+                $minutesLate = (int) $clockInTime->diffInMinutes($lateThreshold);
+            @endphp
+            <div class="flex flex-col gap-3 soft-panel px-4 py-3 rounded-xl sm:flex-row sm:items-center sm:justify-between">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2.5 text-sm font-semibold text-[var(--text)]">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </span>
                         {{ $late->salesman->name ?? 'N/A' }}
-                        <span class="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded-full">{{ ucfirst($late->salesman->role ?? '-') }}</span>
-                    </span>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-white/50">{{ $clockInTime->format('h:i A') }}</span>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">
-                            {{ $minutesLate }} min late
+                        <span class="badge badge-gray capitalize">{{ ucfirst($late->salesman->role ?? '-') }}</span>
+                    </div>
+                    <p class="mt-2 flex items-start gap-1.5 pl-9 text-xs {{ $late->late_reason ? 'text-[var(--text-soft)]' : 'text-amber-600 dark:text-amber-400' }}">
+                        <i data-lucide="message-square-text" class="mt-0.5 h-3.5 w-3.5 shrink-0"></i>
+                        <span>{{ $late->late_reason ?: 'Late reason not submitted yet.' }}</span>
+                    </p>
+                </div>
+                <div class="flex shrink-0 items-center gap-3 pl-9 sm:pl-0">
+                    <span class="text-xs muted">{{ $clockInTime->format('h:i A') }}</span>
+                    <span class="badge badge-amber">{{ $minutesLate }} min late</span>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
+{{-- Recent Activities --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-7">
+
+    <div class="card p-6">
+        <div class="mb-5 flex items-center justify-between gap-3">
+            <h3 class="font-display font-semibold text-[var(--text)] flex items-center gap-2">
+                <i data-lucide="activity" class="w-5 h-5 text-[var(--accent)]"></i>
+                Recent Attendance Activities
+            </h3>
+            <span class="live-pill"><span></span> Live</span>
+        </div>
+        <ul class="space-y-4">
+            @forelse($attendanceActivities as $a)
+                <li class="flex items-start gap-3">
+                    <div class="w-9 h-9 flex items-center justify-center rounded-xl shrink-0 {{ $a->status === 'present' && !$a->clock_out ? 'activity-live' : '' }}
+                        @if($a->status === 'leave')
+                        bg-amber-500/10 text-amber-500
+                        @elseif($a->status === 'present' && !$a->clock_out) bg-emerald-500/10 text-emerald-500
+                        @elseif($a->status === 'present') bg-sky-500/10 text-sky-500
+                        @else bg-red-500/10 text-red-500 @endif">
+                        @if($a->status === 'leave')
+                            <i data-lucide="ban" class="w-4 h-4"></i>
+                        @elseif(!$a->clock_out)
+                            <i data-lucide="play-circle" class="w-4 h-4"></i>
+                        @else
+                            <i data-lucide="stop-circle" class="w-4 h-4"></i>
+                        @endif
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm text-[var(--text)]">
+                            <strong>{{ $a->salesman->name }}</strong>
+                            @if($a->status === 'leave')
+                                is on <span class="text-amber-500 font-semibold">leave</span>
+                            @elseif(!$a->clock_out)
+                                <span class="text-emerald-500 font-semibold">clocked in</span>
+                                at {{ \Carbon\Carbon::parse($a->clock_in)->format('h:i A') }}
+                            @else
+                                <span class="text-sky-500 font-semibold">clocked out</span>
+                                at {{ \Carbon\Carbon::parse($a->clock_out)->format('h:i A') }}
+                            @endif
+                        </p>
+                        <span class="text-xs muted">{{ $a->updated_at->diffForHumans() }}</span>
+                    </div>
+                </li>
+            @empty
+                <li class="text-sm muted">No attendance activity found.</li>
+            @endforelse
+        </ul>
+    </div>
+
+    <div class="card p-6">
+        <div class="mb-5 flex items-center justify-between gap-3">
+            <h3 class="font-display font-semibold text-[var(--text)] flex items-center gap-2">
+                <i data-lucide="calendar-check" class="w-5 h-5 text-[var(--accent)]"></i>
+                Leave Status Today
+            </h3>
+            <span class="live-pill"><span></span> Live</span>
+        </div>
+        <ul class="space-y-4">
+            @forelse($todayLeaves as $l)
+                <li class="flex items-start gap-3">
+                    <div class="w-9 h-9 flex items-center justify-center rounded-xl shrink-0 bg-amber-500/10 text-amber-500">
+                        <i data-lucide="calendar-off" class="w-4 h-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm text-[var(--text)]">
+                            <strong>{{ $l->salesman->name ?? 'N/A' }}</strong>
+                            is on <span class="text-amber-500 font-semibold">leave</span>
+                        </p>
+                        <span class="text-xs muted">
+                            {{ \Illuminate\Support\Str::limit($l->note ?: 'No note submitted.', 80) }}
                         </span>
                     </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-        <div class="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-[#ff2ba7]/20 rounded-lg">
-                    <i data-lucide="activity" class="w-5 h-5 text-[#ff2ba7]"></i>
-                </div>
-                <h3 class="text-lg font-bold text-white tracking-wide">Live Attendance Feed</h3>
-            </div>
-            <span class="text-[10px] font-bold py-1 px-3 rounded-full bg-white/10 text-white/60 uppercase tracking-tighter">
-                Live Updates
-            </span>
-        </div>
-
-        <div class="p-6">
-            <div class="relative space-y-6">
-
-                @forelse($attendanceActivities as $a)
-                    <div class="relative flex items-center gap-6 group">
-                        <div class="z-10 w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl bg-[#ff2ba7]/10 border border-[#ff2ba7] text-[#ff2ba7] shadow-xl transition-colors">
-                            @if($a->status === 'leave')
-                                <i data-lucide="calendar-off" class="w-5 h-5"></i>
-                            @elseif(!$a->clock_out)
-                                <i data-lucide="play-circle" class="w-5 h-5"></i>
-                            @else
-                                <i data-lucide="check-circle" class="w-5 h-5"></i>
-                            @endif
-                        </div>
-
-                        <div class="flex-1 flex flex-col md:flex-row md:items-center justify-between bg-white/5 border border-white/10 p-4 rounded-2xl hover:bg-white/10 transition-all">
-                            <div class="mb-2 md:mb-0">
-                                <p class="text-sm text-white leading-relaxed">
-                                    <span class="font-bold text-indigo-300">{{ $a->salesman->name }}</span>
-                                    @if($a->status === 'leave')
-                                        <span class="text-white/40 mx-1">— marked on leave</span>
-                                    @elseif(!$a->clock_out)
-                                        <span class="text-white/40 mx-1">— clocked in</span>
-                                    @else
-                                        <span class="text-white/40 mx-1">— clocked out</span>
-                                    @endif
-                                </p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <i data-lucide="clock" class="w-3 h-3 text-white/30"></i>
-                                    <span class="text-[11px] text-white/50 font-medium tracking-wide">
-                                        {{ ($a->clock_in ?? $a->updated_at)->format('h:i A') }} • {{ ($a->clock_in ?? $a->updated_at)->diffForHumans() }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center">
-                                @if($a->status === 'leave')
-                                    <span class="text-[10px] font-bold px-3 py-1 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 uppercase">
-                                        LEAVE
-                                    </span>
-                                @elseif(!$a->clock_out)
-                                    <span class="text-[10px] font-bold px-3 py-1 rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 uppercase">
-                                        ACTIVE
-                                    </span>
-                                @else
-                                    <span class="text-[10px] font-bold px-3 py-1 rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 uppercase">
-                                        FINISHED
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="py-12 text-center">
-                        <i data-lucide="inbox" class="w-12 h-12 text-white/10 mx-auto mb-4"></i>
-                        <p class="text-white/40 text-sm">No attendance activity recorded yet.</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
+                </li>
+            @empty
+                <li class="flex items-center gap-3 text-sm muted">
+                    <span class="w-9 h-9 flex items-center justify-center rounded-xl shrink-0 bg-emerald-500/10 text-emerald-500">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    </span>
+                    Nobody is on leave today.
+                </li>
+            @endforelse
+        </ul>
     </div>
 </div>
 

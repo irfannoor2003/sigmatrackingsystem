@@ -6,23 +6,14 @@
 
     <style>
         /* Month picker icon */
-        input[type="month"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            opacity: 0.9;
+        input[type="month"]::-webkit-calendar-picker-indicator,
+        input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
         }
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1); /* Changes a black icon to white */
-}
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        table th,
-        table td {
-            vertical-align: middle;
+        .dark input[type="month"]::-webkit-calendar-picker-indicator,
+        .dark input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.9;
         }
     </style>
 
@@ -31,67 +22,43 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         $displayMonth = Carbon::createFromFormat('Y-m', $monthInput ?? now()->format('Y-m'))->format('F Y');
     @endphp
 
-    <div class="max-w-6xl mx-auto mt-12">
+    <div>
 
         {{-- HEADER --}}
-        <div class="relative glass p-8 rounded-2xl border border-white/20 shadow-2xl mb-8 overflow-hidden">
-
-    <!-- Decorative blur (desktop only) -->
-    <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400/20 blur-3xl rounded-full hidden md:block"></div>
-
-    <div class="relative flex flex-col lg:flex-row lg:items-center gap-4">
-
-        <div class="bg-white/10 p-3 rounded-2xl">
-            <i data-lucide="clipboard-list" class="w-8 h-8 text-[#ff2ba6]"></i>
-        </div>
-
-
-                <div>
-                    <h2 class="text-3xl font-extrabold text-white">Attendance Reports</h2>
-                    <p class="text-sm text-white/40">
-                        {{ $displayMonth }} overview
-                    </p>
-                </div>
-
-                <div class="flex flex-col sm:flex-row gap-3 lg:ml-auto w-full lg:w-auto">
-
-                    @if (auth()->user()->role === 'hr')
-                        <button onclick="openHolidayModal()"
-                            class="w-full sm:w-auto sm:ml-auto
-flex items-center justify-center gap-2
-px-6 py-3 rounded-2xl
-bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-hover:scale-105 transition
-text-white font-bold shadow-xl
-">
-                            <i data-lucide="calendar-plus" class="w-5 h-5"></i>
-                            Mark Holiday
-                        </button>
-                    @endif
-                    <a href="{{ route('hr.attendance.export.all', ['month' => $monthInput]) }}"
-                        class="inline-flex items-center justify-center px-5 py-3 rounded-2xl
-       bg-green-600 hover:bg-green-700
-       text-white font-semibold text-sm shadow"
->
-                        Export All (Excel)
-                    </a>
-                </div>
+        <div class="page-head">
+            <div>
+                <h1 class="page-title">
+                    <span class="page-ico"><i data-lucide="clipboard-list" class="w-6 h-6"></i></span>
+                    Attendance Reports
+                </h1>
+                <p class="mt-1 muted">{{ $displayMonth }} overview</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                @if (auth()->user()->role === 'hr')
+                    <button onclick="openHolidayModal()" class="btn btn-primary">
+                        <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+                        Mark Holiday
+                    </button>
+                @endif
+                <a href="{{ route('hr.attendance.export.all', ['month' => $monthInput]) }}" class="btn btn-success">
+                    <i data-lucide="file-down" class="w-5 h-5"></i>
+                    Export All (Excel)
+                </a>
             </div>
         </div>
 
-{{-- DATE RANGE EXPORT --}}
-        <div class="glass p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl mb-8">
+        {{-- DATE RANGE EXPORT --}}
+        <div class="card p-6 md:p-8 mb-8">
 
             <div class="flex items-center gap-3 mb-5">
-                <div class="bg-white/10 p-3 rounded-xl">
-                    <i data-lucide="file-spreadsheet" class="w-6 h-6 text-emerald-400"></i>
+                <div class="stat-ico !w-11 !h-11">
+                    <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
                 </div>
-
                 <div>
-                    <h3 class="text-xl font-bold text-white">
+                    <h3 class="font-display font-semibold text-lg text-[var(--text)]">
                         Export Attendance by Date Range
                     </h3>
-                    <p class="text-sm text-white/50">
+                    <p class="text-sm muted">
                         Select a start date and end date to export attendance records.
                     </p>
                 </div>
@@ -101,54 +68,26 @@ text-white font-bold shadow-xl
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-                    {{-- Start Date --}}
-                    <div>
-                        <label class="text-xs text-white/50 mb-1 block">
-                            Start Date
-                        </label>
+                    <x-filter-field icon="calendar" label="Start Date">
+                        <input type="date" name="start_date" required class="input">
+                    </x-filter-field>
 
-                        <input type="date" name="start_date" required class="w-full px-4 py-3 rounded-2xl
-                                  bg-black/40 border border-white/10
-                                  text-white">
-                    </div>
+                    <x-filter-field icon="calendar" label="End Date">
+                        <input type="date" name="end_date" required class="input">
+                    </x-filter-field>
 
-                    {{-- End Date --}}
-                    <div>
-                        <label class="text-xs text-white/50 mb-1 block">
-                            End Date
-                        </label>
-
-                        <input type="date" name="end_date" required class="w-full px-4 py-3 rounded-2xl
-                                  bg-black/40 border border-white/10
-                                  text-white">
-                    </div>
-
-                    {{-- Optional Staff --}}
-                    <div>
-                        <label class="text-xs text-white/50 mb-1 block">
-                            Staff (Optional)
-                        </label>
-
-                        <select name="staff"
-                            class="bg-white/10 text-white border border-white/20 p-3 rounded-xl w-full focus:ring-2 focus:ring-[#ff2ba6]/50 transition outline-none">
-
+                    <x-filter-field icon="users" label="Staff (Optional)">
+                        <select name="staff" class="select">
                             <option value="">All Staff</option>
-
                             @foreach ($allStaff as $user)
-                                <option value="{{ $user->id }}" class="text-black">
-                                    {{ $user->name }}
-                                </option>
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </x-filter-field>
 
-                    {{-- Export Button --}}
                     <div>
-                        <button type="submit" class="w-full px-6 py-3 rounded-2xl
-                               bg-gradient-to-r from-emerald-500 to-green-600
-                               hover:scale-105 transition
-                               text-white font-bold shadow-xl">
-
+                        <button type="submit" class="btn btn-success w-full">
+                            <i data-lucide="file-down" class="w-5 h-5"></i>
                             Export Excel
                         </button>
                     </div>
@@ -158,341 +97,277 @@ text-white font-bold shadow-xl
             </form>
         </div>
 
-
         {{-- FILTERS --}}
-        <form method="GET" action="{{ route('hr.attendance.index') }}"
-            class="glass p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl mb-8">
+        <x-filter-bar :action="route('hr.attendance.index')">
+            <x-filter-field icon="calendar" label="Month">
+                <input type="month" name="month" value="{{ $monthInput }}" class="input">
+            </x-filter-field>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            <x-filter-field icon="users" label="Staff">
+                <select name="staff" class="select">
+                    <option value="">All Staff</option>
+                    @foreach ($allStaff as $user)
+                        <option value="{{ $user->id }}" {{ ($staffId ?? '') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ ucfirst($user->role) }})
+                        </option>
+                    @endforeach
+                </select>
+            </x-filter-field>
 
-                {{-- Month --}}
-                <div>
-                    <label class="text-xs text-white/50 mb-1 block">Month</label>
-                    <div class="relative">
-                        <i data-lucide="calendar" class="absolute left-4 top-3 w-5 h-5 text-white/40"></i>
-                        <input type="month" name="month" value="{{ $monthInput }}"
-                            class="w-full pl-12 px-4 py-3 rounded-2xl
-                               bg-black/40 border border-white/10 text-white">
-                    </div>
-                </div>
-
-                {{-- Staff --}}
-                <div>
-                    <label class="text-xs text-white/50 mb-1 block">Staff</label>
-                    <div class="relative">
-                        <i data-lucide="users" class="absolute left-4 top-3 w-5 h-5 text-white/40"></i>
-                        <select name="staff"
-                            class="bg-white/10 text-white border border-white/20 p-3 pl-10 rounded-xl w-full focus:ring-2 focus:ring-[#ff2ba6]/50 transition outline-none">
-
-                            <option value="" class="text-black">All Staff</option>
-                            @foreach ($allStaff as $user)
-                                <option value="{{ $user->id }}" {{ ($staffId ?? '') == $user->id ? 'selected' : '' }} class="text-black">
-                                    {{ $user->name }} ({{ ucfirst($user->role) }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                {{-- Buttons --}}
-                <div class="flex gap-3">
-                    <button
-                        class="px-6 py-3 rounded-2xl font-bold text-white
-                           bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]">
-                        Apply
-                    </button>
-
-                    <a href="{{ route('hr.attendance.index') }}"
-                        class="px-6 py-3 rounded-2xl bg-white/5 text-white border border-white/10">
-                        Reset
-                    </a>
-                </div>
-            </div>
-        </form>
+            <x-filter-actions submit="Apply" :reset="route('hr.attendance.index')" />
+        </x-filter-bar>
 
         {{-- INSIGHTS --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
 
-            <div class="relative glass p-4 rounded-2xl border border-emerald-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-emerald-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Star Performer</p>
-                        <div class="bg-emerald-500/10 p-1.5 rounded-lg">
-                            <i data-lucide="trophy" class="w-3.5 h-3.5 text-emerald-400"></i>
-                        </div>
+            <div class="stat-card tint-magenta">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[.68rem] font-bold uppercase tracking-wider muted">Star Performer</p>
                     </div>
-                    <h3 class="text-sm text-white font-bold mb-1.5">
-                        {{ $bestAttendance?->salesman?->name ?? '--' }}
-                    </h3>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-2xl font-extrabold text-emerald-400">{{ $bestAttendance->presents ?? 0 }}</span>
-                        <span class="text-[10px] text-emerald-300/70 font-medium uppercase">days</span>
-                    </div>
+                    <span class="stat-ico"><i data-lucide="trophy" class="w-5 h-5"></i></span>
+                </div>
+                <h3 class="text-sm font-bold text-[var(--text)] mt-2">{{ $bestAttendance?->salesman?->name ?? '--' }}</h3>
+                <div class="flex items-baseline gap-1.5 mt-1">
+                    <span class="text-2xl font-display font-bold text-[var(--text)]">{{ $bestAttendance->presents ?? 0 }}</span>
+                    <span class="text-[10px] muted font-medium uppercase">days</span>
                 </div>
             </div>
 
-            <div class="relative glass p-4 rounded-2xl border border-rose-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-rose-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider">Most Leaves</p>
-                        <div class="bg-rose-500/10 p-1.5 rounded-lg">
-                            <i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-400"></i>
-                        </div>
+            <div class="stat-card tint-rose">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[.68rem] font-bold uppercase tracking-wider muted">Most Leaves</p>
                     </div>
-                    <h3 class="text-sm text-white font-bold mb-1.5">
-                        {{ $mostLeaves?->salesman?->name ?? '--' }}
-                    </h3>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-2xl font-extrabold text-rose-400">{{ $mostLeaves->leaves ?? 0 }}</span>
-                        <span class="text-[10px] text-rose-300/70 font-medium uppercase">leaves</span>
-                    </div>
+                    <span class="stat-ico"><i data-lucide="x-circle" class="w-5 h-5"></i></span>
+                </div>
+                <h3 class="text-sm font-bold text-[var(--text)] mt-2">{{ $mostLeaves?->salesman?->name ?? '--' }}</h3>
+                <div class="flex items-baseline gap-1.5 mt-1">
+                    <span class="text-2xl font-display font-bold text-[var(--text)]">{{ $mostLeaves->leaves ?? 0 }}</span>
+                    <span class="text-[10px] muted font-medium uppercase">leaves</span>
                 </div>
             </div>
 
-            <div class="relative glass p-4 rounded-2xl border border-sky-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-sky-500/20 to-sky-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <p class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">Hardest Worker</p>
-                        <div class="bg-sky-500/10 p-1.5 rounded-lg">
-                            <i data-lucide="clock" class="w-3.5 h-3.5 text-sky-400"></i>
-                        </div>
+            <div class="stat-card tint-cyan">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[.68rem] font-bold uppercase tracking-wider muted">Hardest Worker</p>
                     </div>
-                    <h3 class="text-sm text-white font-bold mb-1.5">
-                        {{ $hardestWorker?->salesman?->name ?? '--' }}
-                    </h3>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-2xl font-extrabold text-sky-400">{{ number_format(($hardestWorker->minutes ?? 0) / 60, 1) }}</span>
-                        <span class="text-[10px] text-sky-300/70 font-medium uppercase">hours</span>
-                    </div>
+                    <span class="stat-ico"><i data-lucide="clock" class="w-5 h-5"></i></span>
+                </div>
+                <h3 class="text-sm font-bold text-[var(--text)] mt-2">{{ $hardestWorker?->salesman?->name ?? '--' }}</h3>
+                <div class="flex items-baseline gap-1.5 mt-1">
+                    <span class="text-2xl font-display font-bold text-[var(--text)]">{{ number_format(($hardestWorker->minutes ?? 0) / 60, 1) }}</span>
+                    <span class="text-[10px] muted font-medium uppercase">hours</span>
                 </div>
             </div>
 
-            <div class="relative glass p-4 rounded-2xl border border-purple-400/30 hover:scale-[1.03] transition-all duration-300 overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div class="relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <p class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Attendance Health</p>
-                        <div class="bg-purple-500/10 p-1.5 rounded-lg">
-                            <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-purple-400"></i>
-                        </div>
+            <div class="stat-card tint-violet">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-[.68rem] font-bold uppercase tracking-wider muted">Attendance Health</p>
                     </div>
-                    <div class="flex items-center gap-1.5 mb-1.5">
-                        <span class="text-2xl font-extrabold text-purple-400">{{ $attendanceRate }}%</span>
-                    </div>
-                    <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full bg-gradient-to-r from-purple-500/40 to-purple-400/20" style="width: {{ $attendanceRate }}%"></div>
-                    </div>
+                    <span class="stat-ico"><i data-lucide="heart-pulse" class="w-5 h-5"></i></span>
                 </div>
+                <div class="flex items-baseline gap-1.5 mt-2">
+                    <span class="text-2xl font-display font-bold text-[var(--text)]">{{ $attendanceRate }}%</span>
+                </div>
+                <div class="stat-bar mt-3 relative"><div style="width: {{ $attendanceRate }}%"></div></div>
             </div>
         </div>
 
         {{-- TABLE --}}
-        <div class="hidden md:block glass rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
+        <div class="tbl-wrap hidden md:block overflow-x-auto">
+            <table class="tbl min-w-full">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th class="text-center">Present</th>
+                        <th class="text-center">Leaves</th>
+                        <th class="text-center">Short</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-white text-sm">
-                    <thead class="bg-white/5 text-white/60 uppercase text-xs">
+                <tbody>
+                    @forelse($staff as $i => $user)
                         <tr>
-                            <th class="px-6 py-3">#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th class="text-center">Present</th>
-                            <th class="text-center">Leaves</th>
-                            <th class="text-center">Short</th>
-                            <th class="text-center">Action</th>
+                            <td class="muted">{{ $i + 1 }}</td>
+
+                            <td class="font-semibold">{{ $user->name }}</td>
+
+                            <td class="muted">{{ $user->email }}</td>
+
+                            <td>
+                                <span class="badge badge-gray uppercase">{{ ucfirst($user->role) }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge badge-emerald font-bold">{{ $user->monthAttendance }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge badge-rose font-bold">{{ $user->monthLeaves }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge badge-orange font-bold">{{ $user->shortLeaves }}</span>
+                            </td>
+
+                            <td class="text-center">
+                                <a href="{{ route('hr.attendance.staff', ['id' => $user->id, 'month' => $monthInput]) }}"
+                                    class="btn btn-primary btn-sm">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                    View
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-
-                    <tbody class="divide-y divide-white/5">
-                        @forelse($staff as $i => $user)
-                            <tr class="hover:bg-white/10 transition">
-                                <td class="px-6 py-4 text-white/60">{{ $i + 1 }}</td>
-
-                                <td class="font-semibold flex items-center gap-2 mt-4">
-
-                                    {{ $user->name }}
-                                </td>
-
-                                <td class="text-white/50">{{ $user->email }}</td>
-
-                                <td>
-                                    <span class="px-3 py-1 text-xs rounded-full bg-white/10">
-                                        {{ ucfirst($user->role) }}
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-                                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">
-                                        {{ $user->monthAttendance }}
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-                                    <span class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 font-bold">
-                                        {{ $user->monthLeaves }}
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-                                    <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 font-bold">
-                                        {{ $user->shortLeaves }}
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-                                    <a href="{{ route('hr.attendance.staff', ['id' => $user->id, 'month' => $monthInput]) }}"
-                                        class="inline-flex items-center gap-1 px-4 py-2 rounded-xl
-                                      bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-                                      hover:scale-105 transition text-white text-xs font-bold">
-                                        <i data-lucide="eye" class="w-4 h-4"></i>
-                                        View
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="py-10 text-center text-white/40">
-                                    No records found
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="py-10 text-center muted">
+                                No records found
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-{{-- ▌▌ MOBILE VIEW (CARDS) --}}
-<div class="md:hidden space-y-4 mb-6">
 
-    @forelse($staff as $u)
+    {{-- MOBILE VIEW (CARDS) --}}
+    <div class="md:hidden space-y-4 mb-6">
 
-        <div class="p-4 bg-white/10 rounded-xl border border-white/10 shadow">
+        @forelse($staff as $u)
 
-            {{-- Name --}}
-            <div class="text-lg font-semibold text-white flex items-center">
-                <i data-lucide="user" class="w-5 h-5 mr-2 text-pink-300"></i>
-                {{ $u->name }}
-            </div>
+            <div class="card p-4">
 
-            {{-- Email --}}
-            <div class="text-white/70 text-sm flex items-center">
-                <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
-                {{ $u->email }}
-            </div>
-
-            {{-- Stats --}}
-            <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-
-                <div class="bg-white/5 p-3 rounded-lg">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
-                        Present
-                    </div>
-                    <div class="text-emerald-300 font-semibold text-lg">
-                        {{ $u->monthAttendance }}
-                    </div>
+                {{-- Name --}}
+                <div class="text-lg font-semibold text-[var(--text)] flex items-center">
+                    <i data-lucide="user" class="w-5 h-5 mr-2 text-[var(--accent)]"></i>
+                    {{ $u->name }}
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-lg">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
-                        Leaves
-                    </div>
-                    <div class="text-rose-300 font-semibold text-lg">
-                        {{ $u->monthLeaves }}
-                    </div>
+                {{-- Email --}}
+                <div class="muted text-sm flex items-center">
+                    <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
+                    {{ $u->email }}
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-lg">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
-                        Short
+                {{-- Stats --}}
+                <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+
+                    <div class="soft-panel p-3 rounded-lg">
+                        <div class="muted flex items-center">
+                            <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                            Present
+                        </div>
+                        <div class="text-emerald-500 font-semibold text-lg">
+                            {{ $u->monthAttendance }}
+                        </div>
                     </div>
-                    <div class="text-orange-300 font-semibold text-lg">
-                        {{ $u->shortLeaves }}
+
+                    <div class="soft-panel p-3 rounded-lg">
+                        <div class="muted flex items-center">
+                            <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
+                            Leaves
+                        </div>
+                        <div class="text-rose-500 font-semibold text-lg">
+                            {{ $u->monthLeaves }}
+                        </div>
                     </div>
+
+                    <div class="soft-panel p-3 rounded-lg">
+                        <div class="muted flex items-center">
+                            <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
+                            Short
+                        </div>
+                        <div class="text-orange-500 font-semibold text-lg">
+                            {{ $u->shortLeaves }}
+                        </div>
+                    </div>
+
+                    <div class="soft-panel p-3 rounded-lg col-span-2 sm:col-span-3">
+                        <div class="muted flex items-center">
+                            <i data-lucide="badge-check" class="w-4 h-4 mr-2"></i>
+                            Role
+                        </div>
+                        <div class="text-[var(--text)] font-semibold uppercase">
+                            {{ ucfirst($u->role) }}
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="bg-white/5 p-3 rounded-lg col-span-2 sm:col-span-3">
-                    <div class="text-white/60 flex items-center">
-                        <i data-lucide="badge-check" class="w-4 h-4 mr-2"></i>
-                        Role
-                    </div>
-                    <div class="text-white font-semibold">
-                        {{ ucfirst($u->role) }}
-                    </div>
+                {{-- Action --}}
+                <div class="mt-4">
+                    <a href="{{ route('hr.attendance.staff', ['id' => $u->id, 'month' => $monthInput]) }}"
+                       class="btn btn-primary w-full">
+                        <i data-lucide="eye" class="w-4 h-4"></i>
+                        View Attendance
+                    </a>
                 </div>
 
             </div>
 
-            {{-- Action --}}
-            <div class="mt-4">
-                <a href="{{ route('hr.attendance.staff', ['id' => $u->id, 'month' => $monthInput]) }}"
-                   class="block text-center py-2 rounded-lg
-                          bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-                          text-white text-sm font-semibold">
-                    <i data-lucide="eye" class="inline w-4 h-4 mr-1"></i>
-                    View Attendance
-                </a>
+        @empty
+            <div class="text-center muted py-10">
+                No records found
             </div>
+        @endforelse
 
-        </div>
-
-    @empty
-        <div class="text-center text-white/40 py-10">
-            No records found
-        </div>
-    @endforelse
-
-</div>
+    </div>
 
     {{-- HOLIDAY MODAL --}}
-    <div id="holidayModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div id="holidayModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center overflow-y-auto p-4 z-[10000] backdrop-blur-sm">
 
-        <div class="glass w-full max-w-md p-6 rounded-2xl border border-white/20 shadow-2xl relative">
-            <button onclick="closeHolidayModal()" class="absolute top-4 right-4 text-white/60">✕</button>
+        <div class="card !rounded-2xl p-6 w-full max-w-md relative my-auto">
+            <button onclick="closeHolidayModal()" class="icon-btn absolute top-4 right-4">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
 
-            <h3 class="text-2xl font-bold text-white mb-4">📅 Mark Company Holiday</h3>
+            <h3 class="font-display font-semibold text-lg text-[var(--text)] mb-4 flex items-center gap-2">
+                <i data-lucide="calendar-plus" class="w-5 h-5 text-[var(--accent)]"></i>
+                Mark Company Holiday
+            </h3>
 
             <form method="POST" action="{{ route('hr.holiday.store') }}">
                 @csrf
 
                 {{-- ERROR DISPLAY (CRITICAL) --}}
                 @if ($errors->any())
-                    <div class="mb-4 p-3 rounded-xl bg-red-500/20 text-red-300 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <div>• {{ $error }}</div>
-                        @endforeach
+                    <div class="alert alert-error mb-4">
+                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-px"></i>
+                        <div>
+                            @foreach ($errors->all() as $error)
+                                <div>• {{ $error }}</div>
+                            @endforeach
+                        </div>
                     </div>
                 @endif
 
                 {{-- SUCCESS --}}
                 @if (session('success'))
-                    <div class="mb-4 p-3 rounded-xl bg-green-500/20 text-green-300 text-sm">
+                    <div class="alert alert-success mb-4">
+                        <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
                         {{ session('success') }}
                     </div>
                 @endif
 
-                <input type="text" name="title" required
-                    class="w-full mb-3 px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white"
-                    placeholder="Holiday Title">
+                <label class="label">Holiday Title</label>
+                <input type="text" name="title" required class="input mb-3" placeholder="Holiday Title">
 
-                <label class="text-xs text-white/60">Start Date</label>
-                <input type="date" name="start_date" required
-                    class="w-full mb-3 px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
+                <label class="label">Start Date</label>
+                <input type="date" name="start_date" required class="input mb-3">
 
-                <label class="text-xs text-white/60">End Date (optional)</label>
-                <input type="date" name="end_date"
-                    class="w-full mb-4 px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white">
+                <label class="label">End Date (optional)</label>
+                <input type="date" name="end_date" class="input mb-4">
 
                 {{-- SUBMIT BUTTON --}}
-                <button type="submit"
-                    class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-fuchsia-600
-               text-white font-bold">
+                <button type="submit" class="btn btn-primary w-full">
+                    <i data-lucide="save" class="w-5 h-5"></i>
                     Save Holiday
                 </button>
             </form>
@@ -514,7 +389,6 @@ text-white font-bold shadow-xl
             document.getElementById('singleDate').classList.toggle('hidden', type === 'range');
             document.getElementById('rangeDate').classList.toggle('hidden', type !== 'range');
         }
-        lucide.createIcons();
     </script>
 
 @endsection

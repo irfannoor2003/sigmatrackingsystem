@@ -13,7 +13,20 @@ class RoleMiddleware
             abort(403);
         }
 
-        if (!in_array(auth()->user()->role, $roles, true)) {
+        $user = auth()->user();
+
+        // Kicked-out check: staff who have left cannot use the panel
+        if (method_exists($user, 'isLeft') && $user->isLeft()) {
+            $leftAt = $user->left_at;
+            auth()->logout();
+            $request->session()->regenerate();
+
+            return redirect()->route('login')->withErrors([
+                'email' => 'You left Sigma on ' . $leftAt->format('d M Y') . '. You can no longer access the panel.',
+            ]);
+        }
+
+        if (!in_array($user->role, $roles, true)) {
             abort(403, 'Unauthorized action.');
         }
 

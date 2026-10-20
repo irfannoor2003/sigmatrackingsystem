@@ -8,61 +8,73 @@
 
 <style>
     .ts-wrapper .ts-control {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        border-radius: 0.5rem !important;
-        padding: 12px !important;
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text) !important;
+        border-radius: .75rem !important;
+        padding: .75rem 1rem !important;
+        transition: all .2s ease;
     }
+
     .ts-wrapper.focus .ts-control {
-        background: rgba(255, 255, 255, 0.2) !important;
-        box-shadow: none !important;
+        background: var(--surface) !important;
+        box-shadow: 0 0 0 3px var(--accent-soft) !important;
     }
+
     .ts-dropdown {
-        background: #1e1e1e !important;
-        color: white !important;
-        border-radius: 0.5rem !important;
+        background: var(--surface) !important;
+        color: var(--text) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: .75rem !important;
+        margin-top: 5px !important;
+        box-shadow: var(--shadow-lg) !important;
     }
+
+    .ts-dropdown .option {
+        padding: .6rem .75rem !important;
+        color: var(--text-soft) !important;
+    }
+
     .ts-dropdown .active {
-        background: #ff2ba6 !important;
+        background: var(--accent-soft) !important;
+        color: var(--text) !important;
     }
+
+    .ts-dropdown .active .item {
+        background: var(--accent) !important;
+        color: #fff !important;
+    }
+
     .ts-control input {
-        color: white !important;
+        color: var(--text) !important;
+    }
+
+    .ts-wrapper.single .ts-control::after {
+        border-color: var(--text-muted) transparent transparent transparent !important;
     }
 </style>
 
-<div class="max-w-xl mx-auto p-0">
+<div class="max-w-xl mx-auto">
 
-    <h1 class="text-3xl font-bold text-white mb-6 tracking-wide flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             class="mr-3 text-[#ff2ba6]">
-            <path d="M12 20h9"/>
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
-        </svg>
-        Edit Visit
-    </h1>
+    <div class="page-head">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="pencil" class="w-6 h-6"></i></span>
+            Edit Visit
+        </h1>
+    </div>
 
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-xl">
+    <div class="card !rounded-2xl p-6 md:p-8">
 
         <form method="POST" action="{{ route('salesman.visits.update', $visit->id) }}">
             @csrf
             @method('PUT')
 
-            {{-- Customer --}}
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="mr-2">
-                    <rect width="16" height="20" x="4" y="2" rx="2"/>
-                    <path d="M9 22v-4h6v4"/>
-                </svg>
+            <label class="label flex items-center gap-2">
+                <i data-lucide="building-2" class="w-4 h-4 text-[var(--accent)]"></i>
                 Select Customer
             </label>
 
-            <div class="mb-4">
+            <div class="mb-5">
                 <select name="customer_id" id="customer_search" required>
                     @foreach($customers as $customer)
                         <option value="{{ $customer->id }}"
@@ -73,56 +85,34 @@
                 </select>
             </div>
 
-            {{-- Purpose --}}
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                     class="mr-2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="6"/>
-                    <circle cx="12" cy="12" r="2"/>
-                </svg>
+            <label class="label flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-[var(--accent)]"></i>
                 Purpose of Visit
             </label>
 
-            <select name="purpose"
-                    class="w-full px-4 py-3 mb-4 rounded-lg bg-white/10 text-white outline-none"
-                    required>
+            <select name="purpose" class="select w-full mb-4" required>
                 @foreach([
                     'Complaint Visit','Delivery','Follow-up','New Lead Visit',
                     'Order Taking','Office Work','Product Details',
                     'Payment Collection','Recovery'
                 ] as $purpose)
                     <option value="{{ $purpose }}"
-                        {{ $visit->purpose === $purpose ? 'selected' : '' }}
-                        class="text-black">
+                        {{ $visit->purpose === $purpose ? 'selected' : '' }}>
                         {{ $purpose }}
                     </option>
                 @endforeach
             </select>
 
-            {{-- KM --}}
-            <label class="block text-sm text-white/80 mb-1">
-                KM / Distance
-            </label>
-            <input type="number" step="0.1" name="distance_km"
-                   value="{{ $visit->distance_km }}"
-                   class="w-full px-4 py-3 mb-4 rounded-lg bg-white/10 text-white outline-none">
+            <label class="label">KM / Distance</label>
+            <input type="number" step="0.1" name="distance_km" value="{{ $visit->distance_km }}"
+                class="input w-full mb-4">
 
-            {{-- Note --}}
-            <label class="block text-sm text-white/80 mb-1">
-                Visit Note
-            </label>
-            <textarea name="notes" rows="3"
-                      class="w-full px-4 py-3 mb-6 rounded-lg bg-white/10 text-white outline-none"
-                      placeholder="Enter visit notes...">{{ $visit->notes }}</textarea>
+            <label class="label">Visit Note</label>
+            <textarea name="notes" rows="3" class="textarea w-full mb-6"
+                placeholder="Enter visit notes...">{{ $visit->notes }}</textarea>
 
-            <button type="submit"
-                    class="w-full py-3 rounded-xl text-white font-semibold tracking-wide
-                           flex items-center justify-center
-                           bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6]
-                           shadow-lg hover:opacity-90 transition">
+            <button type="submit" class="btn btn-primary w-full">
+                <i data-lucide="check" class="w-4 h-4"></i>
                 Update Visit
             </button>
 

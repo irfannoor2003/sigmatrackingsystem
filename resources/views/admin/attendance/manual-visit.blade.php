@@ -3,29 +3,24 @@
 @section('title','Manual Visit')
 
 @section('content')
-<div class="max-w-xl mx-auto mt-12 px-0">
+<div class="max-w-xl mx-auto">
 
-    <div class="glass p-8 rounded-3xl border border-white/20 shadow-2xl">
-
-        <h2 class="text-2xl font-extrabold text-white mb-6 flex items-center gap-2">
-            <i data-lucide="map-pin" class="w-6 h-6 text-pink-400"></i>
+    <div class="page-head">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="map-pin" class="w-6 h-6"></i></span>
             Manual Visit
-        </h2>
+        </h1>
+    </div>
 
-        @if(session('success'))
-            <div class="mb-4 p-3 rounded-xl bg-green-500/20 text-green-300">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="card !rounded-2xl p-8">
 
         <form method="POST" action="{{ route('admin.attendance.manual.store') }}" class="space-y-5">
             @csrf
 
             {{-- STAFF --}}
             <div>
-                <label class="text-xs text-white/50 mb-1 block">Staff</label>
-                <select name="staff_id"
-                        class="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-white/10">
+                <label class="label">Staff</label>
+                <select name="staff_id" class="select">
                     @foreach($staff as $user)
                         <option value="{{ $user->id }}">
                             {{ $user->name }} ({{ ucfirst($user->role) }})
@@ -36,10 +31,8 @@
 
             {{-- TYPE --}}
             <div>
-                <label class="text-xs text-white/50 mb-1 block">Visit Type</label>
-                <select name="type" id="visitType"
-                        onchange="toggleDates()"
-                        class="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-white/10">
+                <label class="label">Visit Type</label>
+                <select name="type" id="visitType" onchange="toggleDates()" class="select">
                     <option value="single">Single Day</option>
                     <option value="range">Multiple Days</option>
                 </select>
@@ -47,27 +40,23 @@
 
             {{-- SINGLE DATE --}}
             <div id="singleDate">
-                <input type="date" name="date"
-                       class="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-white/10">
+                <input type="date" name="date" class="input">
             </div>
 
             {{-- RANGE --}}
             <div id="rangeDate" class="hidden space-y-3">
-                <input type="date" name="start_date"
-                       class="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-white/10">
-                <input type="date" name="end_date"
-                       class="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-white/10">
+                <input type="date" name="start_date" class="input">
+                <input type="date" name="end_date" class="input">
             </div>
 
             {{-- NOTE --}}
-            <textarea name="note" rows="3"
-                      placeholder="Reason / Client / Location"
-                      class="w-full px-4 py-3 rounded-xl bg-black/40 text-white border border-white/10"></textarea>
+            <div>
+                <label class="label">Note</label>
+                <textarea name="note" rows="3" placeholder="Reason / Client / Location" class="textarea"></textarea>
+            </div>
 
-            <button
-                class="w-full py-3 rounded-xl
-                       bg-gradient-to-r from-[#ff2ba6] to-[#d41a8a]
-                       text-white font-bold">
+            <button class="btn btn-primary w-full">
+                <i data-lucide="save" class="w-4 h-4"></i>
                 Save Manual Visit
             </button>
 
@@ -81,6 +70,5 @@ function toggleDates() {
     document.getElementById('singleDate').classList.toggle('hidden', type === 'range');
     document.getElementById('rangeDate').classList.toggle('hidden', type !== 'range');
 }
-lucide.createIcons();
 </script>
 @endsection

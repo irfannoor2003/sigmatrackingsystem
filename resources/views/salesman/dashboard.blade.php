@@ -6,114 +6,108 @@
 
 @include('partials.late-reason-modal', ['lateRecord' => $pendingLateRecord ?? null])
 
-<div class="p-0">
-
-    <!-- Page Title -->
-    <h1 class="text-3xl font-bold text-white tracking-wide mb-8">
-        Salesman Dashboard
-    </h1>
-
-    <!-- ✅ Holiday Banner -->
-   @if($isNonWorkingDay)
-    <div class="bg-purple-500/10 border border-purple-500/30 text-purple-300 p-4 rounded mb-6 text-center font-semibold">
-        📢 Today is a non-working day:
-        <span class="font-bold">{{ $nonWorkingReason }}</span>
-    </div>
-@endif
-
-
-    <!-- Welcome Card -->
-    <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg flex items-center gap-4">
-        <i data-lucide="smile" class="w-8 h-8 text-pink-500"></i>
+<div class="space-y-6" style="--brand: #eb268f">
+    <div class="page-head">
         <div>
-            <h2 class="text-xl font-semibold text-magenta-300">Welcome!</h2>
-            <p class="mt-2 text-white/80">
-                Track your visits and customer additions for this month.
-            </p>
+            <h1 class="page-title">
+                <span class="page-ico"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></span>
+                Salesman Dashboard
+            </h1>
+            <p class="mt-2 text-sm muted">Track your visits and customer additions for this month.</p>
+        </div>
+        <span class="badge badge-gray !px-3 !py-1.5">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            {{ now()->format('d M Y') }}
+        </span>
+    </div>
+
+    @if($isNonWorkingDay)
+        <div class="alert alert-info">
+            <i data-lucide="calendar-off" class="w-5 h-5 shrink-0 mt-px"></i>
+            <span>Today is a non-working day: <strong>{{ $nonWorkingReason }}</strong></span>
+        </div>
+    @endif
+
+    <div class="card p-6 sm:p-7 flex items-center gap-4">
+        <div class="w-11 h-11 rounded-2xl bg-[var(--accent-soft)] text-[var(--brand)] flex items-center justify-center shrink-0">
+            <i data-lucide="smile" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <h2 class="text-xl font-display font-semibold text-[var(--text)]">Welcome</h2>
+            <p class="mt-1 text-sm muted">Keep your daily activity and customer follow-up on track.</p>
         </div>
     </div>
 
-    <!-- Graphs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-
-        <!-- Completed Visits Chart -->
-        <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg">
-            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <i data-lucide="check-square" class="w-5 h-5"></i>
-                Visits Completed This Month
-            </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="card p-5 sm:p-6">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="check-square" class="w-5 h-5"></i>
+                </span>
+                <h2 class="font-display font-semibold text-[var(--text)]">Visits Completed This Month</h2>
+            </div>
             <canvas id="visitsChart" height="140"></canvas>
         </div>
 
-        <!-- New Customers Chart -->
-        <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-lg">
-            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <i data-lucide="user-plus" class="w-5 h-5"></i>
-                Customers Added This Month
-            </h3>
+        <div class="card p-5 sm:p-6">
+            <div class="flex items-center gap-3 mb-5">
+                <span class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </span>
+                <h2 class="font-display font-semibold text-[var(--text)]">Customers Added This Month</h2>
+            </div>
             <canvas id="customersChart" height="140"></canvas>
         </div>
-
     </div>
 
-    <!-- Action Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-
-        <!-- Add Customer -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <a href="{{ $isNonWorkingDay ? '#' : route('salesman.customers.create') }}"
-   class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6
-          {{ $isNonWorkingDay ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-white/20' }}
-          transition border-l-4"
-   style="border-left-color:#ff2ba6;">
-
+            class="card card-hover p-5 sm:p-6 block {{ $isNonWorkingDay ? 'opacity-50 pointer-events-none' : '' }}">
             <div class="flex items-center gap-3">
-                <i data-lucide="user-plus" class="w-7 h-7 text-pink-500"></i>
-                <h3 class="text-xl font-semibold text-magenta-300">Add Customer</h3>
+                <span class="w-9 h-9 rounded-xl bg-[var(--accent-soft)] text-[var(--brand)] flex items-center justify-center">
+                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                </span>
+                <h3 class="font-display font-semibold text-[var(--text)]">Add Customer</h3>
             </div>
-            <p class="text-white/70 mt-2">Register a new customer.</p>
+            <p class="mt-3 text-sm muted">Register a new customer.</p>
         </a>
 
-        <!-- Add Visit -->
         <a href="{{ $isNonWorkingDay ? '#' : route('salesman.visits.create') }}"
-   class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6
-          {{ $isNonWorkingDay ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-white/20' }}
-          transition border-l-4"
-   style="border-left-color:#ff2ba6;">
-
+            class="card card-hover p-5 sm:p-6 block {{ $isNonWorkingDay ? 'opacity-50 pointer-events-none' : '' }}">
             <div class="flex items-center gap-3">
-                <i data-lucide="map-pin" class="w-7 h-7 text-pink-500"></i>
-                <h3 class="text-xl font-semibold text-magenta-300">Add Visit</h3>
+                <span class="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                    <i data-lucide="map-pin" class="w-5 h-5"></i>
+                </span>
+                <h3 class="font-display font-semibold text-[var(--text)]">Add Visit</h3>
             </div>
-            <p class="text-white/70 mt-2">Record a new visit for today.</p>
+            <p class="mt-3 text-sm muted">Record a new visit for today.</p>
         </a>
 
-        <!-- My Visits -->
         <a href="{{ $isNonWorkingDay ? '#' : route('salesman.visits.index') }}"
-   class="block bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg p-6
-          {{ $isNonWorkingDay ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'hover:bg-white/20' }}
-          transition border-l-4"
-   style="border-left-color:#ff2ba6;">
-
+            class="card card-hover p-5 sm:p-6 block {{ $isNonWorkingDay ? 'opacity-50 pointer-events-none' : '' }}">
             <div class="flex items-center gap-3">
-                <i data-lucide="clipboard" class="w-7 h-7 text-pink-500"></i>
-                <h3 class="text-xl font-semibold text-magenta-300">My Visits</h3>
+                <span class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <i data-lucide="clipboard" class="w-5 h-5"></i>
+                </span>
+                <h3 class="font-display font-semibold text-[var(--text)]">My Visits</h3>
             </div>
-            <p class="text-white/70 mt-2">View all your visit history.</p>
+            <p class="mt-3 text-sm muted">View all your visit history.</p>
         </a>
-
     </div>
-
 </div>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
     const visitLabels = @json($visitLabels);
     const visitData = @json($visitData);
     const customerData = @json($customerData);
+    const rootStyles = getComputedStyle(document.documentElement);
+    const chartColor = (name, fallback) => rootStyles.getPropertyValue(name).trim() || fallback;
+    const chartText = chartColor('--text-soft', '#4a3f58');
+    const chartGrid = chartColor('--border', '#e8e2f0');
+    const chartAccent = chartColor('--accent', '#eb268f');
+    const chartAccentSoft = chartColor('--accent-soft', 'rgba(235, 38, 143, .12)');
 
-    // Visits Chart
     new Chart(document.getElementById('visitsChart'), {
         type: 'bar',
         data: {
@@ -121,8 +115,8 @@
             datasets: [{
                 label: 'Completed Visits',
                 data: visitData,
-                backgroundColor: 'rgba(129, 140, 248, 0.6)',
-                borderColor: 'rgb(129, 140, 248)',
+                backgroundColor: chartAccentSoft,
+                borderColor: chartAccent,
                 borderWidth: 2,
                 borderRadius: 8,
             }]
@@ -131,21 +125,20 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: "#ffffff" },
-                    grid: { color: "rgba(255,255,255,0.1)" }
+                    ticks: { color: chartText },
+                    grid: { color: chartGrid }
                 },
                 x: {
-                    ticks: { color: "#ffffff" },
-                    grid: { color: "rgba(255,255,255,0.1)" }
+                    ticks: { color: chartText },
+                    grid: { color: chartGrid }
                 }
             },
             plugins: {
-                legend: { labels: { color: "#ffffff" } }
+                legend: { labels: { color: chartText } }
             }
         }
     });
 
-    // Customers Added Chart
     new Chart(document.getElementById('customersChart'), {
         type: 'line',
         data: {
@@ -154,8 +147,8 @@
                 label: 'Customers Added',
                 data: customerData,
                 fill: true,
-                borderColor: 'rgb(236, 72, 153)',
-                backgroundColor: 'rgba(236, 72, 153, 0.4)',
+                borderColor: chartAccent,
+                backgroundColor: chartAccentSoft,
                 tension: 0.4
             }]
         },
@@ -163,23 +156,22 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: "#ffffff" },
-                    grid: { color: "rgba(255,255,255,0.1)" }
+                    ticks: { color: chartText },
+                    grid: { color: chartGrid }
                 },
                 x: {
-                    ticks: { color: "#ffffff" },
-                    grid: { color: "rgba(255,255,255,0.1)" }
+                    ticks: { color: chartText },
+                    grid: { color: chartGrid }
                 }
             },
             plugins: {
-                legend: { labels: { color: "#ffffff" } }
+                legend: { labels: { color: chartText } }
             }
         }
     });
 
-    // Render Lucide icons
     document.addEventListener("DOMContentLoaded", () => {
-        lucide.createIcons();
+        if (window.SigmaIcons) window.SigmaIcons.refresh();
     });
 </script>
 

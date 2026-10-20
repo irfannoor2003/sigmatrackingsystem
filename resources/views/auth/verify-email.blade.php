@@ -1,29 +1,37 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+    <div class="mb-6">
+        <h2 class="font-display font-bold text-[1.5rem] tracking-tight text-[var(--text)]">Verify your email</h2>
+        <p class="text-sm mt-1 muted">Check your inbox for a verification link</p>
+    </div>
+
+    <div class="alert alert-info !text-sm">
+        <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+        <span>{{ __('Thanks for signing up! Click the link we emailed you to activate your account.') }}</span>
     </div>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+        <div class="alert alert-success mt-4">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <span>{{ __('A new verification link has been sent to your email.') }}</span>
         </div>
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
+    <div class="mt-6 flex items-center justify-between gap-3">
         <form method="POST" action="{{ route('verification.send') }}">
             @csrf
-
             <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    {{ __('Resend Verification') }}
+                </button>
             </div>
         </form>
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button type="submit"
+                class="btn btn-ghost btn-sm text-[var(--text-soft)]">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
                 {{ __('Log Out') }}
             </button>
         </form>

@@ -16,6 +16,7 @@ use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\GlobalSearchController;
 
 
 // Admin
@@ -65,7 +66,7 @@ Route::get('/dashboard', function () {
         'it', 'account', 'store', 'office_boy' => redirect()->route('staff.dashboard'),
         default     => abort(403),
     };
-})->middleware('auth')->name('dashboard');
+})->middleware(['auth', 'active'])->name('dashboard');
 
 
 /*
@@ -73,7 +74,11 @@ Route::get('/dashboard', function () {
 | PROFILE
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
+    Route::patch('/profile/glass-mode', [ProfileController::class, 'toggleGlassMode'])->name('profile.glass-mode');
+});
+
+Route::middleware(['auth', 'active', 'role:admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -208,6 +213,12 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('/staff/{staff}/unblock', [StaffController::class, 'unblock'])
                 ->name('staff.unblock');
 
+            Route::post('/staff/{staff}/left', [StaffController::class, 'markAsLeft'])
+                ->name('staff.left');
+
+            Route::post('/staff/{staff}/rejoin', [StaffController::class, 'rejoin'])
+                ->name('staff.rejoin');
+
 
         /* ---------------- Old Customers ---------------- */
         Route::get('/old-customers', [AdminOldCustomerController::class, 'index'])
@@ -332,6 +343,10 @@ Route::middleware(['auth', 'role:it,account,store,office_boy'])
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')
+    ->get('/global-search', [GlobalSearchController::class, 'index'])
+    ->name('global-search');
+
+Route::middleware('auth')
     ->get('/attendance/check-work-hours', [AttendanceController::class, 'checkWorkHours']);
 
 Route::middleware('auth')
@@ -413,6 +428,8 @@ Route::prefix('staff')->name('staff.')->group(function () {
     Route::get('/{staff}/edit', [HRStaffController::class, 'edit'])->name('edit');   // Edit form
     Route::put('/{staff}', [HRStaffController::class, 'update'])->name('update');   // Update staff
     Route::delete('/{staff}', [HRStaffController::class, 'destroy'])->name('destroy'); // Delete staff
+    Route::post('/{staff}/left', [HRStaffController::class, 'markAsLeft'])->name('left');
+    Route::post('/{staff}/rejoin', [HRStaffController::class, 'rejoin'])->name('rejoin');
 });
 
 

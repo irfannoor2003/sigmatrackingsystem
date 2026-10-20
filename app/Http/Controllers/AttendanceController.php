@@ -32,6 +32,10 @@ class AttendanceController extends Controller
             abort(403, 'Your account is blocked. Contact admin.');
         }
 
+        if (method_exists($user, 'isLeft') && $user->isLeft()) {
+            abort(403, 'Your access to the panel has been revoked.');
+        }
+
         return $user;
     }
 
@@ -232,6 +236,16 @@ AttendanceVerification::create([
 
     // 5️⃣ Login user safely
     $user = User::findOrFail($verification->user_id);
+
+    // Guard: left / blocked staff cannot log in via verification link
+    if (method_exists($user, 'isLeft') && $user->isLeft()) {
+        abort(403, 'Your access to the panel has been revoked.');
+    }
+
+    if (method_exists($user, 'isBlocked') && $user->isBlocked()) {
+        abort(403, 'Your account is blocked. Contact admin.');
+    }
+
     Auth::login($user);
 
 

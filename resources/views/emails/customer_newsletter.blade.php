@@ -83,7 +83,7 @@
                         </p>
 
                         <ul style="font-size:14px; line-height:1.65; color:#374151; padding-left:18px;">
-                            <li>Email: <a href="mailto:support@yourcompany.com" style="color:#ff2ba6;">support@yourcompany.com</a></li>
+                            <li>Email: <a href="mailto:{{ config('support.email') }}" style="color:#ff2ba6;">{{ config('support.email') }}</a></li>
                             @if($customer->whatsapp)
                                 <li>WhatsApp: <a href="https://wa.me/{{ $customer->whatsapp }}" target="_blank" style="color:#ff2ba6;">{{ $customer->whatsapp }}</a></li>
                             @endif

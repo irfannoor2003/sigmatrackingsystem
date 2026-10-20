@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Your existing role middleware
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'active' => \App\Http\Middleware\EnsureActiveUser::class,
         ]);
 
         // ZKTeco device routes excluded from CSRF

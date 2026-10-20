@@ -20,7 +20,7 @@ class HrDashboardController extends Controller
     public function index()
     {
         $today = Carbon::today();
-        $totalStaff = User::whereNotIn('role', ['admin', 'hr', 'saleshead'])->count();
+        $totalStaff = User::active()->whereNotIn('role', ['admin', 'hr', 'saleshead'])->count();
 
         $presentCount = Attendance::whereDate('date', $today)
             ->where(function ($q) {
@@ -43,6 +43,15 @@ class HrDashboardController extends Controller
             ->limit(6)
             ->get();
 
+        // Today's leaves only — the "Leave Status Today" panel used to reuse the
+        // generic activity feed, so it showed "Nobody is on leave today" even when
+        // somebody was.
+        $todayLeaves = Attendance::with('salesman')
+            ->whereDate('date', $today)
+            ->where('status', 'leave')
+            ->orderByDesc('created_at')
+            ->get();
+
         // Late Staff (clocked in after 10:15 AM)
         $lateStaff = Attendance::with('salesman')
             ->whereDate('date', $today)
@@ -56,6 +65,7 @@ class HrDashboardController extends Controller
             'leaveCount',
             'absentCount',
             'attendanceActivities',
+            'todayLeaves',
             'lateStaff'
         ));
     }
@@ -95,7 +105,9 @@ class HrDashboardController extends Controller
         $staffId = $request->staff;
         $roles = ['salesman', 'it', 'account', 'store', 'office_boy'];
 
-        $allStaff = User::whereIn('role', $roles)->orderBy('name')->get();
+        $allStaff = User::active()->whereIn('role', $roles)->orderBy('name')->get();
+
+        $activeStaffIds = $allStaff->pluck('id');
 
         $attendanceStats = Attendance::select(
                 'salesman_id',
@@ -104,6 +116,7 @@ class HrDashboardController extends Controller
                 DB::raw("SUM(short_leave = 1) as short_leaves"),
                 DB::raw("SUM(total_minutes) as minutes")
             )
+            ->whereIn('salesman_id', $activeStaffIds)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->groupBy('salesman_id')
@@ -119,7 +132,7 @@ class HrDashboardController extends Controller
             ? round(($totalPresents / ($totalStaffCount * $date->daysInMonth)) * 100)
             : 0;
 
-        $staffQuery = User::whereIn('role', $roles)
+        $staffQuery = User::active()->whereIn('role', $roles)
             ->whereIn('id', $attendanceStats->pluck('salesman_id'));
         if ($staffId) { $staffQuery->where('id', $staffId); }
 
@@ -171,12 +184,13 @@ class HrDashboardController extends Controller
                 'status' => $dateString > $today ? 'future' : 'absent',
                 'label'  => $dateString > $today ? 'Upcoming' : 'Absent',
                 'attendance' => null,
+                'holiday' => null,
             ];
 
             if (isset($dbHolidays[$dateString])) {
-                $dayData['status'] = 'off'; $dayData['label'] = $dbHolidays[$dateString];
+                $dayData['status'] = 'holiday'; $dayData['label'] = $dbHolidays[$dateString]; $dayData['holiday'] = $dbHolidays[$dateString];
             } elseif (isset($pakHolidays[$md])) {
-                $dayData['status'] = 'off'; $dayData['label'] = $pakHolidays[$md];
+                $dayData['status'] = 'holiday'; $dayData['label'] = $pakHolidays[$md]; $dayData['holiday'] = $pakHolidays[$md];
             } elseif ($currentDate->isSunday()) {
                 $dayData['status'] = 'off'; $dayData['label'] = 'Sunday';
             } elseif ($attendanceRecords->has($dateString)) {
@@ -238,7 +252,7 @@ class HrDashboardController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $staff = User::whereNotIn('role', ['admin', 'hr', 'saleshead'])
+        $staff = User::active()->whereNotIn('role', ['admin', 'hr', 'saleshead'])
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
 
@@ -257,37 +271,83 @@ class HrDashboardController extends Controller
 
     public function storeManualVisit(Request $request, $userId)
     {
+        $user = User::findOrFail($userId);
+
+        if ($user->role !== 'salesman') {
+            return back()->with('error', 'Manual visits can only be marked for salesmen.');
+        }
+
         $request->validate([
             'start_date' => 'required|date',
             'end_date'   => 'nullable|date|after_or_equal:start_date',
-            'note'       => 'required|string',
+            'clock_in'   => 'nullable|date_format:H:i',
+            'clock_out'  => 'nullable|date_format:H:i',
+            'note'       => 'required|string|max:255',
         ]);
 
-        $start = Carbon::parse($request->start_date);
-        $end   = Carbon::parse($request->end_date ?? $request->start_date);
+        $start = Carbon::parse($request->start_date)->startOfDay();
+        $end   = Carbon::parse($request->end_date ?? $request->start_date)->startOfDay();
+
+        $clockInTime  = $request->clock_in ?: '10:00';
+        $clockOutTime = $request->clock_out ?: '17:00';
+
+        $marked = 0;
+        $skippedSundays = [];
 
         while ($start->lte($end)) {
-            $clockIn  = $start->copy()->setTime(10, 0);
-            $clockOut = $start->copy()->setTime(17, 0);
+            // Sundays are weekly off — never mark a manual visit on one.
+            if ($start->isSunday()) {
+                $skippedSundays[] = $start->toDateString();
+                $start->addDay();
+                continue;
+            }
+
+            $clockIn  = $start->copy()->setTimeFromTimeString($clockInTime);
+            $clockOut = $start->copy()->setTimeFromTimeString($clockOutTime);
+
+            if ($clockOut->lessThan($clockIn)) {
+                $clockOut = $clockIn->copy()->addDay();
+            }
 
             $attendance = Attendance::updateOrCreate(
-                ['salesman_id' => $userId, 'date' => $start->toDateString()],
+                ['salesman_id' => $user->id, 'date' => $start->toDateString()],
                 [
                     'status' => 'present', 'clock_in' => $clockIn, 'clock_out' => $clockOut,
                     'total_minutes' => $clockIn->diffInMinutes($clockOut),
-                    'office_verified' => false, 'manual_visit' => true, 'note' => $request->note
+                    'office_verified' => false, 'auto_clock_out' => false,
+                    'short_leave' => false, 'manual_visit' => true,
+                    'marked_by' => auth()->id(),
+                    'note' => $request->note,
                 ]
             );
 
-            \App\Models\OutOfCityVisit::create([
-                'attendance_id' => $attendance->id,
-                'salesman_id'   => $userId,
-                'status'        => 'pending',
-            ]);
+            if (! OutOfCityVisit::where('attendance_id', $attendance->id)->exists()) {
+                OutOfCityVisit::create([
+                    'attendance_id' => $attendance->id,
+                    'salesman_id'   => $user->id,
+                    'status'        => 'pending',
+                ]);
+            }
 
+            $marked++;
             $start->addDay();
         }
-        return back()->with('success', 'Manual visit marked.');
+
+        if ($marked === 0) {
+            return redirect()
+                ->route('hr.attendance.staff', ['id' => $user->id, 'month' => now()->format('Y-m')])
+                ->with('warning', 'No manual visit was marked — the selected range only contains Sundays.');
+        }
+
+        $message = 'Manual visit marked successfully for ' . $marked . ' day' . ($marked > 1 ? 's' : '') . '.';
+
+        if ($skippedSundays) {
+            $message .= ' Sundays were skipped (weekly off).';
+        }
+
+        return redirect()
+            ->route('hr.attendance.staff', ['id' => $user->id, 'month' => now()->format('Y-m')])
+            ->with('success', $message);
     }
 
     /**
@@ -323,7 +383,7 @@ class HrDashboardController extends Controller
     $todayDate = now(); // Carbon instance
 
     // All staff except admin
-    $allStaff = User::whereNotIn('role', ['admin', 'hr', 'saleshead'])->orderBy('name')->get();
+    $allStaff = User::active()->whereNotIn('role', ['admin', 'hr', 'saleshead'])->orderBy('name')->get();
 
     // Staff present today (including manual visits)
     $presentStaff = Attendance::with('salesman')

@@ -15,7 +15,7 @@ class AdminDashboardController extends Controller
         $today = Carbon::today();
 
         // Total Salesmen
-        $totalSalesmen = User::where('role', 'salesman')->count();
+        $totalSalesmen = User::active()->where('role', 'salesman')->count();
 
         // Staff Working Today (clocked in but not clocked out)
         $workingToday = Attendance::whereDate('date', $today)
@@ -78,7 +78,7 @@ public function todayAttendance()
     $today = Carbon::today();
     $roles = ['salesman', 'it', 'account', 'store', 'office_boy'];
 
-    $allStaff = User::whereIn('role', $roles)
+    $allStaff = User::active()->whereIn('role', $roles)
         ->with(['attendances' => function ($query) use ($today) {
             $query->whereDate('date', $today);
         }])

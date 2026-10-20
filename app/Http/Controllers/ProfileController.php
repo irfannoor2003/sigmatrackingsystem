@@ -38,6 +38,21 @@ class ProfileController extends Controller
     }
 
     /**
+     * Toggle the experimental glass interface.
+     */
+    public function toggleGlassMode(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $user->glass_mode = ! $user->glass_mode;
+        $user->save();
+
+        return back()->with('success', $user->glass_mode
+            ? 'Glass interface enabled.'
+            : 'Classic interface restored.');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

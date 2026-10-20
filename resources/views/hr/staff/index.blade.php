@@ -6,148 +6,219 @@
     <div class="p-0">
 
         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide">
-                <i data-lucide="users-2" class="w-7 h-7 inline mr-2 text-[var(--hf-magenta-light)]"></i>
-                Staff Management
-            </h1>
+            <div class="page-head !mb-0">
+                <h1 class="page-title">
+                    <span class="page-ico"><i data-lucide="users-2" class="w-6 h-6"></i></span>
+                    Staff Management
+                </h1>
+            </div>
 
-            <a href="{{ route('hr.staff.create') }}"
-                class="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6] text-white font-semibold shadow hover:opacity-90 w-full sm:w-auto transition transform hover:-translate-y-0.5">
+            <a href="{{ route('hr.staff.create') }}" class="btn btn-primary w-full sm:w-auto">
                 <i data-lucide="plus-circle" class="w-5 h-5"></i>
                 Add New Staff
             </a>
         </div>
 
+        {{-- Status Filter Tabs --}}
+        <div class="flex gap-2 mb-4">
+            <a href="{{ route('hr.staff.index', array_merge(request()->query(), ['status' => 'active'])) }}"
+                class="px-4 py-2 rounded-xl text-sm font-semibold transition {{ ($status ?? 'active') === 'active' ? 'btn-primary' : 'btn btn-ghost' }}">
+                Active
+            </a>
+            <a href="{{ route('hr.staff.index', array_merge(request()->query(), ['status' => 'left'])) }}"
+                class="px-4 py-2 rounded-xl text-sm font-semibold transition {{ ($status ?? 'active') === 'left' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow' : 'btn btn-ghost' }}">
+                Left
+            </a>
+            <a href="{{ route('hr.staff.index', array_merge(request()->query(), ['status' => 'all'])) }}"
+                class="px-4 py-2 rounded-xl text-sm font-semibold transition {{ ($status ?? 'active') === 'all' ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow' : 'btn btn-ghost' }}">
+                All
+            </a>
+        </div>
+
         {{-- Filter Bar --}}
-        <form method="GET" action="{{ route('hr.staff.index') }}"
-            class="glass mb-6 p-4 sm:p-6 rounded-2xl border border-white/20 grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+        <x-filter-bar :action="route('hr.staff.index')">
+            <input type="hidden" name="status" value="{{ $status ?? 'active' }}">
 
-            <div class="relative flex items-center sm:col-span-4">
-                <i data-lucide="shield-check" class="absolute left-3 w-5 h-5 text-white/50 pointer-events-none"></i>
-                <select name="role" class="bg-white/10 text-white border border-white/20 p-3 pl-10 rounded-xl w-full focus:ring-2 focus:ring-[#ff2ba6]/50 transition outline-none">
-
-                    <option value="" class="text-black">All Roles</option>
-<option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }} class="text-black">Admin</option>
-<option value="salesman" {{ request('role') == 'salesman' ? 'selected' : '' }} class="text-black"> Salesman</option>
-<option value="account" {{ request('role') == 'account' ? 'selected' : '' }} class="text-black">Accounts</option>
-<option value="it" {{ request('role') == 'it' ? 'selected' : '' }} class="text-black">IT</option>
-<option value="store" {{ request('role') == 'store' ? 'selected' : '' }} class="text-black">Store</option>
-<option value="office_boy" {{ request('role') == 'office_boy' ? 'selected' : '' }} class="text-black">Office_Boy</option>
-<option value="hr" {{ request('role') == 'hr' ? 'selected' : '' }} class="text-black">Hr</option>
-<option value="saleshead" {{ request('saleshead') == 'saleshead' ? 'selected' : '' }} class="text-black">Saleshead</option>
-
+            <x-filter-field icon="shield-check">
+                <select name="role" class="select">
+                    <option value="">All Roles</option>
+                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="salesman" {{ request('role') == 'salesman' ? 'selected' : '' }}>Salesman</option>
+                    <option value="account" {{ request('role') == 'account' ? 'selected' : '' }}>Accounts</option>
+                    <option value="it" {{ request('role') == 'it' ? 'selected' : '' }}>IT</option>
+                    <option value="store" {{ request('role') == 'store' ? 'selected' : '' }}>Store</option>
+                    <option value="office_boy" {{ request('role') == 'office_boy' ? 'selected' : '' }}>Office_Boy</option>
+                    <option value="hr" {{ request('role') == 'hr' ? 'selected' : '' }}>Hr</option>
+                    <option value="saleshead" {{ request('saleshead') == 'saleshead' ? 'selected' : '' }}>Saleshead</option>
                 </select>
-            </div>
+            </x-filter-field>
 
-            <div class="relative flex items-center sm:col-span-5">
-                <i data-lucide="search" class="absolute left-3 w-5 h-5 text-white/50 pointer-events-none"></i>
-                <input type="text" name="search" placeholder="Search name or email..." value="{{ request('search') }}"
-                    class="bg-white/10 text-white border border-white/20 p-3 pl-10 rounded-xl w-full focus:ring-2 focus:ring-[#ff2ba6]/50 transition outline-none">
-            </div>
+            <x-filter-field icon="search">
+                <input type="text" name="search" placeholder="Search name or email..." value="{{ request('search') }}" class="input">
+            </x-filter-field>
 
-            <div class="flex gap-3 sm:col-span-3">
-                <button type="submit"
-                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6] text-white font-semibold shadow hover:opacity-90 transition">
-                    <i data-lucide="filter" class="w-4 h-4"></i>
-                    Filter
-                </button>
-
-                <a href="{{ route('hr.staff.index') }}"
-                    class="flex items-center justify-center px-4 py-3 rounded-xl bg-white/20 border border-white/30 text-white hover:bg-white/30 transition"
-                    title="Reset Filters">
-                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-                </a>
-            </div>
-        </form>
+            <x-filter-actions :reset="route('hr.staff.index', ['status' => $status ?? 'active'])" />
+        </x-filter-bar>
 
         {{-- Desktop Table View --}}
-        <div class="glass rounded-2xl border border-white/20 overflow-hidden shadow-xl hidden md:block">
-            <table class="w-full min-w-[600px]">
-                <thead class="bg-white/10 backdrop-blur-xl">
-                    <tr class="text-left text-white/70 text-xs sm:text-sm  tracking-wider">
-                        <th class="p-4 w-20"><div class="flex items-center gap-2"><i data-lucide="hash" class="w-4 h-4 text-white/50"></i>Id</div></th>
-                        <th class="p-4"><div class="flex items-center gap-2"><i data-lucide="user" class="w-4 h-4 text-white/50"></i>Staff Member</div></th>
-                        <th class="p-4"><div class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4 text-white/50"></i>Email</div></th>
-                        <th class="p-4 text-center"><div class="flex items-center justify-center gap-2"><i data-lucide="shield" class="w-4 h-4 text-white/50"></i>Role</div></th>
-                        <th class="p-4 text-center"><div class="flex items-center justify-center gap-2"><i data-lucide="settings" class="w-4 h-4 text-white/50"></i>Actions</div></th>
+        <div class="card !rounded-2xl overflow-hidden shadow-card-lg hidden md:block">
+            <div class="tbl-wrap !border-0 !shadow-none">
+            <table class="tbl w-full min-w-[600px]">
+                <thead>
+                    <tr>
+                        <th class="w-20">Id</th>
+                        <th>Staff Member</th>
+                        <th>Email</th>
+                        <th class="text-center">Role</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     @forelse ($staff as $user)
-                        <tr class="border-t border-white/10 hover:bg-white/10 transition">
-                            <td class="p-4 text-white/40 font-mono text-xs">#{{ $user->id }}</td>
-                            <td class="p-4">
+                        <tr class="{{ $user->left_at ? 'opacity-70' : '' }}">
+                            <td class="muted font-mono text-xs">#{{ $user->id }}</td>
+                            <td>
                                 <div class="flex items-center gap-3">
-                                    <div class="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold uppercase shadow-lg">
+                                    <div class="avatar avatar-md gradient-surface !text-white font-bold uppercase">
                                         {{ substr($user->name, 0, 2) }}
                                     </div>
-                                    <span class="font-semibold text-white/90">{{ $user->name }}</span>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-semibold text-[var(--text)]">{{ $user->name }}</span>
+                                            @if($user->left_at)
+                                                <span class="badge badge-orange text-[10px]">Left</span>
+                                            @endif
+                                        </div>
+                                        @if($user->left_at)
+                                            <div class="muted text-xs">Left on {{ $user->left_at->format('d M Y') }}</div>
+                                        @endif
+                                    </div>
                                 </div>
                             </td>
-                            <td class="p-4 text-white/70 text-sm italic">{{ $user->email }}</td>
-                            <td class="p-4 text-center">
-                                <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase border
-                                    {{ $user->role === 'admin' ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-blue-500/20 text-blue-300 border-blue-500/40' }}">
+                            <td class="text-[var(--text-soft)] text-sm italic">{{ $user->email }}</td>
+                            <td class="text-center">
+                                <span class="badge {{ $user->role === 'admin' ? 'badge-rose' : 'badge-sky' }} uppercase !text-[10px]">
                                     {{ $user->role }}
                                 </span>
                             </td>
-                            <td class="p-4">
+                            <td>
                                 <div class="flex items-center justify-center gap-2">
                                     @if($user->role !== 'admin')
                                         <a href="{{ route('hr.attendance.staff', $user->id) }}"
-                                           class="p-2 rounded-lg bg-blue-500/20 border border-blue-400/30 text-blue-200 hover:bg-blue-500/40 transition"
+                                           class="p-2 rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400 hover:bg-blue-500/30 transition"
                                            title="Attendance">
                                             <i data-lucide="calendar-check" class="w-4 h-4"></i>
                                         </a>
                                     @endif
 
+                                    @if($user->role !== 'admin' && auth()->id() !== $user->id)
+                                        @if($user->left_at)
+                                            <form method="POST" action="{{ route('hr.staff.rejoin', $user->id) }}"
+                                                onsubmit="return confirm('Are you sure you want to re-add this staff member as active?')">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="p-2 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/40 transition"
+                                                        title="Rejoin">
+                                                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form method="POST" action="{{ route('hr.staff.left', $user->id) }}"
+                                                onsubmit="confirmLeft(event, this)">
+                                                @csrf
+                                                <input type="hidden" name="left_reason" value="">
+                                                <input type="hidden" name="left_at" value="">
+                                                <button type="submit"
+                                                        class="p-2 rounded-lg bg-orange-500/15 text-orange-600 dark:text-orange-400 hover:bg-orange-500/40 transition"
+                                                        title="Mark as Left">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <circle cx="12" cy="12" r="10" stroke-width="2"/>
+    <path d="M12 6v6l4 2" stroke-width="2"/>
+</svg>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-10 text-center text-white/40 italic">No staff members found matching your filters.</td>
+                            <td colspan="5" class="p-10 text-center muted italic">No staff members found matching your filters.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- Mobile Card View --}}
         <div class="md:hidden space-y-4 mt-4">
             @forelse ($staff as $user)
-                <div class="glass border border-white/20 rounded-2xl p-5 shadow-lg relative">
+                <div class="card !rounded-2xl p-5 relative {{ $user->left_at ? 'opacity-80' : '' }}">
                     <div class="absolute top-4 right-4">
-                         <span class="px-2 py-1 rounded-md text-[9px] font-bold uppercase border
-                            {{ $user->role === 'admin' ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : 'bg-blue-500/20 text-blue-300 border-blue-500/40' }}">
+                         <span class="badge {{ $user->role === 'admin' ? 'badge-rose' : 'badge-sky' }} uppercase !text-[9px]">
                             {{ $user->role }}
                         </span>
                     </div>
 
                     <div class="flex items-center gap-4 mb-4">
-                        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
+                        <div class="avatar avatar-lg gradient-surface !text-white font-bold">
                             {{ substr($user->name, 0, 2) }}
                         </div>
                         <div>
-                            <h3 class="text-white font-bold">{{ $user->name }}</h3>
-                            <p class="text-white/50 text-xs">{{ $user->email }}</p>
+                            <h3 class="text-[var(--text)] font-bold">
+                                {{ $user->name }}
+                                @if($user->left_at)
+                                    <span class="badge badge-orange text-[9px] align-middle">Left</span>
+                                @endif
+                            </h3>
+                            <p class="muted text-xs">{{ $user->email }}</p>
+                            @if($user->left_at)
+                                <p class="text-orange-500/80 text-[10px]">Left on {{ $user->left_at->format('d M Y') }}</p>
+                            @endif
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-3 pt-4 border-t border-white/10">
+                    <div class="grid grid-cols-1 gap-3 pt-4 border-t border-[var(--border)]">
                         @if($user->role !== 'admin')
                             <a href="{{ route('hr.attendance.staff', $user->id) }}"
-                                class="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold hover:bg-blue-500/30 transition">
+                                class="btn btn-soft btn-sm w-full">
                                 <i data-lucide="calendar-check" class="w-4 h-4"></i>
                                 Attendance
                             </a>
                         @endif
-
+                        @if($user->role !== 'admin' && auth()->id() !== $user->id)
+                            @if($user->left_at)
+                                <form method="POST" action="{{ route('hr.staff.rejoin', $user->id) }}"
+                                    onsubmit="return confirm('Are you sure you want to re-add this staff member as active?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-sm w-full">
+                                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                                        Rejoin
+                                    </button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('hr.staff.left', $user->id) }}"
+                                    onsubmit="confirmLeft(event, this)">
+                                    @csrf
+                                    <input type="hidden" name="left_reason" value="">
+                                    <input type="hidden" name="left_at" value="">
+                                    <button type="submit"
+                                        class="btn btn-sm w-full bg-orange-500/15 text-orange-600 dark:text-orange-400 hover:bg-orange-500/30 border border-orange-500/25 rounded-xl font-bold">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                            <path d="M12 6v6l4 2" stroke-width="2"/>
+                                        </svg>
+                                        Mark Left
+                                    </button>
+                                </form>
+                            @endif
+                        @endif
                     </div>
                 </div>
             @empty
-                <p class="text-center text-white/50 py-10">No staff members found matching your filters.</p>
+                <p class="text-center muted py-10">No staff members found matching your filters.</p>
             @endforelse
         </div>
 
@@ -156,4 +227,20 @@
         </div>
 
     </div>
+
+    <script>
+        function confirmLeft(event, form) {
+            event.preventDefault();
+            const reason = prompt('Optional reason for leaving (can be empty):', '');
+            if (reason === null) return false;
+            const today = new Date().toISOString().slice(0, 10);
+            const leftAt = prompt('Leaving date (YYYY-MM-DD), empty = today:', today);
+            if (leftAt === null) return false;
+            form.querySelector('[name=left_reason]').value = reason || '';
+            form.querySelector('[name=left_at]').value = leftAt || '';
+            if (!confirm('Are you sure you want to mark this staff member as left?')) return false;
+            form.submit();
+            return false;
+        }
+    </script>
 @endsection

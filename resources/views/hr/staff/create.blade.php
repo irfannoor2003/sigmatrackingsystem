@@ -4,112 +4,94 @@
 
 @section('content')
 
-    <div
-        class="max-w-xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20
-             p-8 rounded-2xl shadow-xl mt-10">
+    <div class="max-w-xl mx-auto mt-10">
 
-        {{-- Header --}}
-        <h2 class="text-2xl font-bold text-white mb-6 tracking-wide flex items-center">
-            <i data-lucide="user-plus" class="w-7 h-7 mr-3 text-[#ff2ba6]"></i> Create Staff
-        </h2>
+        <div class="card !rounded-2xl p-8 shadow-card-lg">
 
-        {{-- Form --}}
-        <form method="POST" action="{{ route('hr.staff.store') }}">
-            @csrf
-
-            <!-- Name -->
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                <i data-lucide="user" class="w-4 h-4 mr-2"></i> Full Name
-            </label>
-            <div class="relative mb-4">
-                <i data-lucide="scan-face" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/50"></i>
-                <input name="name" type="text" value="{{ old('name') }}" placeholder="Enter full name"
-                    class="w-full px-4 py-3 pl-10 rounded-lg bg-white/10 text-white
-                       placeholder-white/50 focus:bg-white/20 outline-none"
-                    required>
+            <div class="page-head !mb-6">
+                <h2 class="page-title">
+                    <span class="page-ico"><i data-lucide="user-plus" class="w-6 h-6"></i></span>
+                    Create Staff
+                </h2>
             </div>
 
-            <!-- Email -->
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Email
-            </label>
-            <div class="relative mb-4">
-                <i data-lucide="at-sign" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/50"></i>
-                <input name="email" type="email" value="{{ old('email') }}" placeholder="Enter email address"
-                    class="w-full px-4 py-3 pl-10 rounded-lg bg-white/10 text-white
-                       placeholder-white/50 focus:bg-white/20 outline-none"
-                    required>
-            </div>
+            <form method="POST" action="{{ route('hr.staff.store') }}">
+                @csrf
 
-            <!-- Phone -->
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                <i data-lucide="phone" class="w-4 h-4 mr-2"></i> Phone (WhatsApp)
-            </label>
-            <div class="relative mb-4">
-                <i data-lucide="smartphone" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/50"></i>
-                <input name="phone" type="text" value="{{ old('phone') }}" placeholder="e.g. +923001234567"
-                    class="w-full px-4 py-3 pl-10 rounded-lg bg-white/10 text-white
-                       placeholder-white/50 focus:bg-white/20 outline-none">
-            </div>
+                <label class="label flex items-center">
+                    <i data-lucide="user" class="w-4 h-4 mr-2"></i> Full Name
+                </label>
+                <div class="input-icon-wrap mb-4">
+                    <i data-lucide="scan-face" class="w-4 h-4"></i>
+                    <input name="name" type="text" value="{{ old('name') }}" placeholder="Enter full name"
+                        class="input" required>
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
 
-            <!-- Password -->
-            <label class="block text-sm text-white/80 mb-1 flex items-center">
-                <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Password
-            </label>
-            <div class="relative mb-4">
-                <i data-lucide="key" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-white/50"></i>
-                <input name="password" type="password" placeholder="Enter password"
-                    class="w-full px-4 py-3 pl-10 rounded-lg bg-white/10 text-white
-                       placeholder-white/50 focus:bg-white/20 outline-none"
-                    required>
-            </div>
+                <label class="label flex items-center">
+                    <i data-lucide="mail" class="w-4 h-4 mr-2"></i> Email
+                </label>
+                <div class="input-icon-wrap mb-4">
+                    <i data-lucide="at-sign" class="w-4 h-4"></i>
+                    <input name="email" type="email" value="{{ old('email') }}" placeholder="Enter email address"
+                        class="input" required>
+                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
 
-           <!-- Role -->
-<label class="block text-sm text-white/80 mb-1 flex items-center">
-    <i data-lucide="shield-check" class="w-4 h-4 mr-2"></i> Role
-</label>
+                <label class="label flex items-center">
+                    <i data-lucide="phone" class="w-4 h-4 mr-2"></i> Phone (WhatsApp)
+                </label>
+                <div class="input-icon-wrap mb-4">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                    <input name="phone" type="text" value="{{ old('phone') }}" placeholder="e.g. +923001234567"
+                        class="input">
+                </div>
 
-<div class="relative mb-6">
-    <select name="role"
-        class="w-full px-4 py-3 rounded-lg bg-white/10 text-white
-               focus:bg-white/20 outline-none"
-        required>
+                <label class="label flex items-center">
+                    <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Password
+                </label>
+                <div class="input-icon-wrap mb-4">
+                    <i data-lucide="key" class="w-4 h-4"></i>
+                    <input name="password" type="password" placeholder="Enter password"
+                        class="input" required>
+                </div>
 
-        <option value="" disabled selected class="text-black">Select Role</option>
+                <label class="label flex items-center">
+                    <i data-lucide="shield-check" class="w-4 h-4 mr-2"></i> Role
+                </label>
 
-        {{-- ADMIN & MANAGEMENT --}}
-        <optgroup label="Management" class="text-black font-semibold">
-            <option value="admin" class="text-black">Admin (Full Access)</option>
-            <option value="hr" class="text-black">HR</option>
-            <option value="saleshead" class="text-black">Sales Head</option>
-        </optgroup>
+                <div class="mb-6">
+                    <select name="role" class="select w-full" required>
+                        <option value="" disabled {{ old('role') ? '' : 'selected' }}>Select Role</option>
 
-        {{-- SALES --}}
-        <optgroup label="Sales Team" class="text-black font-semibold">
-            <option value="salesman" class="text-black">Salesman</option>
-        </optgroup>
+                        {{-- ADMIN & MANAGEMENT --}}
+                        <optgroup label="Management" class="font-semibold">
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin (Full Access)</option>
+                            <option value="hr" {{ old('role') == 'hr' ? 'selected' : '' }}>HR</option>
+                            <option value="saleshead" {{ old('role') == 'saleshead' ? 'selected' : '' }}>Sales Head</option>
+                        </optgroup>
 
-        {{-- STAFF --}}
-        <optgroup label="Staff" class="text-black font-semibold">
-            <option value="it" class="text-black">IT Department</option>
-            <option value="account" class="text-black">Accounts</option>
-            <option value="store" class="text-black">Store</option>
-            <option value="office_boy" class="text-black">Office Boy</option>
-        </optgroup>
+                        {{-- SALES --}}
+                        <optgroup label="Sales Team" class="font-semibold">
+                            <option value="salesman" {{ old('role') == 'salesman' ? 'selected' : '' }}>Salesman</option>
+                        </optgroup>
 
-    </select>
-</div>
+                        {{-- STAFF --}}
+                        <optgroup label="Staff" class="font-semibold">
+                            <option value="it" {{ old('role') == 'it' ? 'selected' : '' }}>IT Department</option>
+                            <option value="account" {{ old('role') == 'account' ? 'selected' : '' }}>Accounts</option>
+                            <option value="store" {{ old('role') == 'store' ? 'selected' : '' }}>Store</option>
+                            <option value="office_boy" {{ old('role') == 'office_boy' ? 'selected' : '' }}>Office Boy</option>
+                        </optgroup>
+                    </select>
+                </div>
 
+                <button class="btn btn-primary w-full !py-3">
+                    <i data-lucide="save" class="w-5 h-5 mr-2"></i> Create Staff
+                </button>
 
-            <!-- Submit Button -->
-            <button
-                class="w-full py-3 rounded-xl text-white font-semibold tracking-wide flex items-center justify-center
-                   bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6] shadow-lg
-                   hover:opacity-90 transition">
-                <i data-lucide="save" class="w-5 h-5 mr-2"></i> Create Staff
-            </button>
-
-        </form>
+            </form>
+        </div>
     </div>
 
 @endsection

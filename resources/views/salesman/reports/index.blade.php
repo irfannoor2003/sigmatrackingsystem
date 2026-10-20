@@ -4,37 +4,57 @@
 
 @section('content')
 <div class="p-0">
-    <h1 class="text-2xl font-bold mb-4">My Visit Report</h1>
 
-    <table class="table-auto w-full border">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="p-2">Customer</th>
-                <th class="p-2">Purpose</th>
-                <th class="p-2">Status</th>
-                <th class="p-2">Notes</th>
-                <th class="p-2">Duration (min)</th>
-                <th class="p-2">Visit Started Date</th>
-                <th class="p-2">Date & Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($visits as $v)
-            <tr class="border-t">
-                <td class="p-2">{{ $v->customer->name }}</td>
-                <td class="p-2">{{ $v->purpose }}</td>
-                <td class="p-2">{{ ucfirst($v->status) }}</td>
-                <td class="p-2">{{ $v->notes }}</td>
-                <td class="p-2">{{ $v->duration ?? '-' }}</td>
-                <td class="p-2">
-                    {{ optional($v->started_at)->format('Y-m-d') }}
-                </td>
-                <td class="p-2">
-                    {{ optional($v->started_at)->format('Y-m-d H:i') }}
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="page-head !mb-6">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="bar-chart-3" class="w-6 h-6"></i></span>
+            My Visit Report
+        </h1>
+    </div>
+
+    <div class="card !rounded-2xl shadow-card-lg">
+        <div class="tbl-wrap !border-0 !shadow-none">
+        <table class="tbl w-full">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Purpose</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Duration (min)</th>
+                    <th>Visit Started Date</th>
+                    <th>Date & Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($visits as $v)
+                <tr>
+                    <td class="text-[var(--text)]">{{ $v->customer->name }}</td>
+                    <td class="text-[var(--text-soft)]">{{ $v->purpose }}</td>
+                    <td>
+                        @if($v->status == 'started')
+                            <span class="badge badge-amber">{{ ucfirst($v->status) }}</span>
+                        @elseif($v->status == 'completed')
+                            <span class="badge badge-emerald">{{ ucfirst($v->status) }}</span>
+                        @elseif($v->status == 'blocked')
+                            <span class="badge badge-red">{{ ucfirst($v->status) }}</span>
+                        @else
+                            <span class="badge badge-gray">{{ ucfirst($v->status) }}</span>
+                        @endif
+                    </td>
+                    <td class="text-[var(--text-muted)]">{{ $v->notes }}</td>
+                    <td class="text-[var(--text-soft)]">{{ $v->duration ?? '-' }}</td>
+                    <td class="text-[var(--text-soft)]">
+                        {{ optional($v->started_at)->format('Y-m-d') }}
+                    </td>
+                    <td class="text-[var(--text-soft)]">
+                        {{ optional($v->started_at)->format('Y-m-d H:i') }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        </div>
+    </div>
 </div>
 @endsection

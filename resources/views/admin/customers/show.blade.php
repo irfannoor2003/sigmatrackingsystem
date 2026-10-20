@@ -3,134 +3,115 @@
 @section('title', 'Customer Details: ' . $customer->name)
 
 @section('content')
-    <div class="max-w-4xl mx-auto mt-10 px-0">
+    <div>
 
-        <div class="glass p-6 md:p-8 rounded-3xl border border-white/20 shadow-2xl">
-
-            <h2 class="text-2xl md:text-3xl font-bold text-white mb-6 tracking-wide flex items-center gap-3">
-                <i data-lucide="briefcase" class="w-7 h-7 text-[var(--hf-magenta-light)]"></i>
+        <div class="page-head">
+            <h1 class="page-title">
+                <span class="page-ico"><i data-lucide="briefcase" class="w-6 h-6"></i></span>
                 Customer Details
-            </h2>
+            </h1>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="card !rounded-2xl p-6 md:p-8">
 
+            <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h3 class="text-xl md:text-2xl font-semibold text-white flex items-center gap-2 mb-2">
-                        <i data-lucide="building-2" class="w-6 h-6 text-white/80"></i>
+                    <h3 class="text-xl md:text-2xl font-display font-semibold text-[var(--text)] flex items-center gap-2">
+                        <i data-lucide="building-2" class="w-6 h-6 text-[var(--accent)]"></i>
                         {{ $customer->name }}
                     </h3>
-
-                    <p class="text-indigo-200 font-medium mb-4 capitalize flex items-center gap-2">
-                        <i data-lucide="tag" class="w-4 h-4 text-indigo-200"></i>
+                    <p class="text-[var(--text-soft)] font-medium mt-1 capitalize flex items-center gap-2">
+                        <i data-lucide="tag" class="w-4 h-4 muted"></i>
                         {{ $customer->category->name ?? 'No Category' }}
                     </p>
+                </div>
 
-                    <div class="space-y-3">
+                <div class="flex gap-3">
+                    <button id="showImageBtn" class="btn btn-primary btn-sm">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        Preview Document
+                    </button>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i>
-                                Contact Person</span>
-                            <span class="text-white">{{ $customer->contact_person ?? 'N/A' }}</span>
-                        </div>
+                    <button id="closeImageBtn" class="btn btn-danger btn-sm hidden">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                        Close Preview
+                    </button>
+                </div>
+            </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>
-                                Phone 1</span>
-                            <span class="text-white">{{ $customer->phone1 }}</span>
-                        </div>
+            <div class="space-y-3">
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>
-                                Phone 2</span>
-                            <span class="text-white">{{ $customer->phone2 ?? 'N/A' }}</span>
-                        </div>
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="user" class="w-4 h-4"></i> Contact Person</span>
+                    <span class="text-[var(--text)] font-medium">{{ $customer->contact_person ?? 'N/A' }}</span>
+                </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>
-                                Email</span>
-                            <span class="text-white">{{ $customer->email ?? 'N/A' }}</span>
-                        </div>
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> Phone 1</span>
+                    <span class="text-[var(--text)] font-medium">{{ $customer->phone1 }}</span>
+                </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="map-pin"
-                                    class="w-4 h-4"></i> City</span>
-                            <span class="text-white capitalize">{{ $customer->city?->name ?? 'N/A' }}</span>
-                        </div>
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> Phone 2</span>
+                    <span class="text-[var(--text)] font-medium">{{ $customer->phone2 ?? 'N/A' }}</span>
+                </div>
 
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="factory"
-                                    class="w-4 h-4"></i> Industry</span>
-                            <span class="text-white">{{ $customer->industry?->name ?? 'N/A' }}</span>
-                        </div>
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> Email</span>
+                    <span class="text-[var(--text)] font-medium">{{ $customer->email ?? 'N/A' }}</span>
+                </div>
 
-                        <div class="flex justify-between items-start bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2 whitespace-nowrap">
-                                <i data-lucide="home" class="w-4 h-4"></i> Address
-                            </span>
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> City</span>
+                    <span class="text-[var(--text)] font-medium capitalize">{{ $customer->city?->name ?? 'N/A' }}</span>
+                </div>
 
-                            <div class="max-w-[60%] text-right">
-                                <p id="address-{{ $customer->id }}"
-                                    class="text-white text-sm leading-relaxed line-clamp-2 break-words">
-                                    {{ $customer->address ?? 'N/A' }}
-                                </p>
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="factory" class="w-4 h-4"></i> Industry</span>
+                    <span class="text-[var(--text)] font-medium">{{ $customer->industry?->name ?? 'N/A' }}</span>
+                </div>
 
+                <div class="flex justify-between items-start soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="home" class="w-4 h-4"></i> Address
+                    </span>
 
-                            </div>
-                        </div>
-
-
-                        <div class="flex justify-between items-center bg-white/10 py-3 px-4 rounded-xl">
-                            <span class="text-white/70 flex items-center gap-2"><i data-lucide="calendar"
-                                    class="w-4 h-4"></i> Added On</span>
-                            <span class="text-white">{{ $customer->created_at->format('d M, Y') }}</span>
-                        </div>
-
+                    <div class="max-w-[60%] text-right">
+                        <p id="address-{{ $customer->id }}"
+                            class="text-[var(--text)] text-sm leading-relaxed line-clamp-2 break-words">
+                            {{ $customer->address ?? 'N/A' }}
+                        </p>
                     </div>
+                </div>
 
-                    <div class="mt-6 flex gap-4">
-                        <button id="showImageBtn"
-                            class="flex items-center gap-2 px-5 py-3 bg-[#ff2ba6]/80 hover:bg-[#ff2ba6] text-white font-semibold rounded-xl shadow-lg transition">
-                            <i data-lucide="file-text" class="w-5 h-5"></i>
-                            Preview Document
-                        </button>
-
-                        <button id="closeImageBtn"
-                            class="flex items-center gap-2 px-5 py-3 bg-red-600/70 hover:bg-red-600 text-white font-semibold rounded-xl shadow-lg transition hidden">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                            Close Preview
-                        </button>
-                    </div>
-
+                <div class="flex justify-between items-center soft-panel py-3 px-4 rounded-xl">
+                    <span class="muted flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> Added On</span>
+                    <span class="text-[var(--text)] font-medium">{{ $customer->created_at->format('d M, Y') }}</span>
                 </div>
 
             </div>
 
             <div id="imageDisplaySection" class="mt-8 hidden">
-
-                <h3 class="text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                    <i data-lucide="receipt" class="w-6 h-6 text-white/70"></i>
+                <h3 class="text-xl font-display font-semibold text-[var(--text)] mb-4 flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-6 h-6 muted"></i>
                     Customer Document
                 </h3>
 
-                       @if ($customer->image)
-    <div class="rounded-xl overflow-hidden bg-white/10 border border-white/10 shadow-lg cursor-pointer"
-         id="imageBox"
-         data-image="{{ asset($customer->image) }}">
-
-        <img src="{{ asset($customer->image) }}"
-             class="w-full h-64 object-cover">
-    </div>
-@else
-    <p class="text-white/60 text-lg">No document uploaded</p>
-@endif
-
-
+                @if ($customer->image)
+                    <div class="rounded-2xl overflow-hidden soft-panel border border-[var(--border)] cursor-pointer"
+                         id="imageBox"
+                         data-image="{{ asset($customer->image) }}">
+                        <img src="{{ asset($customer->image) }}"
+                             class="w-full h-64 object-cover">
+                    </div>
+                @else
+                    <p class="muted text-lg">No document uploaded</p>
+                @endif
             </div>
 
             <div class="mt-8 text-center md:text-right">
-                <a href="{{ route('admin.customers.index') }}"
-                    class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600/80 hover:bg-purple-600 text-white font-semibold rounded-xl shadow-lg transition">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <a href="{{ route('admin.customers.index') }}" class="btn btn-outline">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     Back to Customers
                 </a>
             </div>
@@ -142,43 +123,20 @@
          FULL SCREEN IMAGE MODAL
     =========================== -->
     <div id="imagePreviewModal"
-        class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/70 backdrop-blur-xl p-6 transition">
+        class="fixed inset-0 hidden items-center justify-center z-[9999] bg-black/70 backdrop-blur-xl p-6">
 
-        <div
-            class="relative w-full max-w-4xl mx-auto bg-white/10 border border-white/20 backdrop-blur-2xl
-                rounded-3xl shadow-2xl p-4 md:p-6 animate-fadeIn">
+        <div class="relative w-full max-w-4xl mx-auto card !rounded-3xl shadow-card-lg p-4 md:p-6 animate-fade-in">
 
             <!-- Close Button -->
             <button id="closePreview"
-                class="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full transition shadow-lg">
+                class="absolute top-4 right-4 icon-btn !w-11 !h-11 bg-[var(--surface)]">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
 
             <!-- Full-screen Image -->
-            <img id="previewImage" src="" class="w-full max-h-[80vh] object-contain rounded-2xl shadow-xl">
+            <img id="previewImage" src="" class="w-full max-h-[80vh] object-contain rounded-2xl">
         </div>
     </div>
-
-
-    <!-- Fade Animation -->
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .animate-fadeIn {
-            animation: fadeIn 0.25s ease-out;
-        }
-    </style>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {

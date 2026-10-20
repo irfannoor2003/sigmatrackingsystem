@@ -140,6 +140,17 @@ class ZKTecoController extends Controller
                 }
 
                 // -------------------------------------------------
+                // BLOCK: User has left the company
+                // -------------------------------------------------
+                if (method_exists($user, 'isLeft') && $user->isLeft()) {
+                    Log::info("ZKTeco blocked — user has left the company", [
+                        'date' => $date,
+                        'user' => $user->name,
+                    ]);
+                    continue;
+                }
+
+                // -------------------------------------------------
                 // BLOCK: Public holiday
                 // -------------------------------------------------
                 if (Holiday::isHoliday($date)) {

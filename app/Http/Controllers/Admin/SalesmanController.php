@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Mail\UserWelcome;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SalesmanController extends Controller
 {
@@ -30,16 +33,31 @@ class SalesmanController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+            'phone'    => 'nullable|string|max:255',
         ]);
 
-        $data['password'] = Hash::make($data['password']);
-        $data['role'] = 'salesman';
+        $salesman = User::create([
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'password' => $data['password'],
+            'phone'    => $data['phone'] ?? null,
+            'role'     => 'salesman',
+        ]);
 
-        User::create($data);
+        $mailSent = true;
+
+        try {
+            Mail::to($salesman->email)->send(new UserWelcome($salesman, $data['password']));
+        } catch (\Exception $e) {
+            $mailSent = false;
+            Log::error('Failed sending welcome email: ' . $e->getMessage());
+        }
 
         return redirect()
             ->route('admin.salesmen.index')
-            ->with('success', 'Salesman created successfully.');
+            ->with('success', $mailSent
+                ? 'Salesman created successfully and welcome email sent.'
+                : 'Salesman created successfully, but the welcome email could not be sent.');
     }
 
     public function edit($id)

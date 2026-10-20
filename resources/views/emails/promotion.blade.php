@@ -35,7 +35,7 @@
                         text-align:center;
                         color:#ffffff;
                     ">
-                      <img src="{{ asset('images/company-logo.webp') }}"
+                      <img src="{{ asset('images/logo.webp') }}"
      alt="Company Logo"
      style="
         max-width:180px;
@@ -147,7 +147,7 @@
                 color:#9ca3af;
                 text-align:center;
             ">
-                漏 {{ date('Y') }} {{ config('app.name') }} 路 All rights reserved
+                © {{ date('Y') }} {{ config('app.name') }} . All rights reserved
             </p>
 
         </td>

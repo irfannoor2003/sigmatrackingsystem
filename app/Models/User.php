@@ -18,6 +18,10 @@ class User extends Authenticatable
         'role',
         'phone',
         'is_blocked',
+        'left_at',
+        'left_reason',
+        'joined_at',
+        'glass_mode',
     ];
 
     protected $hidden = [
@@ -25,13 +29,39 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->joined_at)) {
+                $user->joined_at = now()->toDateString();
+            }
+        });
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_blocked' => 'boolean',
+            'left_at' => 'datetime',
+            'joined_at' => 'date',
+            'glass_mode' => 'boolean',
         ];
+    }
+
+    // ===============================
+    // SCOPES
+    // ===============================
+
+    public function scopeActive($query)
+    {
+        return $query->whereNull('left_at');
+    }
+
+    public function scopeLeft($query)
+    {
+        return $query->whereNotNull('left_at');
     }
 
     // ===============================
@@ -82,6 +112,56 @@ class User extends Authenticatable
         }
 
         return $saved;
+    }
+
+    // ===============================
+    // LEFT STAFF HELPERS
+    // ===============================
+
+    public function isLeft(): bool
+    {
+        return $this->left_at !== null;
+    }
+
+    public function markAsLeft(?string $reason = null, $leftAt = null): bool
+    {
+        if (!$this->isLeft()) {
+            $this->left_at = $leftAt ? \Carbon\Carbon::parse($leftAt) : now();
+            $this->left_reason = $reason;
+        } else {
+            $this->left_reason = $reason;
+        }
+        $saved = $this->save();
+
+        try {
+            // Terminate any active sessions so the user is logged out immediately
+            \Illuminate\Support\Facades\DB::table('sessions')
+                ->where('user_id', $this->id)
+                ->delete();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed clearing sessions for left user: '.$e->getMessage());
+        }
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($this->email)->send(new \App\Mail\UserLeft($this));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed sending left email: '.$e->getMessage());
+        }
+
+        try {
+            \App\Services\NotificationService::sendWhatsApp($this->phone, 'You have left Sigma Engineering Services on '.$this->left_at->format('d M Y').'. You can no longer access the panel.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed sending left WhatsApp: '.$e->getMessage());
+        }
+
+        return $saved;
+    }
+
+    public function rejoin(): bool
+    {
+        $this->left_at = null;
+        $this->left_reason = null;
+        return $this->save();
     }
 
     // ===============================

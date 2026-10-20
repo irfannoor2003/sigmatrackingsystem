@@ -30,12 +30,15 @@ class AttendanceReportController extends Controller
         $staffId = $request->staff;
         $roles = ['salesman', 'it', 'account', 'store', 'office_boy'];
 
-        /** Staff list */
-        $allStaff = User::whereIn('role', $roles)
+        /** Active staff list (left members excluded) */
+        $allStaff = User::active()
+            ->whereIn('role', $roles)
             ->orderBy('name')
             ->get();
 
-        /** Attendance stats */
+        $activeStaffIds = $allStaff->pluck('id');
+
+        /** Attendance stats (active staff only) */
         $attendanceStats = Attendance::select(
                 'salesman_id',
                 DB::raw("SUM(status = 'present' AND short_leave = 0) as presents"),
@@ -43,6 +46,7 @@ class AttendanceReportController extends Controller
                 DB::raw("SUM(short_leave = 1) as short_leaves"),
                 DB::raw("SUM(total_minutes) as minutes")
             )
+            ->whereIn('salesman_id', $activeStaffIds)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
             ->groupBy('salesman_id')
@@ -75,8 +79,8 @@ class AttendanceReportController extends Controller
             ]);
         }
 
-        /** Staff table */
-        $staffQuery = User::whereIn('role', $roles)
+        /** Staff table (active staff only) */
+        $staffQuery = User::active()->whereIn('role', $roles)
             ->whereIn('id', $attendanceStats->pluck('salesman_id'));
 
         if ($staffId) {
@@ -144,17 +148,20 @@ class AttendanceReportController extends Controller
                 'status' => $dateString > $today ? 'future' : 'absent',
                 'label'  => $dateString > $today ? 'Upcoming' : 'Absent',
                 'attendance' => null,
+                'holiday' => null,
             ];
 
             /** Admin holiday */
             if (isset($dbHolidays[$dateString])) {
-                $dayData['status'] = 'off';
+                $dayData['status'] = 'holiday';
                 $dayData['label']  = $dbHolidays[$dateString];
+                $dayData['holiday'] = $dbHolidays[$dateString];
             }
             /** Pakistan holiday */
             elseif (isset($pakHolidays[$md])) {
-                $dayData['status'] = 'off';
+                $dayData['status'] = 'holiday';
                 $dayData['label']  = $pakHolidays[$md];
+                $dayData['holiday'] = $pakHolidays[$md];
             }
             /** Sunday */
             elseif ($currentDate->isSunday()) {

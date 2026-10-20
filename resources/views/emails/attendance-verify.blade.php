@@ -35,7 +35,7 @@
                         text-align:center;
                         color:#ffffff;
                     ">
-                        <img src="{{ asset('images/company-logo.webp') }}"
+                        <img src="{{ asset('images/logo.webp') }}"
                              alt="Company Logo"
                              style="
                                 max-width:180px;

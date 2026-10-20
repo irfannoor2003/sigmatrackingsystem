@@ -4,50 +4,53 @@
 
 @section('content')
 
-<div class="p-0 text-white">
+<div class="p-0">
 
-    <h1 class="text-3xl font-bold mb-6 tracking-wide flex items-center">
-        <i data-lucide="notebook-tabs" class="w-8 h-8 mr-3 text-pink-400"></i> Visit Details
-    </h1>
+    <div class="page-head !mb-6">
+        <h1 class="page-title">
+            <span class="page-ico"><i data-lucide="notebook-tabs" class="w-6 h-6"></i></span>
+            Visit Details
+        </h1>
+    </div>
 
-    <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-6 rounded-2xl backdrop-blur-xl border border-white/10 shadow-xl">
+    <div class="card !rounded-2xl p-6 shadow-card-lg">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-white/90">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-[var(--text-soft)]">
 
             <div>
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="user" class="w-5 h-5 mr-2 text-pink-300"></i>
-                    <strong class="text-white mr-2">Salesman:</strong> {{ $visit->salesman->name }}
+                    <i data-lucide="user" class="w-5 h-5 mr-2 text-[var(--accent)]"></i>
+                    <strong class="text-[var(--text)] mr-2">Salesman:</strong> {{ $visit->salesman->name }}
                 </p>
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="building" class="w-5 h-5 mr-2 text-indigo-300"></i>
-                    <strong class="text-white mr-2">Customer:</strong> {{ $visit->customer->name }}
+                    <i data-lucide="building" class="w-5 h-5 mr-2 text-indigo-400"></i>
+                    <strong class="text-[var(--text)] mr-2">Customer:</strong> {{ $visit->customer->name }}
                 </p>
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="target" class="w-5 h-5 mr-2 text-sky-300"></i>
-                    <strong class="text-white mr-2">Purpose:</strong> {{ $visit->purpose }}
+                    <i data-lucide="target" class="w-5 h-5 mr-2 text-sky-400"></i>
+                    <strong class="text-[var(--text)] mr-2">Purpose:</strong> {{ $visit->purpose }}
                 </p>
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="info" class="w-5 h-5 mr-2 text-gray-400"></i>
-                    <strong class="text-white mr-2">Status:</strong>
+                    <i data-lucide="info" class="w-5 h-5 mr-2 text-[var(--text-soft)]"></i>
+                    <strong class="text-[var(--text)] mr-2">Status:</strong>
 
                     @if($visit->status == 'started')
-                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-yellow-500/30 bg-yellow-500/10 text-yellow-400">
+                        <span class="badge badge-amber">
                             <i data-lucide="loader-2" class="w-3 h-3 mr-1"></i>
                             {{ ucfirst($visit->status) }}
                         </span>
                     @elseif($visit->status == 'completed')
-                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-green-500/30 bg-green-500/10 text-green-400">
+                        <span class="badge badge-emerald">
                             <i data-lucide="check-square" class="w-3 h-3 mr-1"></i>
                             {{ ucfirst($visit->status) }}
                         </span>
                     @elseif($visit->status == 'blocked')
-                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-red-500/30 bg-red-500/10 text-red-400">
+                        <span class="badge badge-red">
                             <i data-lucide="shield-off" class="w-3 h-3 mr-1"></i>
                             {{ ucfirst($visit->status) }}
                         </span>
                     @else
-                        <span class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold uppercase border border-gray-500/30 bg-gray-500/10 text-gray-400">
+                        <span class="badge badge-gray">
                             {{ ucfirst($visit->status) }}
                         </span>
                     @endif
@@ -56,20 +59,20 @@
 
             <div>
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="clock-start" class="w-5 h-5 mr-2 text-white/70"></i>
-                    <strong class="text-white mr-2">Started At:</strong>
+                    <i data-lucide="clock-start" class="w-5 h-5 mr-2 text-[var(--text-soft)]"></i>
+                    <strong class="text-[var(--text)] mr-2">Started At:</strong>
                     {{ $visit->started_at ? $visit->started_at->format('Y-m-d H:i') : '-' }}
                 </p>
 
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="clock-end" class="w-5 h-5 mr-2 text-white/70"></i>
-                    <strong class="text-white mr-2">Completed At:</strong>
+                    <i data-lucide="clock-end" class="w-5 h-5 mr-2 text-[var(--text-soft)]"></i>
+                    <strong class="text-[var(--text)] mr-2">Completed At:</strong>
                     {{ $visit->completed_at ? $visit->completed_at->format('Y-m-d H:i') : '-' }}
                 </p>
 
                 <p class="mb-3 flex items-center">
-                    <i data-lucide="timer" class="w-5 h-5 mr-2 text-white/70"></i>
-                    <strong class="text-white mr-2">Duration:</strong>
+                    <i data-lucide="timer" class="w-5 h-5 mr-2 text-[var(--text-soft)]"></i>
+                    <strong class="text-[var(--text)] mr-2">Duration:</strong>
 
                     @if($visit->started_at && $visit->completed_at)
                         @php
@@ -80,21 +83,21 @@
                             $pretty = $hours > 0 ? "{$hours}h {$mins}m" : "{$mins}m";
                         @endphp
 
-                        <span class="text-white">{{ $pretty }}</span>
+                        <span class="text-[var(--text)]">{{ $pretty }}</span>
 
                         @if($signed < 0)
-                            <span class="ml-2 inline-flex items-center text-sm text-yellow-300 bg-yellow-900/40 px-2 py-0.5 rounded-lg">
+                            <span class="ml-2 inline-flex items-center text-sm text-amber-500 bg-[var(--accent-softer)] px-2 py-0.5 rounded-lg">
                                 <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i> timestamps inconsistent
                             </span>
                         @endif
 
                     @else
-                        <span class="text-white/60">-</span>
+                        <span class="text-[var(--text-soft)]">-</span>
                     @endif
                 </p>
-<p class="mb-3 flex items-center">
-                    <i data-lucide="map" class="w-5 h-5 mr-2 text-white/70"></i>
-                    <strong class="text-white mr-2">
+                <p class="mb-3 flex items-center">
+                    <i data-lucide="map" class="w-5 h-5 mr-2 text-[var(--text-soft)]"></i>
+                    <strong class="text-[var(--text)] mr-2">
                         @if($visit->pitstops && count($visit->pitstops) > 0)
                             Total KM Traveled:
                         @else
@@ -102,7 +105,7 @@
                         @endif
                     </strong>
                     @if($visit->pitstops && count($visit->pitstops) > 0 && $visit->pitstop_total_km)
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#ff2ba6]/20 text-[#ff2ba6] text-sm font-bold border border-[#ff2ba6]/30">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[var(--accent-softer)] text-[var(--accent)] text-sm font-bold border border-[var(--accent-soft)]">
                             {{ $visit->pitstop_total_km }} km
                         </span>
                     @else
@@ -114,23 +117,23 @@
         </div>
 
         <div class="mt-6">
-            <p class="text-white mb-2 font-semibold text-lg flex items-center">
-                <i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-white/80"></i> Notes:
+            <p class="text-[var(--text)] mb-2 font-semibold text-lg flex items-center">
+                <i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-[var(--text-soft)]"></i> Notes:
             </p>
-            <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+            <div class="soft-panel p-4 rounded-xl border border-[var(--border)]">
                 {{ $visit->notes ?? 'No notes added.' }}
             </div>
         </div>
 
         @if($visit->status == 'cancelled' && $visit->cancelled_reason)
         <div class="mt-6">
-            <p class="text-white mb-2 font-semibold text-lg flex items-center">
-                <i data-lucide="x-circle" class="w-5 h-5 mr-2 text-red-400"></i> Cancellation Reason:
+            <p class="text-[var(--text)] mb-2 font-semibold text-lg flex items-center">
+                <i data-lucide="x-circle" class="w-5 h-5 mr-2 text-red-500"></i> Cancellation Reason:
             </p>
-            <div class="bg-red-500/10 p-4 rounded-xl border border-red-400/30">
-                <p class="text-red-200">{{ $visit->cancelled_reason }}</p>
+            <div class="alert alert-error p-4 rounded-xl">
+                <p class="text-red-400 dark:text-red-200">{{ $visit->cancelled_reason }}</p>
                 @if($visit->cancelled_at)
-                    <p class="mt-2 text-xs text-white/50">
+                    <p class="mt-2 text-xs text-[var(--text-soft)]">
                         Cancelled on {{ $visit->cancelled_at->format('Y-m-d H:i') }}
                     </p>
                 @endif
@@ -141,19 +144,19 @@
         {{-- HORIZONTAL ROAD MAP --}}
         @if($visit->pitstops && count($visit->pitstops) > 0)
         <div class="mt-8">
-            <h2 class="text-xl font-semibold mb-4 text-white flex items-center">
-                <i data-lucide="route" class="w-6 h-6 mr-2 text-[#ff2ba6]"></i>
+            <h2 class="text-xl font-semibold mb-4 text-[var(--text)] flex items-center">
+                <i data-lucide="route" class="w-6 h-6 mr-2 text-[var(--accent)]"></i>
                 Route Map
             </h2>
 
-            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-4 py-5">
+            <div class="soft-panel p-4 py-5 rounded-2xl" style="border:1px solid var(--border);">
                 <div id="roadTrack" class="flex items-center justify-between w-full" style="position:relative;">
 
                     <div class="road-node relative flex flex-col items-center cursor-pointer" data-target="office-start">
-                        <div class="w-8 h-8 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center z-10 route-marker">
-                            <i data-lucide="send" class="w-3.5 h-3.5 text-green-400"></i>
+                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center z-10 route-marker">
+                            <i data-lucide="send" class="w-3.5 h-3.5 text-emerald-400"></i>
                         </div>
-                        <span class="route-label-h absolute -bottom-4 text-[9px] text-white/40 font-medium whitespace-nowrap">Office</span>
+                        <span class="route-label-h absolute -bottom-4 text-[9px] text-[var(--text-soft)] font-medium whitespace-nowrap">Office</span>
                     </div>
 
                     <div class="flex-1 h-[2px] route-line-h mx-1"></div>
@@ -162,28 +165,28 @@
                         <div class="w-9 h-9 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center z-10 route-marker shadow-lg shadow-blue-500/20">
                             <i data-lucide="user" class="w-4 h-4 text-blue-400"></i>
                         </div>
-                        <span class="route-label-h absolute -bottom-4 text-[9px] text-white/50 font-semibold whitespace-nowrap">{{ \Illuminate\Support\Str::limit($visit->customer->name, 14) }}</span>
+                        <span class="route-label-h absolute -bottom-4 text-[9px] text-[var(--text-soft)] font-semibold whitespace-nowrap">{{ \Illuminate\Support\Str::limit($visit->customer->name, 14) }}</span>
                     </div>
 
                     @foreach($visit->pitstops as $idx => $ps)
                         <div class="flex-1 h-[2px] route-line-h mx-1"></div>
                         <div class="road-node relative flex flex-col items-center cursor-pointer" data-target="stop-{{ $idx }}">
-                            <div class="w-8 h-8 rounded-full bg-[#ff2ba6] text-white text-xs font-bold flex items-center justify-center z-10 route-marker shadow-lg shadow-[#ff2ba6]/30 border-2 border-white/20">{{ $idx + 1 }}</div>
-                            <span class="route-label-h absolute -bottom-4 text-[9px] text-white/50 font-medium whitespace-nowrap">{{ \Illuminate\Support\Str::limit($ps->customer->name ?? 'N/A', 14) }}</span>
+                            <div class="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-bold flex items-center justify-center z-10 route-marker shadow-lg shadow-[var(--accent-softer)] border-2 border-[var(--border)]">{{ $idx + 1 }}</div>
+                            <span class="route-label-h absolute -bottom-4 text-[9px] text-[var(--text-soft)] font-medium whitespace-nowrap">{{ \Illuminate\Support\Str::limit($ps->customer->name ?? 'N/A', 14) }}</span>
                         </div>
                     @endforeach
 
                     <div class="flex-1 h-[2px] route-line-h mx-1"></div>
 
                     <div class="road-node relative flex flex-col items-center cursor-pointer" data-target="office-end">
-                        <div class="w-8 h-8 rounded-full bg-[#ff2ba6]/20 border-2 border-[#ff2ba6]/50 flex items-center justify-center z-10 route-car">
-                            <i data-lucide="building" class="w-3.5 h-3.5 text-[#ff2ba6]"></i>
+                        <div class="w-8 h-8 rounded-full bg-[var(--accent-softer)] border-2 border-[var(--accent-soft)] flex items-center justify-center z-10 route-car">
+                            <i data-lucide="building" class="w-3.5 h-3.5 text-[var(--accent)]"></i>
                         </div>
-                        <span class="route-label-h absolute -bottom-4 text-[9px] text-white/40 font-medium whitespace-nowrap">Office</span>
+                        <span class="route-label-h absolute -bottom-4 text-[9px] text-[var(--text-soft)] font-medium whitespace-nowrap">Office</span>
                     </div>
                     <div id="roadCar" style="position:absolute;top:50%;left:0;z-index:5;transform:translateY(calc(-50% - 5px));pointer-events:none;opacity:0;will-change:left,opacity;">
                         <div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 90 70" fill="white" style="filter:drop-shadow(0 2px 6px rgba(255,255,255,0.3));">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 90 70" fill="var(--text)" style="filter:drop-shadow(0 2px 6px rgba(120,110,135,0.3));">
                                 <path d="M75.48 36.05l-7.99-1.22-2.35-2.57c-5.6-6.13-13.57-9.65-21.87-9.65h-6.25c-1.36 0-2.7.11-4.02.3-.02 0-.04.01-.06.01-7.8 1.13-14.8 5.47-19.29 12.11C5.71 37.91 0 45.36 0 52.95c0 3.25 2.65 5.9 5.9 5.9h3.45c.97 4.87 5.27 8.55 10.42 8.55s9.45-3.68 10.42-8.55h30.14c.97 4.87 5.27 8.55 10.42 8.55s9.45-3.68 10.42-8.55H84.1c3.25 0 5.9-2.65 5.9-5.9 0-7.6-6.11-14.71-14.52-15.99zm-32.21-9.44c7.07 0 13.85 2.95 18.68 8.09H39.46l-3.27-8.07c.28-.01.55-.03.83-.03h6.25zm-11.19.52l3.07 7.58H18.97c3.46-3.88 8.05-6.53 13.11-7.58zm-12.31 36.28c-3.65 0-6.62-2.97-6.62-6.62s2.97-6.62 6.62-6.62 6.62 2.97 6.62 6.62-2.97 6.62-6.62 6.62zm50.97 0c-3.65 0-6.62-2.97-6.62-6.62s2.97-6.62 6.62-6.62 6.62 2.97 6.62 6.62-2.97 6.62-6.62 6.62z"/>
                                 <circle cx="19.77" cy="56.78" r="1.96" fill="rgba(0,0,0,0.4)"/>
                                 <circle cx="70.74" cy="56.78" r="1.96" fill="rgba(0,0,0,0.4)"/>
@@ -196,11 +199,11 @@
 
         <script>
         var roadModalData = roadModalData || {};
-        roadModalData['office-start'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-green-500/20 border border-green-400/40 flex items-center justify-center"><i data-lucide="home" class="w-3 h-3 text-green-400"></i></div><div><div class="text-white font-semibold text-sm">Office</div><div class="text-white/40 text-[10px]">Start Point</div></div></div><p class="text-white/50 text-xs">Visit started from office location</p>';
-        roadModalData['main-customer'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center"><i data-lucide="user" class="w-3 h-3 text-blue-400"></i></div><div><div class="text-white font-semibold text-sm">{!! addslashes($visit->customer->name) !!}</div><div class="text-white/40 text-[10px]">Main Visit</div></div></div><div class="space-y-1.5 text-xs"><div class="flex items-center gap-1.5 text-white/60"><i data-lucide="target" class="w-2.5 h-2.5 text-blue-400 shrink-0"></i>{!! addslashes($visit->purpose) !!}</div>@if($visit->notes)<div class="flex items-start gap-1.5 text-white/50"><i data-lucide="sticky-note" class="w-2.5 h-2.5 text-white/30 shrink-0 mt-0.5"></i><span class="italic break-words">"{!! \Illuminate\Support\Str::limit($visit->notes, 80) !!}"</span></div>@endif @if($visit->distance_km)<div class="flex items-center gap-1.5 text-white/60"><i data-lucide="map-pin" class="w-2.5 h-2.5 text-blue-400 shrink-0"></i>{{ $visit->distance_km }} km</div>@endif</div>';
-        roadModalData['office-end'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[#ff2ba6]/20 border border-[#ff2ba6]/40 flex items-center justify-center"><i data-lucide="building" class="w-3 h-3 text-[#ff2ba6]"></i></div><div><div class="text-white font-semibold text-sm">Office</div><div class="text-white/40 text-[10px]">End Point</div></div></div><p class="text-white/50 text-xs">Return to office after visit</p>@if($visit->pitstops && count($visit->pitstops) > 0 && $visit->pitstop_total_km)<div class="mt-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#ff2ba6]/10 border border-[#ff2ba6]/30"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#ff2ba6] shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2.5 2.5"/></svg><span class="text-[#ff2ba6] text-xs font-bold">Total Trip: {{ $visit->pitstop_total_km }} km</span></div>@endif';
+        roadModalData['office-start'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center"><i data-lucide="home" class="w-3 h-3 text-emerald-400"></i></div><div><div class="text-[var(--text)] font-semibold text-sm">Office</div><div class="text-[var(--text-soft)] text-[10px]">Start Point</div></div></div><p class="text-[var(--text-soft)] text-xs">Visit started from office location</p>';
+        roadModalData['main-customer'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center"><i data-lucide="user" class="w-3 h-3 text-blue-400"></i></div><div><div class="text-[var(--text)] font-semibold text-sm">{!! addslashes($visit->customer->name) !!}</div><div class="text-[var(--text-soft)] text-[10px]">Main Visit</div></div></div><div class="space-y-1.5 text-xs"><div class="flex items-center gap-1.5 text-[var(--text-soft)]"><i data-lucide="target" class="w-2.5 h-2.5 text-blue-400 shrink-0"></i>{!! addslashes($visit->purpose) !!}</div>@if($visit->notes)<div class="flex items-start gap-1.5 text-[var(--text-soft)]"><i data-lucide="sticky-note" class="w-2.5 h-2.5 text-[var(--text-soft)] shrink-0 mt-0.5"></i><span class="italic break-words">"{!! \Illuminate\Support\Str::limit($visit->notes, 80) !!}"</span></div>@endif @if($visit->distance_km)<div class="flex items-center gap-1.5 text-[var(--text-soft)]"><i data-lucide="map-pin" class="w-2.5 h-2.5 text-blue-400 shrink-0"></i>{{ $visit->distance_km }} km</div>@endif</div>';
+        roadModalData['office-end'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[var(--accent-softer)] border border-[var(--accent-soft)] flex items-center justify-center"><i data-lucide="building" class="w-3 h-3 text-[var(--accent)]"></i></div><div><div class="text-[var(--text)] font-semibold text-sm">Office</div><div class="text-[var(--text-soft)] text-[10px]">End Point</div></div></div><p class="text-[var(--text-soft)] text-xs">Return to office after visit</p>@if($visit->pitstops && count($visit->pitstops) > 0 && $visit->pitstop_total_km)<div class="mt-2 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--accent-softer)] border border-[var(--accent-soft)]"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[var(--accent)] shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2.5 2.5"/></svg><span class="text-[var(--accent)] text-xs font-bold">Total Trip: {{ $visit->pitstop_total_km }} km</span></div>@endif';
         @foreach($visit->pitstops as $idx => $ps)
-        roadModalData['stop-{{ $idx }}'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[#ff2ba6] text-white text-[10px] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</div><div><div class="text-white font-semibold text-sm">{!! addslashes($ps->customer->name ?? 'N/A') !!}</div><div class="text-white/40 text-[10px]">{{ $ps->visited_at ? $ps->visited_at->format('d M, h:i A') : '-' }}</div></div></div><div class="space-y-1.5 text-xs">@if($ps->purpose)<div class="flex items-center gap-1.5 text-white/60"><i data-lucide="target" class="w-2.5 h-2.5 text-[#ff2ba6] shrink-0"></i>{!! addslashes($ps->purpose) !!}</div>@endif @if($ps->notes)<div class="flex items-start gap-1.5 text-white/50"><i data-lucide="sticky-note" class="w-2.5 h-2.5 text-white/30 shrink-0 mt-0.5"></i><span class="italic break-words">"{!! \Illuminate\Support\Str::limit($ps->notes, 80) !!}"</span></div>@endif @if($ps->distance_km)<div class="flex items-center gap-1.5 text-white/60"><i data-lucide="map-pin" class="w-2.5 h-2.5 text-[#ff2ba6] shrink-0"></i>{{ $ps->distance_km }} km</div>@endif @if($ps->images && count($ps->images) > 0)<div class="flex gap-1.5 mt-2 flex-wrap">@foreach($ps->images as $img)<img src="{{ asset($img) }}" class="w-10 h-10 object-cover rounded-lg border border-white/10 road-pitstop-img cursor-pointer" onclick="event.stopPropagation();openRoadImage(this.src)">@endforeach</div>@endif</div>';
+        roadModalData['stop-{{ $idx }}'] = '<div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-full bg-[var(--accent)] text-white text-[10px] font-bold flex items-center justify-center shrink-0">{{ $idx + 1 }}</div><div><div class="text-[var(--text)] font-semibold text-sm">{!! addslashes($ps->customer->name ?? 'N/A') !!}</div><div class="text-[var(--text-soft)] text-[10px]">{{ $ps->visited_at ? $ps->visited_at->format('d M, h:i A') : '-' }}</div></div></div><div class="space-y-1.5 text-xs">@if($ps->purpose)<div class="flex items-center gap-1.5 text-[var(--text-soft)]"><i data-lucide="target" class="w-2.5 h-2.5 text-[var(--accent)] shrink-0"></i>{!! addslashes($ps->purpose) !!}</div>@endif @if($ps->notes)<div class="flex items-start gap-1.5 text-[var(--text-soft)]"><i data-lucide="sticky-note" class="w-2.5 h-2.5 text-[var(--text-soft)] shrink-0 mt-0.5"></i><span class="italic break-words">"{!! \Illuminate\Support\Str::limit($ps->notes, 80) !!}"</span></div>@endif @if($ps->distance_km)<div class="flex items-center gap-1.5 text-[var(--text-soft)]"><i data-lucide="map-pin" class="w-2.5 h-2.5 text-[var(--accent)] shrink-0"></i>{{ $ps->distance_km }} km</div>@endif @if($ps->images && count($ps->images) > 0)<div class="flex gap-1.5 mt-2 flex-wrap">@foreach($ps->images as $img)<img src="{{ asset($img) }}" class="w-10 h-10 object-cover rounded-lg border border-[var(--border)] road-pitstop-img cursor-pointer" onclick="event.stopPropagation();openRoadImage(this.src)">@endforeach</div>@endif</div>';
         @endforeach
         </script>
         @endif
@@ -208,7 +211,7 @@
         {{-- ROAD MODAL (always rendered) --}}
         <div id="road-modal-overlay" onclick="closeRoadModal()" style="position:fixed !important;top:0;left:0;right:0;bottom:0;z-index:9998;"></div>
         <div id="road-modal-box" style="position:fixed !important;z-index:9999;max-width:calc(100vw - 2rem);width:max-content;min-width:16rem;">
-            <div class="bg-[#0f172a] border border-white/20 rounded-xl p-4 shadow-2xl">
+            <div class="card !rounded-xl p-4 shadow-card-lg" style="border:1px solid var(--border);">
                 <div id="road-modal-content"></div>
             </div>
         </div>
@@ -226,7 +229,7 @@
             var overlay = document.getElementById('road-modal-overlay');
             var key = node.getAttribute('data-target');
             content.innerHTML = (typeof roadModalData !== 'undefined' && roadModalData[key]) ? roadModalData[key] : '';
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (window.SigmaIcons) window.SigmaIcons.refresh();
             box.classList.add('show');
             overlay.classList.add('show');
         }
@@ -364,28 +367,23 @@
         </script>
 
         <div class="mt-8">
-            <h2 class="text-xl font-semibold mb-3 text-white flex items-center">
+            <h2 class="text-xl font-semibold mb-3 text-[var(--text)] flex items-center">
                 <i data-lucide="image" class="w-6 h-6 mr-2 text-sky-400"></i> Uploaded Images
             </h2>
 
-            <button
-                onclick="toggleImageModal()"
-                class="px-5 py-2 rounded-xl bg-gradient-to-r from-[#ff2ba6] to-[#ff2ba6]
-                       text-white font-semibold shadow hover:opacity-90 transition flex items-center">
+            <button onclick="toggleImageModal()" class="btn btn-primary">
                 <i data-lucide="eye" class="w-4 h-4 mr-2"></i> Preview Documents
             </button>
 
             @if(!$visit->images || count($visit->images) == 0)
-                <p class="text-white/60 mt-3 flex items-center">
+                <p class="mt-3 muted flex items-center">
                     <i data-lucide="image-off" class="w-4 h-4 mr-2"></i> No images available
                 </p>
             @endif
         </div>
 
         <div class="mt-8 text-center md:text-right">
-            <a href="{{ route('salehead.reports.index') }}"
-               class="inline-block px-6 py-3 bg-purple-600/80 hover:bg-purple-600
-                      text-white font-semibold rounded-xl shadow-lg transition flex items-center justify-center md:inline-flex md:justify-end">
+            <a href="{{ route('salehead.reports.index') }}" class="btn btn-outline">
                 <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Visits
             </a>
         </div>
@@ -400,20 +398,20 @@
             flex justify-center items-center"
      style="position:fixed !important;inset:0;z-index:50;padding:1rem;">
 
-    <div class="relative bg-white/5 border border-white/10 rounded-3xl p-6 w-full max-w-3xl shadow-2xl
+    <div class="relative card !rounded-3xl p-6 w-full max-w-3xl shadow-card-lg
                 transform transition-all duration-300 scale-95 opacity-0"
          id="imageModalContent">
 
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-bold text-white flex items-center tracking-wide">
-                <i data-lucide="gallery-vertical-end" class="w-6 h-6 mr-2 text-pink-400"></i>
+            <h3 class="text-2xl font-bold text-[var(--text)] flex items-center tracking-wide">
+                <i data-lucide="gallery-vertical-end" class="w-6 h-6 mr-2 text-[var(--accent)]"></i>
                 Documents Preview
             </h3>
 
             <button onclick="toggleImageModal()"
-                class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-red-500/40
-                       transition text-white shadow-lg">
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-[var(--accent-softer)] hover:bg-red-500/40
+                       transition text-[var(--text)] shadow-lg">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
@@ -421,7 +419,7 @@
         @if($visit->images && count($visit->images))
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-5"> @foreach($visit->images as $img)
                         <div
-    class="rounded-xl overflow-hidden bg-white/10 border border-white/10 shadow-lg cursor-pointer preview-image flex itmes-center justify-center"
+    class="rounded-xl overflow-hidden bg-[var(--accent-softer)] border border-[var(--border)] shadow-lg cursor-pointer preview-image flex itmes-center justify-center"
     data-image="{{ asset($img) }}"
 >
                               <div class="w-full aspect-square overflow-hidden">
@@ -430,7 +428,7 @@
                     @endforeach
                 </div>
             @else
-                <p class="text-white/60 text-lg">No images available</p>
+                <p class="muted text-lg">No images available</p>
             @endif
 
     </div>
