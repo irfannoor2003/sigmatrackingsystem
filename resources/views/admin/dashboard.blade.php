@@ -263,10 +263,19 @@
                     </div>
                     <div class="min-w-0">
                         <p class="text-sm text-[var(--text)]">
-                            <strong>{{ $v->salesman->name }}</strong> started visit at
+                            <strong>{{ $v->salesman->name }}</strong>
+                            @if($v->status === 'completed')
+                                completed visit at
+                            @elseif($v->status === 'cancelled')
+                                cancelled visit at
+                            @elseif($v->status === 'blocked')
+                                blocked visit at
+                            @else
+                                started visit at
+                            @endif
                             <strong>{{ $v->customer->name }}</strong>
                         </p>
-                        <span class="text-xs muted">{{ $v->created_at->diffForHumans() }}</span>
+                        <span class="text-xs muted">{{ ($v->completed_at ?? $v->started_at ?? $v->created_at)->diffForHumans() }}</span>
                     </div>
                 </li>
             @empty

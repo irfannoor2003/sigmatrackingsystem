@@ -161,6 +161,7 @@ class HrDashboardController extends Controller
         $user = User::findOrFail($id);
 
         $attendanceRecords = Attendance::where('salesman_id', $id)
+            ->with('markedBy')
             ->whereMonth('date', $date->month)
             ->whereYear('date', $date->year)
             ->get()
@@ -261,12 +262,46 @@ class HrDashboardController extends Controller
 
     public function markLeave(Request $request, $id)
     {
-        $request->validate(['date' => 'required|date', 'note' => 'nullable|string']);
-        Attendance::updateOrCreate(
-            ['salesman_id' => $id, 'date' => $request->date],
-            ['status' => 'leave', 'note' => $request->note, 'office_verified' => true, 'short_leave' => false]
-        );
-        return back()->with('success', 'Leave marked successfully.');
+        $request->validate([
+            'start_date' => 'required_without:date|date',
+            'date'       => 'required_without:start_date|date',
+            'end_date'   => 'nullable|date|after_or_equal:start_date',
+            'note'       => 'nullable|string',
+        ]);
+
+        $start = Carbon::parse($request->start_date ?? $request->date)->startOfDay();
+        $end   = Carbon::parse($request->end_date ?? $request->start_date ?? $request->date)->startOfDay();
+
+        $marked = 0;
+        $skippedSundays = [];
+
+        while ($start->lte($end)) {
+            if ($start->isSunday()) {
+                $skippedSundays[] = $start->toDateString();
+                $start->addDay();
+                continue;
+            }
+
+            Attendance::updateOrCreate(
+                ['salesman_id' => $id, 'date' => $start->toDateString()],
+                ['status' => 'leave', 'note' => $request->note, 'office_verified' => true, 'short_leave' => false, 'marked_by' => auth()->id()]
+            );
+
+            $marked++;
+            $start->addDay();
+        }
+
+        if ($marked === 0) {
+            return back()->with('warning', 'No leave was marked — the selected range only contains Sundays.');
+        }
+
+        $message = 'Leave marked successfully for ' . $marked . ' day' . ($marked > 1 ? 's' : '') . '.';
+
+        if ($skippedSundays) {
+            $message .= ' Sundays were skipped (weekly off).';
+        }
+
+        return back()->with('success', $message);
     }
 
     public function storeManualVisit(Request $request, $userId)

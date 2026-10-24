@@ -29,9 +29,9 @@ class AdminDashboardController extends Controller
             ->limit(6)
             ->get();
 
-        // Visit Activities
+        // Visit Activities (include starts & completions; order by latest change)
         $visitActivities = Visit::with('salesman', 'customer')
-            ->latest()
+            ->latest('updated_at')
             ->limit(6)
             ->get();
 
@@ -72,6 +72,53 @@ public function lateStaff()
     return view('admin.attendance.late-staff', compact('lateStaff', 'today', 'allTodayAttendance'))
         ->with('backRoute', route('admin.dashboard'));
 }
+
+    public function sidebarActivity()
+    {
+        $attendances = Attendance::with('salesman')
+            ->whereDate('date', Carbon::today())
+            ->whereNotNull('clock_in')
+            ->orderByDesc('clock_in')
+            ->limit(3)
+            ->get()
+            ->map(function ($a) {
+                return [
+                    'name' => $a->salesman->name ?? '—',
+                    'status' => $a->status,
+                    'clock_in' => $a->clock_in?->format('H:i'),
+                    'clock_out' => $a->clock_out?->format('H:i'),
+                    'clock_in_iso' => $a->clock_in?->toIso8601String(),
+                    'clock_out_iso' => $a->clock_out?->toIso8601String(),
+                    'total_minutes' => $a->total_minutes,
+                    'open' => is_null($a->clock_out),
+                ];
+            });
+
+        $visits = Visit::with('salesman', 'customer')
+            ->orderByDesc('started_at')
+            ->limit(3)
+            ->get()
+            ->map(function ($v) {
+                return [
+                    'salesman' => $v->salesman->name ?? '—',
+                    'customer' => $v->customer->name ?? '—',
+                    'status' => $v->status,
+                    'started_at' => $v->started_at?->format('H:i'),
+                    'completed_at' => $v->completed_at?->format('H:i'),
+                    'cancelled_at' => $v->cancelled_at?->format('H:i'),
+                    'started_iso' => $v->started_at?->toIso8601String(),
+                    'completed_iso' => $v->completed_at?->toIso8601String(),
+                    'cancelled_iso' => $v->cancelled_at?->toIso8601String(),
+                    'open' => $v->status === 'started',
+                ];
+            });
+
+        return response()->json([
+            'attendances' => $attendances,
+            'visits' => $visits,
+            'cancelled_visits' => Visit::where('status', 'cancelled')->count(),
+        ]);
+    }
 
 public function todayAttendance()
 {

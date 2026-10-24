@@ -133,6 +133,9 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/attendance/late-staff', [AdminDashboardController::class, 'lateStaff'])
             ->name('attendance.late-staff');
 
+        Route::get('/sidebar-activity', [AdminDashboardController::class, 'sidebarActivity'])
+            ->name('sidebar.activity');
+
         /* ---------------- Salesmen ---------------- */
         Route::resource('salesmen', AdminSalesmanController::class)
             ->except(['show']);

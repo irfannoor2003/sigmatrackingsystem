@@ -90,7 +90,11 @@ $weeks = collect($calendar)->chunk(7);
                     @csrf
                     <div class="input-icon-wrap">
                         <i data-lucide="calendar" class="w-4 h-4"></i>
-                        <input type="date" name="date" required class="input w-full">
+                        <input type="date" name="start_date" required class="input w-full" placeholder="Start date">
+                    </div>
+                    <div class="input-icon-wrap">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <input type="date" name="end_date" class="input w-full" placeholder="End date (optional)">
                     </div>
                     <textarea name="note" rows="3" required class="textarea w-full" placeholder="Leave reason"></textarea>
                     <button class="btn btn-danger w-full !py-3">
@@ -239,6 +243,16 @@ $weeks = collect($calendar)->chunk(7);
                                             </span>
                                         @endif
                                         @if($attendance->status === 'leave')
+                                            @php
+                                                $markerRole = $attendance->markedBy?->role;
+                                                $markerLabel = $markerRole === 'hr' ? 'By HR' : 'By Admin';
+                                            @endphp
+                                            @if($attendance->markedBy)
+                                                <span class="badge badge-violet"
+                                                      title="Marked {{ $markerLabel }}{{ $attendance->markedBy ? ' · ' . $attendance->markedBy->name : '' }}{{ $attendance->note ? ' · ' . $attendance->note : '' }}">
+                                                    {{ $markerLabel }}
+                                                </span>
+                                            @endif
                                             <span class="badge badge-red" title="{{ \Illuminate\Support\Str::limit($attendance->note, 120) }}">Leave</span>
                                         @endif
                                     </div>

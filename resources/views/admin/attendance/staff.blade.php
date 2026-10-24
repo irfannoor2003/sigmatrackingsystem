@@ -108,8 +108,12 @@ $weeks = collect($calendar)->chunk(7);
                 <form method="POST" action="{{ route('admin.attendance.leave', $user->id) }}" class="space-y-3">
                     @csrf
                     <div>
-                        <label class="label">Date</label>
-                        <input type="date" name="date" required class="input">
+                        <label class="label">Start Date</label>
+                        <input type="date" name="start_date" required class="input">
+                    </div>
+                    <div>
+                        <label class="label">End Date <span class="muted font-normal">(optional)</span></label>
+                        <input type="date" name="end_date" class="input">
                     </div>
                     <div>
                         <label class="label">Leave Reason</label>
@@ -258,6 +262,16 @@ $weeks = collect($calendar)->chunk(7);
                                             </span>
                                         @endif
                                         @if($attendance->status === 'leave')
+                                            @php
+                                                $markerRole = $attendance->markedBy?->role;
+                                                $markerLabel = $markerRole === 'hr' ? 'By HR' : 'By Admin';
+                                            @endphp
+                                            @if($attendance->markedBy)
+                                                <span class="badge badge-violet"
+                                                      title="Marked {{ $markerLabel }}{{ $attendance->markedBy ? ' · ' . $attendance->markedBy->name : '' }}{{ $attendance->note ? ' · ' . $attendance->note : '' }}">
+                                                    {{ $markerLabel }}
+                                                </span>
+                                            @endif
                                             <span class="badge badge-red" title="{{ \Illuminate\Support\Str::limit($attendance->note, 120) }}">Leave</span>
                                         @endif
                                     </div>

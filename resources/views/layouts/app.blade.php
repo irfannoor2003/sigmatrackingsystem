@@ -594,6 +594,168 @@
         @endforeach
     </div>
 
+    @if(auth()->check() && auth()->user()->role === 'admin')
+    <button type="button" id="admin-side-toggle" aria-label="Open live activity"
+    class="fixed right-0 z-[9999] shadow-lg flex items-center justify-center text-[var(--accent)] transition-transform duration-500"
+    style="top:50%;width:18px;height:104px;border-top-left-radius:10px;border-bottom-left-radius:10px;transform:translate(0,-50%);background:var(--glass-bg);border:1px solid var(--glass-border);border-right:0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+</button>
+    <div id="admin-side-backdrop" class="fixed inset-0 z-[9997] bg-black/40 hidden transition-opacity duration-300"></div>
+    <div id="admin-side-drawer" role="dialog" aria-label="Live Activity" aria-hidden="true"
+    class="fixed right-4 z-[9998] flex flex-col overflow-hidden rounded-3xl shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
+    style="top:max(1rem, env(safe-area-inset-top));
+           bottom:max(1rem, env(safe-area-inset-bottom));
+           width:min(580px, calc(100vw - 2rem));
+           transform:translateX(calc(100% + 1.5rem));
+           background:var(--glass-bg);
+           backdrop-filter:blur(var(--glass-blur));
+           -webkit-backdrop-filter:blur(var(--glass-blur));
+           border:1px solid var(--glass-border);">
+
+    {{-- Fixed header --}}
+    <div class="flex shrink-0 items-center justify-between gap-2 px-4 pt-4 pb-3 sm:px-6 sm:pt-6">
+        <h3 class="font-display font-semibold text-[var(--text)] flex items-center gap-2 min-w-0">
+            <i data-lucide="activity" class="w-5 h-5 text-[var(--accent)] shrink-0"></i>
+            <span class="truncate">Live Activity</span>
+        </h3>
+        <div class="flex items-center gap-2 shrink-0">
+            <span class="live-pill"><span></span> Live</span>
+            <button type="button" id="admin-side-close" class="icon-btn !w-8 !h-8" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+
+    {{-- Scrollable body --}}
+    <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6 sm:px-6">
+        <div class="mb-5">
+            <div class="flex items-center justify-between gap-2 mb-2">
+                <p class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2">
+                    <i data-lucide="calendar-clock" class="w-4 h-4"></i> Attendance (3)
+                </p>
+                <a href="{{ route('admin.attendance.today') }}" class="text-xs font-semibold text-[var(--accent)] hover:underline shrink-0">View all</a>
+            </div>
+            <div id="side-attendance" class="space-y-3"></div>
+        </div>
+        <div>
+            <div class="flex items-center justify-between gap-2 mb-2">
+                <p class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-2 flex-wrap">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i> Visits (3)
+                    <span id="side-cancelled" class="text-[10px] font-semibold text-red-500"></span>
+                </p>
+                <a href="{{ route('admin.reports.index') }}" class="text-xs font-semibold text-[var(--accent)] hover:underline shrink-0">View all</a>
+            </div>
+            <div id="side-visits" class="space-y-3"></div>
+        </div>
+    </div>
+</div>
+    <script>
+        (function(){
+            const toggle = document.getElementById('admin-side-toggle');
+            const drawer = document.getElementById('admin-side-drawer');
+            const backdrop = document.getElementById('admin-side-backdrop');
+            const closeBtn = document.getElementById('admin-side-close');
+            let open = false;
+            const chevLeft = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+            const chevRight = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+            toggle.innerHTML = chevLeft;
+            function setOpen(state) {
+                open = state;
+                drawer.style.transform = open ? 'translateX(0)' : 'translateX(calc(100% + 1.5rem))';
+                drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+                toggle.innerHTML = open ? chevRight : chevLeft;
+                if (backdrop) backdrop.classList.toggle('hidden', !open);
+                document.documentElement.style.overflow = open ? 'hidden' : ''; // stop page scrolling behind it
+                syncToggle();
+            }
+
+            function syncToggle() {
+                const narrow = window.innerWidth < 700;
+                if (open && narrow) {
+                    toggle.style.opacity = '0';
+                    toggle.style.pointerEvents = 'none';
+                    return;
+                }
+                toggle.style.opacity = '';
+                toggle.style.pointerEvents = '';
+                if (open) {
+                    const offset = 16 + drawer.offsetWidth + 4;
+                    toggle.style.transform = 'translate(-' + offset + 'px, -50%)';
+                } else {
+                    toggle.style.transform = 'translate(0, -50%)';
+                }
+            }
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                setOpen(!open);
+            });
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setOpen(false);
+                });
+            }
+            if (backdrop) {
+                backdrop.addEventListener('click', () => setOpen(false));
+            }
+            document.addEventListener('click', (e) => {
+                if (open && !drawer.contains(e.target) && !toggle.contains(e.target) && !(backdrop && backdrop.contains(e.target))) {
+                    setOpen(false);
+                }
+            });
+            // keep toggle aligned with drawer on resize / zoom
+            window.addEventListener('resize', syncToggle);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', syncToggle);
+                window.visualViewport.addEventListener('scroll', syncToggle);
+            }
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(syncToggle);
+                ro.observe(drawer);
+                ro.observe(document.documentElement);
+            }
+            function fmt(ms){ if(ms<0)ms=0; const s=Math.floor(ms/1000); const h=Math.floor(s/3600); const m=Math.floor((s%3600)/60); const sec=s%60; return (h>0?h+':':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+            async function load(){
+                try {
+                    const res = await fetch('{{ route('admin.sidebar.activity') }}');
+                    const data = await res.json();
+                    const attEl = document.getElementById('side-attendance');
+                    const visEl = document.getElementById('side-visits');
+                    const canEl = document.getElementById('side-cancelled');
+                    attEl.innerHTML=''; visEl.innerHTML='';
+                    if (canEl) canEl.textContent = data.cancelled_visits ? ('Cancelled: ' + data.cancelled_visits) : '';
+                    (data.attendances||[]).forEach(a=>{
+                        const div=document.createElement('div');
+                        div.className='rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-xs space-y-1.5 shadow-sm';
+                        div.innerHTML=`<div class="font-semibold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${a.name}</div><div class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Start: ${a.clock_in||'--'} · End: ${a.clock_out||'—'}</div><div class="text-[var(--text-muted)] flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Work: <span data-live="${a.open?'att':''}" data-start="${a.clock_in_iso||''}">${a.total_minutes?Math.floor(a.total_minutes/60)+':'+String(a.total_minutes%60).padStart(2,'0'):(a.open?'00:00':'--')}</span></div>`;
+                        attEl.appendChild(div);
+                    });
+                    (data.visits||[]).forEach(v=>{
+                        const div=document.createElement('div');
+                        div.className='rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-3 text-xs space-y-1.5 shadow-sm';
+                        const endLabel = v.cancelled_at ? ('Cancelled ' + v.cancelled_at) : (v.completed_at ? ('End ' + v.completed_at) : '—');
+                        const liveEnd = v.cancelled_iso || v.completed_iso || '';
+                        const live = v.open ? '00:00' : (v.cancelled_at ? 'Cancelled' : (v.completed_at ? '' : '--'));
+                        div.innerHTML=`<div class="font-semibold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${v.salesman} <span class="opacity-60">→</span> <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${v.customer}</div><div class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Start: ${v.started_at||'--'} · ${endLabel}</div><div class="text-[var(--text-muted)] flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Time: <span data-live="${v.open?'visit':''}" data-start="${v.started_iso||''}" data-end="${liveEnd}">${live}</span></div>`;
+                        visEl.appendChild(div);
+                    });
+                    if (window.lucide) { lucide.createIcons(); }
+                }catch(e){}
+            }
+            function tick(){
+                document.querySelectorAll('[data-live]').forEach(el=>{
+                    const start=el.getAttribute('data-start'); const end=el.getAttribute('data-end');
+                    if(!start) return;
+                    const s=new Date(start).getTime(); const e=end?new Date(end).getTime():Date.now();
+                    el.textContent=fmt(e-s);
+                });
+            }
+            load(); setInterval(load,30000); setInterval(tick,1000); tick();
+            if (window.lucide) { lucide.createIcons(); }
+        })();
+    </script>
+    @endif
+
     @stack('scripts')
     @yield('scripts')
 </body>
